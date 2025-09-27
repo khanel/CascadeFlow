@@ -43,3 +43,40 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# IDEs and tooling
+.vscode/
+
+# Additional Flutter artifacts
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+lib/generated_plugin_registrant.dart
+lib/l10n/
+
+# Android/Gradle secrets
+android/local.properties
+android/key.properties
+*.keystore
+*.jks
+
+# iOS/macOS build outputs
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Generated.xcconfig
+ios/Flutter/ephemeral/
+ios/Runner.xcworkspace/
+ios/Pods/
+macos/Flutter/ephemeral/
+
+# Windows/Linux build outputs
+windows/runner/Debug/
+windows/runner/Release/
+windows/runner/x64/
+windows/runner/x86/
+linux/flutter/ephemeral/
+
+# Reports and temp files
+reports/
+.tmp/
+.temp/

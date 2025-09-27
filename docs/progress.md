@@ -7,7 +7,7 @@ Use this checklist to track progress against the roadmap. Tick off tasks as they
 - [x] 2. Create Flutter project skeleton
 - [x] 3. Add project-specific README with overview, setup, and license info
 - [x] 4. Add MIT LICENSE file
-- [ ] 5. Customize `.gitignore` for Flutter project needs
+- [x] 5. Customize `.gitignore` for Flutter project needs
 - [ ] 6. Configure `analysis_options.yaml` with strict linting rules (e.g., `very_good_analysis`)
 - [ ] 7. Add initial core dependencies (Riverpod, GoRouter, Injectable, GetIt) to top-level `pubspec.yaml`
 - [ ] 8. Create `packages/` directory structure for architecture layers
