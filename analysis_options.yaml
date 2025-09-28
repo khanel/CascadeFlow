@@ -5,13 +5,37 @@
 # IDEs (https://dart.dev/tools#ides-and-editors). The analyzer can also be
 # invoked from the command line by running `flutter analyze`.
 
-# The following line activates a set of recommended lints for Flutter apps,
-# packages, and plugins designed to encourage good coding practices.
-include: package:flutter_lints/flutter.yaml
+# The following line activates the Very Good Analysis baseline, which layers a
+# comprehensive set of Dart & Flutter lints on top of the official recommended
+# rules. See: https://pub.dev/packages/very_good_analysis
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  # Enable strict language checks to surface type-safety issues early. These
+  # match the Very Good Analysis defaults and are recommended by dart.dev.
+  language:
+    strict-casts: true      # Disallow implicit downcasts; require explicit casts.
+    strict-inference: true  # Require types to be inferrable; avoids dynamic.
+    strict-raw-types: true  # Forbid raw generics; enforce type arguments.
+
+  # Treat a few common pitfalls as hard errors so they can't slip into main.
+  errors:
+    missing_required_param: error        # Catch API misuse at compile time.
+    missing_return: error                # Ensure functions with return types return.
+    dead_code: error                     # Prevent unreachable code from lingering.
+    invalid_use_of_visible_for_testing_member: error  # Guard internal-only APIs.
+
+  # Ignore generated and tool-managed files—they shouldn't be hand-edited or linted.
+  exclude:
+    - '**/*.g.dart'
+    - '**/*.freezed.dart'
+    - '**/*.gen.dart'
+    - '**/*.mocks.dart'
+    - 'build/**'
 
 linter:
   # The lint rules applied to this project can be customized in the
-  # section below to disable rules from the `package:flutter_lints/flutter.yaml`
+  # section below to disable rules from the Very Good Analysis preset
   # included above or to enable additional rules. A list of all available lints
   # and their documentation is published at https://dart.dev/lints.
   #
@@ -21,8 +45,42 @@ linter:
   # `// ignore_for_file: name_of_lint` syntax on the line or in the file
   # producing the lint.
   rules:
-    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
-    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
+    # Keep constructors const so widgets short-circuit rebuilds when inputs do not change.
+    prefer_const_constructors: true
+    # Prefer const literals to avoid repeated allocations for immutable collections.
+    prefer_const_literals_to_create_immutables: true
+    # Enforce single quotes for strings to mirror the `very_good_analysis` style and reduce escaping.
+    prefer_single_quotes: true
+    # Sort child properties after layout-related ones to improve Flutter widget readability.
+    sort_child_properties_last: true
+
+    # Require keys in widget constructors to support efficient diffing when widgets are reordered.
+    use_key_in_widget_constructors: true
+    # Flag wrapper widgets that add no value so widget trees stay shallow and performant.
+    avoid_unnecessary_containers: true
+    # Ensure immutable widgets expose const constructors so they can be reused without rebuilds.
+    prefer_const_constructors_in_immutables: true
+
+    # For production code, prefer `dart:developer log`, `debugPrint`, or a logger
+    # package. This prevents accidental stdout noise and keeps logs structured.
+    avoid_print: true
+    # Force package imports even within the same package to avoid fragile relative paths.
+    always_use_package_imports: true
+    # Maintain alphabetical ordering in `pubspec.yaml` so merge conflicts and reviews stay manageable.
+    sort_pub_dependencies: true
+
+    # Require `final` fields when values never change to communicate intent and prevent accidental mutation.
+    prefer_final_fields: true
+    # Disallow redundant `this.` access to keep member usage concise and consistent.
+    unnecessary_this: true
+
+    # Additional robustness rules commonly recommended by the Dart team and VGV.
+    # Disallow dynamic method/field invocations, which are a common source of runtime errors.
+    avoid_dynamic_calls: true
+    # Ensure async work is either awaited or intentionally marked via `unawaited(...)`.
+    discarded_futures: true
+    # Enforce stable and conventional ordering of imports (dart, package, relative).
+    directives_ordering: true
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
