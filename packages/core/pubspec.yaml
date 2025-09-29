@@ -9,4 +9,5 @@ environment:
 dependencies: {}
 
 dev_dependencies:
+  test: ^1.25.2
   very_good_analysis: ^10.0.0
