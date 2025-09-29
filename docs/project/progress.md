@@ -9,15 +9,15 @@ Development cadence: every task runs through TDD—write the failing test, add t
 ## Status Snapshot (2025-09-30)
 - Current focus: convert the repo to feature-based Clean Architecture, wire the Melos workspace, and scope the Ingest slice.
 - Next actions:
-  - Scaffold `melos.yaml` and align all `pubspec.yaml` files with path dependencies.
   - Move universal primitives into `core/` and define initial event contracts.
   - Outline Ingest domain/data/presentation tasks ahead of implementation.
-- Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds.
+  - Draft `CONTRIBUTING.md` with contributor workflow and Melos expectations.
+- Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies.
 
 ## Milestone 1 – Workspace Restructure & Tooling
 - [ ] Adopt feature-based directory layout (`/app`, `/core`, `/infrastructure`, `/features/<pillar>`).
-- [ ] Add root `melos.yaml` covering `app`, `core`, `infrastructure`, and each feature package.
-- [ ] Update app/feature `pubspec.yaml` files to use path dependencies and Melos scripts (`melos bootstrap`, `melos run analyze`, `melos test`).
+- [x] Add root `melos.yaml` covering `app`, `core`, `infrastructure`, and each feature package.
+- [x] Update app/feature `pubspec.yaml` files to use path dependencies and Melos scripts (`melos bootstrap`, `melos run analyze`, `melos test`).
 - [ ] Migrate existing code into the new packages without bloating `core`.
 - [ ] Document Melos usage in contributor notes and ensure CI scripts reference it.
 
@@ -201,7 +201,7 @@ This section preserves the original layered roadmap snapshot (with legacy featur
 - [x] 7. Adopt dependency policy and create `docs/development/dependency-log.md`
 - [ ] 8. Add core dependencies only when required by tasks (see per-layer guidance)
 - [x] 9. Create `packages/` directory structure for architecture layers
-- [ ] 10. Configure top-level `pubspec.yaml` with path dependencies to the new packages
+- [x] 10. Configure top-level `pubspec.yaml` with path dependencies to the new packages
 - [ ] 11. Add `CONTRIBUTING.md` with guidelines and workflow expectations
 
 ### Phase 2 – Domain Layer Implementation

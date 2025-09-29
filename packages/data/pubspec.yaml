@@ -1,0 +1,14 @@
+name: cascade_flow_data
+description: Data layer implementations for CascadeFlow features.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: '>=3.9.2 <4.0.0'
+
+dependencies:
+  cascade_flow_core:
+    path: ../core
+
+dev_dependencies:
+  very_good_analysis: ^10.0.0

@@ -1,0 +1,16 @@
+name: cascade_flow_infrastructure
+description: Cross-cutting services and platform integrations for CascadeFlow.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: '>=3.9.2 <4.0.0'
+
+dependencies:
+  cascade_flow_core:
+    path: ../core
+  cascade_flow_data:
+    path: ../data
+
+dev_dependencies:
+  very_good_analysis: ^10.0.0
