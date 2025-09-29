@@ -14,6 +14,14 @@ Template
 
 Entries
 
+- Date: 2025-09-30
+- Changed by: @codex
+- Affected pubspec: packages/core/pubspec.yaml
+- Packages: test@^1.25.2
+- Why: enable core primitives TDD as part of workspace restructure tasks
+- Scope/usage: unit tests validating Result, EntityId, and domain events
+- PR/Issue: n/a
+
 - Date:
 - Changed by:
 - Affected pubspec:

@@ -135,12 +135,30 @@ The **footer** is for extra info, like:
 Here's how to make your commit messages awesome:
 
 1. **Keep Commits Small**: Change one thing per commit—it's easier to describe.
-2. **Be Clear**: Avoid "Did stuff" or "Fixed it." Say what you did!
-3. **Use Commands**: Write "add button," not "button added."
-4. **Short Subjects**: Stick to 50 characters or less.
-5. **Explain Why**: Tell us the reason for the change, not the coding steps.
-6. **Link Issues**: Add "Closes #123" if it solves a task or bug.
-7. **Wrap Lines**: Keep body/footer lines under 72 characters.
+
+---
+
+## TDD Commit Flow
+When working through the red→green→refactor loop, split your work into three commits:
+
+1. **Red** – add only the failing tests. Do not include production code changes yet.
+1. **Green** – implement the minimal code needed to make the new tests pass.
+1. **Refactor** – clean up the production code and tests without changing behaviour. In this phase, verify that you:
+   - eliminate duplication and follow SOLID/DRY principles without altering behaviour
+   - improve naming, structure, and readability for future contributors
+   - optimise for performance or resource usage where the new code introduced overhead
+   - ensure error handling, logging, and edge cases are consistent with project conventions
+   - keep the public API stable and update docs/comments if signatures or responsibilities shift
+   - rerun the full suite to confirm everything stays green after refactoring
+
+Each commit should stay focused on its phase so the history shows the TDD progression clearly.
+
+1. **Be Clear**: Avoid "Did stuff" or "Fixed it." Say what you did!
+1. **Use Commands**: Write "add button," not "button added."
+1. **Short Subjects**: Stick to 50 characters or less.
+1. **Explain Why**: Tell us the reason for the change, not the coding steps.
+1. **Link Issues**: Add "Closes #123" if it solves a task or bug.
+1. **Wrap Lines**: Keep body/footer lines under 72 characters.
 
 ---
 
@@ -215,7 +233,7 @@ Closes #456
    ```
    Git will open your configured editor where you can type a multi-line message.
 
-2. **Using multiple `-m` flags**:
+1. **Using multiple `-m` flags**:
    ```
    git commit -m "feat: add user logout feature" -m "This adds a logout button to the user menu." -m "Closes #456"
    ```
