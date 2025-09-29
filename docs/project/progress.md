@@ -9,17 +9,17 @@ Development cadence: every task runs through TDD—write the failing test, add t
 ## Status Snapshot (2025-09-30)
 - Current focus: convert the repo to feature-based Clean Architecture, wire the Melos workspace, and scope the Ingest slice.
 - Next actions:
-  - Draft `CONTRIBUTING.md` with contributor workflow and Melos expectations.
   - Scaffold feature package directories to adopt the slice layout.
   - Add lightweight helpers reused by multiple slices while keeping business logic out of `core`.
-- Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief.
+  - Define initial infrastructure service stubs (Hive init, secure storage).
+- Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief, CONTRIBUTING workflow guide.
 
 ## Milestone 1 – Workspace Restructure & Tooling
 - [ ] Adopt feature-based directory layout (`/app`, `/core`, `/infrastructure`, `/features/<pillar>`).
 - [x] Add root `melos.yaml` covering `app`, `core`, `infrastructure`, and each feature package.
 - [x] Update app/feature `pubspec.yaml` files to use path dependencies and Melos scripts (`melos bootstrap`, `melos run analyze`, `melos test`).
 - [ ] Migrate existing code into the new packages without bloating `core`.
-- [ ] Document Melos usage in contributor notes and ensure CI scripts reference it.
+- [x] Document Melos usage in contributor notes and ensure CI scripts reference it.
 
 ## Milestone 2 – Core Primitives & Event Contracts
 - [x] Implement `Failure`, `Result/Either`, IDs/time value objects inside `core/`.
