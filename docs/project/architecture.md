@@ -1,141 +1,132 @@
-# Productivity App Architecture (Flutter, FOSS on GitHub)
+# CascadeFlow Architecture Guide
 
-This document outlines a refined architecture for your open-source productivity app built with Flutter. It adopts **Clean Architecture** for separation of concerns, ensuring maintainability, testability, scalability, and ease of collaboration. Refinements include:
-- Enhanced modularity with feature packages for better OSS contributions.
-- Deeper integration of state management with Riverpod, including auto-dispose and family providers.
-- Added focus on offline-first design, accessibility, and internationalization.
-- Explicit handling of async operations, error states, and performance metrics.
-- Updated for Flutter 3.24+ (as of 2025), leveraging Impeller for smoother rendering and Dart 3.5+ features like enhanced records and patterns.
-- CI/CD refinements for GitHub Actions, including code coverage reports.
-- Security and privacy best practices, e.g., data encryption and minimal permissions.
+CascadeFlow adopts a **feature-based Clean Architecture** that keeps business logic, data, and UI concerns grouped by feature while sharing only the lightest possible primitives. The structure is optimised for an open-source monorepo where contributors can focus on a single feature slice without touching the entire codebase.
 
-The app supports features: task capture, SMART goals, Eisenhower Matrix, habit tracking, time blocking, Pomodoro, and periodic reviews.
+## Guiding Principles
+- **Vertical slices first**: Every feature owns its domain, data, and presentation layers inside a dedicated package under `features/`.
+- **Tiny, stable core**: Only universal value objects, failures, and shared events live in `core/`.
+- **Riverpod everywhere**: Dependency injection and state management flow through Riverpod providers—no GetIt.
+- **Infrastructure as a service hub**: Cross-cutting helpers (Hive init, secure storage, notifications, logging) sit in `infrastructure/` and are consumed through providers.
+- **Offline-first, privacy-friendly**: Local storage via encrypted Hive boxes per feature; remote sync is an opt-in future concern.
+- **Test-driven delivery**: Practice TDD—write the failing test first, implement the minimal code to pass, then refactor with coverage tracked through Melos.
 
-## High-Level Architecture Overview
+## Feature Pillars (Current MVP Order)
+These slices define the initial user journey and map directly to packages under `features/`.
+- **Ingest** – Frictionless capture (widgets, quick-add, voice/text) funnels raw ideas into an inbox so nothing slips away mid-flow.
+- **Goals** – SMART-aligned goal space that translates ambitions into measurable, actionable guidance for downstream features.
+- **Prioritize** – Decision tooling (Eisenhower matrix, scoring, sorting) that bubbles up what matters most from the backlog.
+- **Tasks** – Core task management CRUD with metadata (due dates, tags, subtasks) that keeps execution grounded.
+- **Habits** – Recurring routines with streak tracking, cadence rules, and reminders that turn goals into behaviour change.
+- **Schedule** – Calendar/time-blocking surfaces that place tasks and habits on the timeline, handle conflicts, and keep plans realistic.
+- **Focus** – Execution helpers such as Pomodoro timers and distraction-free flow so users stay on task during scheduled blocks.
+- **Review** – Weekly/custom retrospectives summarising wins, misses, and lessons, prompting plan adjustments and carry-over decisions.
+- **Metrics** – Dashboards and analytics (trends, distributions, streaks) that surface behavioural patterns beyond raw lists.
+- **Insights** – Smart nudges and recommendations (e.g., repeatedly postponed tasks) that reduce cognitive load and highlight blind spots.
+- **Integrations** – External interfaces and configuration (calendar sync, export/import, feature toggles, notifications, theming) so CascadeFlow fits personal ecosystems.
 
-- **Layers** (Concentric, from inner to outer):
-  - **Domain (Core)**: Pure business logic, entities, and use cases. Framework-agnostic (pure Dart).
-  - **Data**: Concrete implementations for storage and external APIs.
-  - **Presentation**: UI, state management, and user interactions.
-  - **Infrastructure**: Cross-cutting utilities like DI, logging, and notifications.
-
-- **Key Principles**:
-  - **Dependency Rule**: Outer layers depend on inner ones (via abstractions).
-  - **Offline-First**: All features work without internet; sync optional for future cloud integration.
-  - **Modularity**: Features as independent modules/packages for easy extension.
-  - **Performance**: 60fps target; use const, memoization, and isolates.
-  - **Testability**: >80% coverage; TDD encouraged.
-  - **Collaboration**: Clear docs, linters, and GitHub workflows.
-
-## Folder Structure
-
-Use a monorepo with feature-specific packages under `packages/` for reusability and independent testing. This allows contributors to work on isolated features.
+## Package Topology
+The repository is a Melos workspace. Each directory below becomes a package with its own `pubspec.yaml` and tests.
 
 ```
-productivity_app/
-├── lib/                          # Main app entry
-│   ├── main.dart                 # App bootstrap (DI setup, theme, router)
-│   ├── app.dart                  # Root widget (MaterialApp with router)
-│   └── config/                   # Env configs (dev/prod flavors)
-├── packages/                     # Modular packages
-│   ├── core/                     # Domain layer (pubspec.yaml for package)
-│   │   ├── lib/
-│   │   │   ├── src/
-│   │   │   │   ├── entities/     # e.g., Task.dart, Habit.dart (immutable records)
-│   │   │   │   ├── usecases/     # e.g., CreateSmartGoalUseCase.dart
-│   │   │   │   └── repositories/ # Interfaces: TaskRepository.dart
-│   │   │   └── exports.dart      # Barrel file
-│   │   └── test/                 # Unit tests
-│   ├── data/                     # Data layer
-│   │   ├── lib/
-│   │   │   ├── src/
-│   │   │   │   ├── datasources/  # Local: HiveDataSource.dart; Remote: (optional) FirebaseDataSource.dart
-│   │   │   │   ├── models/       # Serializable DTOs: TaskModel.dart
-│   │   │   │   └── repositories/ # Impl: TaskRepositoryImpl.dart
-│   │   │   └── exports.dart
-│   │   └── test/
-│   ├── presentation/             # Presentation layer
-│   │   ├── lib/
-│   │   │   ├── src/
-│   │   │   │   ├── features/     # Sub-packages for each feature
-│   │   │   │   │   ├── task_capture/    # Widgets, providers: TaskCaptureScreen.dart
-│   │   │   │   │   ├── smart_goals/     # Similar for each
-│   │   │   │   │   ├── eisenhower/
-│   │   │   │   │   ├── habit_tracking/
-│   │   │   │   │   ├── time_blocking/
-│   │   │   │   │   ├── pomodoro/
-│   │   │   │   │   └── reviews/
-│   │   │   │   ├── common/       # Shared: widgets, themes, utils
-│   │   │   │   ├── navigation/   # AppRouter.dart (GoRouter)
-│   │   │   │   └── providers/    # App-wide: ThemeProvider.dart
-│   │   │   └── exports.dart
-│   │   └── test/                 # Widget/integration tests
-│   ├── infrastructure/           # Cross-cutting
-│   │   ├── lib/
-│   │   │   ├── src/
-│   │   │   │   ├── di/           # injector.dart (GetIt + Injectable)
-│   │   │   │   ├── logging/      # Logger.dart (with Sentry integration)
-│   │   │   │   ├── notifications/# LocalNotifications.dart
-│   │   │   │   └── utils/        # Extensions, helpers
-│   │   │   └── exports.dart
-│   │   └── test/
-├── test/                         # App-level integration tests
-├── analysis_options.yaml         # Strict linting (very_good_analysis)
-├── pubspec.yaml                  # Top-level deps; depend on packages/
-├── README.md                     # Overview, setup, architecture diagram (Mermaid)
-├── CONTRIBUTING.md               # Guidelines for OSS
-└── .github/                      # Workflows: CI (lint, test, coverage), PR templates
+/                                 # Repo root (Melos workspace)
+├── app/                          # Flutter runner; bootstraps providers, theme, router
+├── core/                         # Shared primitives (Failure, Result, value objects, events)
+├── infrastructure/               # Cross-feature services (Hive init, notifications, secure storage, logging)
+└── features/
+    ├── ingest/
+    ├── goals/
+    ├── prioritize/
+    ├── tasks/
+    ├── habits/
+    ├── schedule/
+    ├── focus/
+    ├── review/
+    ├── metrics/
+    ├── insights/
+    └── integrations/
 ```
 
-## Key Architectural Components
+Each feature package repeats the same internal structure:
+- `domain/` – Entities, value objects, and use cases unique to the feature (e.g., capture items, goal definitions, prioritisation rules, focus sessions).
+- `data/` – Data sources, DTOs/adapters, repository implementations.
+- `presentation/` – Riverpod providers, notifiers, UI widgets, and navigation hooks.
 
-### 1. Domain Layer (Core)
-- **Entities**: Immutable Dart records (e.g., `record Task(String id, String description, EisenhowerQuadrant quadrant);`). Include validation logic.
-- **Use Cases**: Pure functions/classes for business rules (e.g., `class PrioritizeTaskUseCase { Either<Failure, Task> execute(Task task, EisenhowerInput input); }`). Use `fpdart` for functional error handling (Either<Failure, Result>).
-- **Repositories**: Abstract interfaces for data ops (e.g., `Stream<List<Habit>> getHabitsStream();`).
-- **Refinements**: Add domain events (e.g., TaskCompletedEvent) for pub-sub if needed. Keep 100% testable with mocks.
+Packages depend only “downward”:
+- A feature can depend on `core` plus `infrastructure` when it needs shared services.
+- `app` depends on every feature package, plus `core` and `infrastructure`.
+- Features never depend on each other directly; shared behaviour is expressed via events or persisted state.
 
-### 2. Data Layer
-- **Data Sources**: 
-  - Local: Hive for key-value storage (fast, encrypted boxes for tasks/habits). Use adapters for custom serialization.
-  - Remote: Optional (e.g., Supabase for sync); fallback to local on offline.
-- **Repositories Impl**: Inject sources; handle CRUD with caching. Use `dartz` for async results.
-- **Refinements**: Migrations via Hive's schema versioning. Secure storage for sensitive data (flutter_secure_storage). Streams for real-time UI updates.
+## Workspace Tooling (Melos)
+Melos manages package linking, scripts, and testing.
+- Root `melos.yaml` enumerates `app`, `core`, `infrastructure`, and every folder in `features/*` as packages.
+- Common scripts:
+  - `melos bootstrap` – install dependencies for all packages.
+  - `melos run analyze` – run static analysis across the workspace.
+  - `melos test` – execute all tests (unit, widget, integration).
 
-### 3. Presentation Layer
-- **State Management**: Riverpod 2.5+ (preferred over Bloc for simplicity). Use `NotifierProvider` for mutable state (e.g., PomodoroTimerNotifier), `StreamProvider` for data streams. Auto-dispose for memory efficiency; family providers for parameterized state (e.g., `taskProviderFamily(id)`).
-- **UI**: 
-  - Widgets: Compositional, with keys for performance. Use `SliverList` for dashboards; `DraggableScrollableSheet` for modals (e.g., reviews).
-  - Features: Each in its sub-package with isolated providers/routes. E.g., Eisenhower feature: drag-and-drop grid with `DragTarget`.
-- **Navigation**: GoRouter 2.0+ with shell routes for tabs (dashboard, settings). Deep linking for sharing tasks.
-- **Refinements**: Accessibility (Semantics, TalkBack); i18n (intl package); adaptive layouts (Responsive Framework for tablet/web). Error widgets for loading/failure states.
+## Core Package (`core/`)
+Purpose: hold immutable building blocks used across multiple features.
+- Failures and Result/Either types.
+- Value objects shared by more than one slice (identifiers, timestamps, lightweight enums).
+- Cross-feature event contracts (e.g., `CaptureItemFiled`, `FocusSessionCompleted`) that allow slices to communicate without tight coupling.
+- No repositories, use cases, or heavy business rules—those stay inside feature packages.
 
-### 4. Infrastructure Layer
-- **DI**: GetIt + Injectable (auto-generate registrations). Lazy singles for heavy objects.
-- **Logging & Monitoring**: Logger package; integrate Sentry for crashes. Analytics optional (Mixpanel FOSS alternative).
-- **Notifications**: flutter_local_notifications for Pomodoro/reminders; integrate with device calendars (device_calendar plugin).
-- **Async/Performance**: Use isolates for heavy tasks (e.g., streak calculations). Zone.guarded for global error catching.
-- **Refinements**: App flavors (flutter_flavorizr); hot reload support. Permissions: Minimal (storage, notifications); request on-demand.
+## Infrastructure Package (`infrastructure/`)
+Purpose: offer reusable services via Riverpod providers.
+- Hive initialisation utilities plus encrypted box helpers (using `flutter_secure_storage` for AES keys).
+- Logging adapters (e.g., `logger`) and error reporting hooks.
+- Notification scheduler built on `flutter_local_notifications` for focus/break timers, habit nudges, and schedule reminders.
+- Platform utilities such as configuration loaders or secure storage wrappers.
+- DI surface is still Riverpod: expose providers that features can `ref.watch` or `ref.read`.
 
-## Best Practices
+## Feature Packages (`features/*`)
+Each feature encapsulates its stack so contributors can evolve it independently.
 
-### Code Quality
-- **Linting/Formatting**: very_good_analysis; auto-format on save. Pre-commit hooks (lefthook).
-- **Style**: Effective Dart; avoid globals, prefer const/final.
+### Domain layer
+- Entities model the feature’s concepts (e.g., `CaptureItem`, `Goal`, `PriorityRule`, `FocusSession`).
+- Value objects enforce invariants (e.g., non-empty descriptions, focus durations).
+- Use cases coordinate domain rules and return `Result`/`Either` values.
+- Repository interfaces describe the data contracts but remain local to the feature.
 
-### Testing
-- **Levels**: Unit (domain/data), Widget (UI), Integration (flows like task-to-Pomodoro).
-- **Tools**: flutter_test, mockito, golden_toolkit for snapshots.
-- **Coverage**: Enforce >80% via GitHub Actions; badges in README.
+### Data layer
+- DTOs and Hive adapters translate between domain entities and persisted models.
+- Local data sources wrap Hive boxes (encrypted per feature) and expose streams + CRUD operations.
+- Repository implementations orchestrate data sources and map into domain models.
 
-### Version Control & Collaboration
-- **Git**: Conventional commits; semantic-release for versioning.
-- **OSS**: Code of Conduct (Contributor Covenant); issue/PR templates. Roadmap in README.
-- **CI/CD**: GitHub Actions: Lint/test on PR; build/release on tags. Coverage reports via Codecov.
+### Presentation layer
+- Riverpod providers wire dependencies (e.g., repository provider, use-case providers).
+- `Notifier`/`AsyncNotifier` classes encapsulate state changes.
+- Widgets/screens compose the UI for the feature; navigation segments register with the app router.
+- Tests use Riverpod overrides to validate behaviour in isolation.
 
-### Deployment & Maintenance
-- **Builds**: Android/iOS flavors; web/desktop support via Flutter's multi-platform.
-- **Monitoring**: Beta testing via Firebase App Distribution.
-- **Updates**: Over-the-air via CodePush if needed.
-- **Security**: Encrypt Hive boxes; no hard-coded secrets. Privacy policy in repo.
+## App Package (`app/`)
+Bootstraps the Flutter application:
+- Entry point configures Flutter bindings, initialises Hive via `infrastructure`, and loads secure keys.
+- Wraps the tree in a `ProviderScope` with overrides for feature repositories/services as needed.
+- Hosts theming, localisation, and the GoRouter setup (including `StatefulShellRoute` for tabbed navigation).
 
+## Cross-Slice Communication
+Two light-touch options keep slices decoupled:
+1. **Event stream**: `core` defines an event contract; `app` composes a Riverpod provider that exposes a broadcast stream or bus. Features emit domain events (e.g., `CaptureItemFiled`, `FocusSessionCompleted`) which other features subscribe to.
+2. **Persisted audit**: A slice writes summary data (e.g., completed tasks, habit streak changes) that other slices read as needed.
+
+Choose the simplest path per interaction; avoid tight compile-time dependencies between feature packages.
+
+## Dependency Management
+- Add dependencies to individual packages only when required; record them in `docs/development/dependency-log.md`.
+- Prefer `dev_dependencies` for testing/tooling inside each package.
+- Keep `core` dependency-free beyond small, pure Dart packages.
+
+## Testing Strategy
+- We work in TDD cycles: red (write a failing test), green (make it pass), refactor (improve design while keeping tests green).
+- **Domain**: Pure unit tests of entities and use cases inside each feature package.
+- **Data**: Tests using temp Hive boxes (with encryption) to validate repositories and data sources.
+- **Presentation**: Widget tests and notifier tests leveraging Riverpod overrides.
+- Melos aggregates coverage so we can track quality trends.
+
+## Contributor Notes
+- New contributions should add or modify code inside a feature slice. Only touch `core` when a type is truly shared.
+- Follow the templates in `docs/project/progress.md` and `docs/project/roadmap.md` for consistent slice scaffolding.
+- Document feature-specific decisions in the feature package README (optional but encouraged).
+
+This architecture keeps CascadeFlow modular, approachable, and resilient as new collaborators join and features evolve.

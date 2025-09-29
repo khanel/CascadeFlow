@@ -1,72 +1,60 @@
 # Productivity App Project Overview
 
 ## Project Name
-**CascadeFlow** (or a placeholder; suggest alternatives like "ProdFlow" or "GoalSync" based on your preference).
+**CascadeFlow** (placeholder options like "ProdFlow" or "GoalSync" remain viable until branding is finalised).
 
 ## Description
-CascadeFlow is an open-source (FOSS) productivity app designed to help users organize goals, tasks, and habits through a seamless integration of proven productivity methods. Built as a personal project and released under the MIT license on GitHub, it aims to provide a free, customizable tool for individuals seeking better focus, prioritization, and long-term progress tracking. The app addresses common productivity challenges like mental clutter, poor planning, and inconsistent execution by combining task management with reflective practices.
+CascadeFlow is an open-source (MIT) productivity companion that guides people from quick capture through deliberate execution and reflective reviews. The app unifies trusted productivity frameworks—SMART goals, the Eisenhower matrix, habit loops, time blocking, Pomodoro timers, and periodic reviews—inside a privacy-first, offline-friendly Flutter experience. Contributors can extend or customise slices without touching unrelated features, making the project a welcoming OSS playground.
 
-Unlike fragmented tools that focus on single methods, CascadeFlow creates a holistic workflow: capture ideas quickly, refine them into actionable goals, prioritize strategically, build habits, schedule focused work, execute with timers, and review progress periodically. It's designed for cross-platform use (mobile-first with potential web/desktop extensions) and emphasizes user privacy with offline-first functionality—no data leaves the device unless explicitly synced.
+Target users include students, professionals, freelancers, and productivity enthusiasts who want a cohesive workflow without the friction of ads, subscriptions, or vendor lock-in.
 
-Target users include professionals, students, freelancers, and productivity enthusiasts who want a simple yet powerful app without ads or subscriptions.
+## Feature Pillars
+1. **Ingest** – Super-fast capture via widgets, quick-add dialogs, or voice input that funnels raw ideas into a single inbox without breaking flow.
+2. **Goals** – SMART-aligned space to define ambitions, add metrics, and generate sub-goals that guide daily execution.
+3. **Prioritize** – Decision tooling (Eisenhower matrix, ranking, scoring) that highlights which items deserve attention now.
+4. **Tasks** – Full task lifecycle management: metadata, subtasks, statuses, tagging, and completion workflows.
+5. **Habits** – Recurring routines with streak tracking, cadence rules, and reminders that reinforce behaviour over time.
+6. **Schedule** – Calendar and time-blocking surfaces that allocate tasks/habits to real time, resolve conflicts, and adapt when plans slip.
+7. **Focus** – Execution helpers like Pomodoro timers, distraction-limiting UIs, and break automation to stay on task.
+8. **Review** – Weekly/custom retrospectives with summaries, reflection prompts, and easy carry-over or replanning.
+9. **Metrics** – Dashboards and analytics (trends, distributions, streaks) exposing patterns beyond raw lists.
+10. **Insights** – Recommendation engine that surfaces nudges (e.g., repeatedly postponed tasks) to reduce cognitive load.
+11. **Integrations** – Calendar sync, import/export, feature toggles, and notification preferences so CascadeFlow fits diverse ecosystems.
 
-## Key Features
-The app integrates the following methods into a cohesive system:
-
-1. **Task Capture ("Jot It Down")**: Quickly log tasks, goals, or distractions via text, voice, or quick-add widgets to clear your mind.
-2. **SMART Goal Setting**: Refine captured items into Specific, Measurable, Achievable, Relevant, and Time-bound goals with guided prompts and AI-like suggestions.
-3. **Eisenhower Matrix**: Prioritize tasks by urgency and importance using an interactive drag-and-drop matrix to focus on what matters.
-4. **Habit Tracking**: Monitor recurring habits with visual streaks ("don't break the chain"), auto-scheduling, and motivational reminders.
-5. **Time Blocking**: Schedule tasks and habits into calendar-integrated blocks, with smart suggestions based on availability and user patterns.
-6. **Pomodoro Technique**: Execute work in focused sessions (e.g., 25/5 intervals) with timers, progress tracking, and distraction-free modes.
-7. **Periodic Reviews/Reflections**: Weekly (or customizable) summaries with insights, reflection prompts, and adjustments to improve future productivity.
-
-Additional enhancements:
-- **Dashboard**: Centralized view of tasks, goals, habits, and metrics.
-- **Analytics & Gamification**: Track efficiency (e.g., Pomodoro hours, streak lengths) with charts, badges, and points for motivation.
-- **Customizations**: Themes, notification preferences, and modular features (enable/disable methods).
-- **Integrations**: Calendar sync (Google/Outlook), wearables for habit tracking, and future API for extensions.
-- **Accessibility**: Voice commands, high-contrast modes, and screen reader support.
+Enhancements on the roadmap include deeper analytics, gamification hooks, multi-device sync, and accessibility-first UX.
 
 ## Technology Stack
-- **Framework**: Flutter (latest stable, e.g., 3.24+) for cross-platform development (iOS, Android, web/desktop).
-- **Language**: Dart 3.5+ with null-safety and modern features like records.
-- **State Management**: Riverpod for efficient, type-safe reactivity.
-- **Storage**: Hive (offline NoSQL) with encryption; optional remote sync (e.g., Firebase/Supabase).
-- **Other Libraries**:
-  - Navigation: GoRouter.
-  - Notifications: flutter_local_notifications.
-  - DI: GetIt + Injectable.
-  - Testing: flutter_test, mockito.
-  - UI: Material 3 with FlexColorScheme for theming.
-- **Architecture**: Clean Architecture with modular packages for maintainability (see [Architecture Document](architecture.md) for details).
+- **Framework**: Flutter 3.24+ with Dart 3.5+.
+- **State & DI**: Riverpod (Notifier/AsyncNotifier APIs) as the single source of truth for dependency injection and state management.
+- **Workspace**: Melos orchestrates the monorepo (bootstrap, analyse, test).
+- **Storage**: Hive for encrypted, offline-first persistence; `flutter_secure_storage` for key handling.
+- **Navigation**: GoRouter with `StatefulShellRoute` for tabbed navigation that preserves stack state.
+- **Notifications**: `flutter_local_notifications` centralised in the infrastructure package.
+- **Theming**: Material 3 with FlexColorScheme.
+- **Testing**: `flutter_test`, Riverpod testing utilities, and Hive test harnesses.
 
 ## Architecture Summary
-Adopts Clean Architecture for separation of concerns:
-- **Domain Layer**: Entities, use cases, repositories (pure business logic).
-- **Data Layer**: Persistence and sources (Hive local, optional remote).
-- **Presentation Layer**: UI features as modules with Riverpod state.
-- **Infrastructure**: DI, logging, utilities.
+CascadeFlow follows a feature-based Clean Architecture:
+- **App package (`app/`)** – Bootstraps Flutter, ProviderScope, theme, router, and top-level initialisation.
+- **Core package (`core/`)** – Houses universal primitives: failures, Result/Either, shared value objects, cross-feature events.
+- **Infrastructure package (`infrastructure/`)** – Supplies cross-cutting services (Hive init, secure storage, logging, notifications) via Riverpod providers.
+- **Feature packages (`features/<slice>/`)** – Each feature encapsulates its own `domain`, `data`, and `presentation` folders. Domain entities and use cases stay local; data sources manage encrypted Hive boxes; presentation exposes Riverpod providers and widgets for the feature UI.
 
-This ensures testability (>80% coverage), scalability, and easy contributions. Folder structure uses a monorepo with packages for modularity.
+Vertical slices reduce coupling, keep `core` intentionally tiny, and map cleanly onto contributor responsibilities. Cross-slice communication happens through shared events or persisted summaries rather than direct dependencies.
 
 ## Development Status
-- **Current Phase**: Planning/Architecture complete; ready for MVP implementation (start with core features like task capture and Pomodoro).
-- **Roadmap**:
-  1. MVP: Basic workflow (capture, prioritize, schedule, execute).
-  2. Beta: Add SMART, habits, reviews; integrations.
-  3. v1.0: Polish, testing, GitHub release.
-  4. Future: AI enhancements, community features, web support.
-- **Known Challenges**: Balancing simplicity with depth; ensuring performance on low-end devices.
+- **Current Focus**: Restructuring the repository to the feature-slice layout, wiring Melos, and standing up the Ingest slice as the golden path.
+- **Next Steps**: Finalise core primitives, infrastructure services, and Ingest; then replicate the pattern across Goals, Prioritize, Tasks, and the remaining pillars.
+- **Roadmap**: Detailed milestones live in `docs/project/roadmap.md`, with day-to-day tracking in `docs/project/progress.md`.
+- **Known Challenges**: Balancing slice autonomy with shared UX polish; ensuring encrypted storage remains ergonomic; keeping onboarding smooth for new contributors.
 
-## How to Get Involved (FOSS on GitHub)
-- **Repository**: [github.com/yourusername/focusflow](https://github.com/yourusername/focusflow) (setup with README, CONTRIBUTING.md, and issues).
+## Contribution Workflow (FOSS)
+- **Repository**: Hosted on GitHub (public monorepo).
 - **Setup**:
   1. Clone the repo.
-  2. Run `flutter pub get`.
-  3. Build with `flutter run` (emulator/device).
-- **Contributions**: Welcome PRs for features, bug fixes, or docs. Follow CONTRIBUTING.md (conventional commits, linting).
-- **License**: MIT – free to use, modify, and distribute.
-- **Community**: Discuss on GitHub issues; potential Discord for collaborators.
+  2. Run `melos bootstrap` to install dependencies across packages.
+  3. Use `melos run analyze` and `melos test` before submitting changes.
+- **Conventions**: Conventional Commits, strict linting, and feature-slice ownership. Touch `core/` only when types truly span slices.
+- **Community**: Collaboration via GitHub issues/PRs (optional Discord planned).
 
-This project empowers users to take control of their productivity while fostering an open-source community. If you'd like to expand on any section (e.g., detailed roadmap or mockups), let me know!
+CascadeFlow aims to empower individuals to design deliberate workflows while cultivating an open-source community around productivity experimentation.
