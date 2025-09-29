@@ -2,6 +2,8 @@
 
 Use this checklist to track progress against the roadmap. Tick off tasks as they are completed.
 
+Dependency policy: add packages only as needed, step‑by‑step with development. See `docs/development/dependency-policy.md` and record changes in `docs/development/dependency-log.md`.
+
 ## Phase 1 – Project Initialization and Setup
 - [x] 1. Initialize Git repository
 - [x] 2. Create Flutter project skeleton
@@ -9,10 +11,11 @@ Use this checklist to track progress against the roadmap. Tick off tasks as they
 - [x] 4. Add MIT LICENSE file
 - [x] 5. Customize `.gitignore` for Flutter project needs
 - [x] 6. Configure `analysis_options.yaml` with strict linting rules (e.g., `very_good_analysis`)
-- [ ] 7. Add initial core dependencies (Riverpod, GoRouter, Injectable, GetIt) to top-level `pubspec.yaml`
-- [ ] 8. Create `packages/` directory structure for architecture layers
-- [ ] 9. Configure top-level `pubspec.yaml` with path dependencies to the new packages
-- [ ] 10. Add `CONTRIBUTING.md` with guidelines and workflow expectations
+- [x] 7. Adopt dependency policy and create `docs/development/dependency-log.md`
+- [ ] 8. Add core dependencies only when required by tasks (see per‑layer guidance)
+- [ ] 9. Create `packages/` directory structure for architecture layers
+- [ ] 10. Configure top-level `pubspec.yaml` with path dependencies to the new packages
+- [ ] 11. Add `CONTRIBUTING.md` with guidelines and workflow expectations
 
 ## Phase 2 – Domain Layer Implementation
 - [ ] 11. Add dependencies to `packages/core/pubspec.yaml` (e.g., `fpdart`)
