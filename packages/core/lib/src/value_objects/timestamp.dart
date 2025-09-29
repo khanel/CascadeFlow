@@ -1,5 +1,5 @@
 /// UTC timestamp used in domain primitives and events.
-class Timestamp {
+class Timestamp implements Comparable<Timestamp> {
   Timestamp(DateTime value) : value = _toUtc(value);
 
   Timestamp._(this.value);
@@ -21,6 +21,9 @@ class Timestamp {
 
   static DateTime _toUtc(DateTime dateTime) =>
       dateTime.isUtc ? dateTime : dateTime.toUtc();
+
+  @override
+  int compareTo(Timestamp other) => value.compareTo(other.value);
 
   @override
   String toString() => value.toIso8601String();

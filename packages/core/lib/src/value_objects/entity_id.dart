@@ -8,6 +8,11 @@ class EntityId {
 
   EntityId._(this.value);
 
+  static const int _defaultLength = 24;
+  static const String _charset = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  static final Random _secureRandom = Random.secure();
+  static final RegExp _validationPattern = RegExp(r'^[a-zA-Z0-9_-]+$');
+
   /// Generates a random identifier using cryptographically secure randomness.
   factory EntityId.generate() => EntityId._(_generate());
 
@@ -20,8 +25,7 @@ class EntityId {
     if (trimmed.isEmpty) {
       throw ValidationFailure(message: 'EntityId cannot be empty');
     }
-    final pattern = RegExp(r'^[a-zA-Z0-9_-]+$');
-    if (!pattern.hasMatch(trimmed)) {
+    if (!_validationPattern.hasMatch(trimmed)) {
       throw ValidationFailure(
         message: 'EntityId contains unsupported characters: $value',
       );
@@ -30,12 +34,10 @@ class EntityId {
   }
 
   static String _generate() {
-    const length = 24;
-    const charset = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    final random = Random.secure();
     final buffer = StringBuffer();
-    for (var i = 0; i < length; i++) {
-      buffer.write(charset[random.nextInt(charset.length)]);
+    for (var i = 0; i < _defaultLength; i++) {
+      final index = _secureRandom.nextInt(_charset.length);
+      buffer.write(_charset[index]);
     }
     return buffer.toString();
   }

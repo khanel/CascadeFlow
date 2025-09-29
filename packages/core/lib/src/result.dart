@@ -14,45 +14,37 @@ sealed class Result<T, F extends Failure> {
   R fold<R>({
     required R Function(T value) onSuccess,
     required R Function(F failure) onFailure,
-  }) {
-    final self = this;
-    if (self is SuccessResult<T, F>) {
-      return onSuccess(self.value);
-    }
-    final failed = self as FailureResult<T, F>;
-    return onFailure(failed.failure);
-  }
+  }) =>
+      switch (this) {
+        SuccessResult<T, F>(value: final value) => onSuccess(value),
+        FailureResult<T, F>(failure: final failure) => onFailure(failure),
+      };
 
   /// Applies a transformation to the successful value while preserving failures.
-  Result<R, F> map<R>(R Function(T value) transform) {
-    final self = this;
-    if (self is SuccessResult<T, F>) {
-      return SuccessResult<R, F>(transform(self.value));
-    }
-    final failed = self as FailureResult<T, F>;
-    return FailureResult<R, F>(failed.failure);
-  }
+  Result<R, F> map<R>(R Function(T value) transform) =>
+      switch (this) {
+        SuccessResult<T, F>(value: final value) =>
+            SuccessResult<R, F>(transform(value)),
+        FailureResult<T, F>(failure: final failure) =>
+            FailureResult<R, F>(failure),
+      };
 
   /// Applies a transformation that returns another [Result].
-  Result<R, F> flatMap<R>(Result<R, F> Function(T value) transform) {
-    final self = this;
-    if (self is SuccessResult<T, F>) {
-      return transform(self.value);
-    }
-    final failed = self as FailureResult<T, F>;
-    return FailureResult<R, F>(failed.failure);
-  }
+  Result<R, F> flatMap<R>(Result<R, F> Function(T value) transform) =>
+      switch (this) {
+        SuccessResult<T, F>(value: final value) => transform(value),
+        FailureResult<T, F>(failure: final failure) =>
+            FailureResult<R, F>(failure),
+      };
 
   /// Helper to convert a nullable value into a [Result].
   static Result<T, Failure> fromNullable<T>(
     T? value,
     Failure Function() onNull,
-  ) {
-    if (value == null) {
-      return FailureResult<T, Failure>(onNull());
-    }
-    return SuccessResult<T, Failure>(value);
-  }
+  ) =>
+      value == null
+          ? FailureResult<T, Failure>(onNull())
+          : SuccessResult<T, Failure>(value);
 }
 
 /// Successful branch containing a value of type [T].
