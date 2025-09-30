@@ -2,38 +2,44 @@ import 'dart:async';
 
 import 'print_logger.dart';
 
+/// Runs [body] while ensuring uncaught errors are logged before being rethrown.
 Future<T> runWithLogging<T>({
   required PrintLogger logger,
   required FutureOr<T> Function() body,
-  void Function(Object error, StackTrace stackTrace)? onError,
+  LogErrorHandler? onError,
 }) async {
   try {
     return await Future<T>.sync(body);
   } catch (error, stackTrace) {
-    final description = _describeError(error);
-    logger.error(
-      'Uncaught zone error: $description',
-      stackTrace: stackTrace,
-    );
+    _logUnhandledError(logger, error, stackTrace);
     onError?.call(error, stackTrace);
     rethrow;
   }
 }
 
-String _describeError(Object error) {
-  if (error is StateError) {
-    return 'StateError: ${error.message}';
-  }
-  if (error is ArgumentError) {
-    return 'ArgumentError: ${error.message}';
-  }
-  if (error is AssertionError && error.message != null) {
-    return 'AssertionError: ${error.message}';
-  }
-  if (error is FormatException) {
-    return 'FormatException: ${error.message}';
-  }
+typedef LogErrorHandler = void Function(Object error, StackTrace stackTrace);
 
+void _logUnhandledError(
+  PrintLogger logger,
+  Object error,
+  StackTrace stackTrace,
+) {
+  logger.error(
+    'Uncaught zone error: ${_describeError(error)}',
+    stackTrace: stackTrace,
+  );
+}
+
+String _describeError(Object error) => switch (error) {
+      StateError(:final message) => 'StateError: $message',
+      ArgumentError(:final message) => 'ArgumentError: $message',
+      AssertionError(:final message?) when message != null =>
+        'AssertionError: $message',
+      FormatException(:final message) => 'FormatException: $message',
+      _ => _fallbackDescription(error),
+    };
+
+String _fallbackDescription(Object error) {
   final typeName = error.runtimeType.toString();
   final errorString = error.toString();
   return errorString.startsWith(typeName)
