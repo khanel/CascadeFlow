@@ -3,6 +3,12 @@ import 'dart:async';
 import 'failure.dart';
 
 /// Represents the outcome of a computation that can succeed or fail.
+typedef FailureBuilder<F extends Failure> =
+    F Function(
+      Object error,
+      StackTrace stackTrace,
+    );
+
 sealed class Result<T, F extends Failure> {
   const Result();
 
@@ -16,61 +22,67 @@ sealed class Result<T, F extends Failure> {
   R fold<R>({
     required R Function(T value) onSuccess,
     required R Function(F failure) onFailure,
-  }) =>
-      switch (this) {
-        SuccessResult<T, F>(value: final value) => onSuccess(value),
-        FailureResult<T, F>(failure: final failure) => onFailure(failure),
-      };
+  }) => switch (this) {
+    SuccessResult<T, F>(value: final value) => onSuccess(value),
+    FailureResult<T, F>(failure: final failure) => onFailure(failure),
+  };
 
   /// Applies a transformation to the successful value while preserving failures.
-  Result<R, F> map<R>(R Function(T value) transform) =>
-      switch (this) {
-        SuccessResult<T, F>(value: final value) =>
-            SuccessResult<R, F>(transform(value)),
-        FailureResult<T, F>(failure: final failure) =>
-            FailureResult<R, F>(failure),
-      };
+  Result<R, F> map<R>(R Function(T value) transform) => switch (this) {
+    SuccessResult<T, F>(value: final value) => SuccessResult<R, F>(
+      transform(value),
+    ),
+    FailureResult<T, F>(failure: final failure) => FailureResult<R, F>(failure),
+  };
 
   /// Applies a transformation that returns another [Result].
   Result<R, F> flatMap<R>(Result<R, F> Function(T value) transform) =>
       switch (this) {
         SuccessResult<T, F>(value: final value) => transform(value),
-        FailureResult<T, F>(failure: final failure) =>
-            FailureResult<R, F>(failure),
+        FailureResult<T, F>(failure: final failure) => FailureResult<R, F>(
+          failure,
+        ),
       };
 
   /// Helper to convert a nullable value into a [Result].
   static Result<T, Failure> fromNullable<T>(
     T? value,
     Failure Function() onNull,
-  ) =>
-      value == null
-          ? FailureResult<T, Failure>(onNull())
-          : SuccessResult<T, Failure>(value);
+  ) => value == null
+      ? FailureResult<T, Failure>(onNull())
+      : SuccessResult<T, Failure>(value);
 
   /// Executes [body] and captures any thrown error into a [FailureResult].
   static Result<T, F> guard<T, F extends Failure>({
     required T Function() body,
-    required F Function(Object error, StackTrace stackTrace) onError,
+    required FailureBuilder<F> onError,
   }) {
     try {
       return SuccessResult<T, F>(body());
     } catch (error, stackTrace) {
-      return FailureResult<T, F>(onError(error, stackTrace));
+      return _failure(onError, error, stackTrace);
     }
   }
 
   /// Executes async [body] and captures any thrown error into a [FailureResult].
   static Future<Result<T, F>> guardAsync<T, F extends Failure>({
     required FutureOr<T> Function() body,
-    required F Function(Object error, StackTrace stackTrace) onError,
+    required FailureBuilder<F> onError,
   }) async {
     try {
       final value = await Future<T>.sync(body);
       return SuccessResult<T, F>(value);
     } catch (error, stackTrace) {
-      return FailureResult<T, F>(onError(error, stackTrace));
+      return _failure(onError, error, stackTrace);
     }
+  }
+
+  static Result<T, F> _failure<T, F extends Failure>(
+    FailureBuilder<F> onError,
+    Object error,
+    StackTrace stackTrace,
+  ) {
+    return FailureResult<T, F>(onError(error, stackTrace));
   }
 }
 
