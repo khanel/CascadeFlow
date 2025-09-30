@@ -3,51 +3,56 @@ import 'dart:async';
 import 'package:cascade_flow_core/cascade_flow_core.dart';
 
 class InMemoryHiveInitializer {
-  bool _initialized = false;
-  final Map<String, InMemoryHiveBox<dynamic>> _boxes = {};
+  Future<void>? _initialization;
+  final Map<String, _InMemoryHiveBox<dynamic>> _boxes =
+      <String, _InMemoryHiveBox<dynamic>>{};
 
-  Future<void> initialize() async {
-    _initialized = true;
+  Future<void> initialize() {
+    return _initialization ??= Future<void>.value();
   }
 
-  Future<InMemoryHiveBox<T>> openEncryptedBox<T>(String name) async {
-    if (!_initialized) {
+  Future<_InMemoryHiveBox<T>> openEncryptedBox<T>(String name) async {
+    final initialization = _initialization;
+    if (initialization == null) {
       throw const InfrastructureFailure(
         message: 'Hive initializer used before initialize() was called.',
       );
     }
+    await initialization;
 
-    final existing = _boxes[name] as InMemoryHiveBox<T>?;
+    final existing = _boxes[name] as _InMemoryHiveBox<T>?;
     if (existing != null) {
       return existing;
     }
 
-    final box = InMemoryHiveBox<T>(name: name);
-    _boxes[name] = box;
+    final box = _InMemoryHiveBox<T>(name: name);
+    _boxes[name] = box as _InMemoryHiveBox<dynamic>;
     return box;
   }
 }
 
-class InMemoryHiveBox<T> {
-  InMemoryHiveBox({required this.name});
+class _InMemoryHiveBox<T> {
+  _InMemoryHiveBox({required this.name});
 
   final String name;
-  final Map<String, T> _items = {};
+  final Map<String, T> _items = <String, T>{};
 
-  Future<void> put(String key, T value) async {
+  Future<void> put(String key, T value) {
     _items[key] = value;
+    return Future<void>.value();
   }
 
-  Future<T?> get(String key) async {
-    return _items[key];
+  Future<T?> get(String key) {
+    return Future<T?>.value(_items[key]);
   }
 
-  Future<List<T>> values() async {
-    return List.unmodifiable(_items.values);
+  Future<List<T>> values() {
+    return Future<List<T>>.value(List.unmodifiable(_items.values));
   }
 
-  Future<void> clear() async {
+  Future<void> clear() {
     _items.clear();
+    return Future<void>.value();
   }
 
   T require(String key) {
