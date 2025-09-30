@@ -11,8 +11,7 @@ Development cadence: every task runs through TDD—write the failing test, add t
 - Next actions:
   - Scaffold feature package directories to adopt the slice layout.
   - Add lightweight helpers reused by multiple slices while keeping business logic out of `core`.
-  - Document Riverpod provider usage across slices.
-- Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief, CONTRIBUTING workflow guide, initial infrastructure stubs (PrintLogger, in-memory Hive + secure storage), logging helper with global error hook.
+- Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief, CONTRIBUTING workflow guide, initial infrastructure stubs (PrintLogger, in-memory Hive + secure storage), logging helper with global error hook, provider registry documentation.
 
 ## Milestone 1 – Workspace Restructure & Tooling
 - [ ] Adopt feature-based directory layout (`/app`, `/core`, `/infrastructure`, `/features/<pillar>`).
@@ -32,7 +31,7 @@ Development cadence: every task runs through TDD—write the failing test, add t
 - [x] Add secure storage wrapper (e.g., `flutter_secure_storage`) for Hive keys.
 - [x] Provide logging utilities and global error handling hooks.
 - [ ] Expose notification facades for focus timers, schedule reminders, and habit nudges.
-- [ ] Document Riverpod providers that slices should consume.
+- [x] Document Riverpod providers that slices should consume.
 
 ## Milestone 4 – App Composition & Navigation
 - [ ] Configure `StatefulShellRoute` branches aligned with pillars (Capture, Plan, Execute, Review, Insights, Settings).
