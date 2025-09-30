@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'failure.dart';
 
 /// Represents the outcome of a computation that can succeed or fail.
@@ -45,6 +47,31 @@ sealed class Result<T, F extends Failure> {
       value == null
           ? FailureResult<T, Failure>(onNull())
           : SuccessResult<T, Failure>(value);
+
+  /// Executes [body] and captures any thrown error into a [FailureResult].
+  static Result<T, F> guard<T, F extends Failure>({
+    required T Function() body,
+    required F Function(Object error, StackTrace stackTrace) onError,
+  }) {
+    try {
+      return SuccessResult<T, F>(body());
+    } catch (error, stackTrace) {
+      return FailureResult<T, F>(onError(error, stackTrace));
+    }
+  }
+
+  /// Executes async [body] and captures any thrown error into a [FailureResult].
+  static Future<Result<T, F>> guardAsync<T, F extends Failure>({
+    required FutureOr<T> Function() body,
+    required F Function(Object error, StackTrace stackTrace) onError,
+  }) async {
+    try {
+      final value = await Future<T>.sync(body);
+      return SuccessResult<T, F>(value);
+    } catch (error, stackTrace) {
+      return FailureResult<T, F>(onError(error, stackTrace));
+    }
+  }
 }
 
 /// Successful branch containing a value of type [T].
