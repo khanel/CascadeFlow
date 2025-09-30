@@ -11,8 +11,8 @@ Development cadence: every task runs through TDD—write the failing test, add t
 - Next actions:
   - Scaffold feature package directories to adopt the slice layout.
   - Add lightweight helpers reused by multiple slices while keeping business logic out of `core`.
-  - Define initial infrastructure service stubs (Hive init, secure storage).
-- Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief, CONTRIBUTING workflow guide.
+  - Extend logging with global error handling hooks and document provider usage across slices.
+- Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief, CONTRIBUTING workflow guide, initial infrastructure stubs (PrintLogger, in-memory Hive + secure storage).
 
 ## Milestone 1 – Workspace Restructure & Tooling
 - [ ] Adopt feature-based directory layout (`/app`, `/core`, `/infrastructure`, `/features/<pillar>`).
@@ -28,8 +28,8 @@ Development cadence: every task runs through TDD—write the failing test, add t
 - [x] Cover invariants with unit tests.
 
 ## Milestone 3 – Infrastructure Services
-- [ ] Implement Hive initialisation + encryption helpers that `app` can call at startup.
-- [ ] Add secure storage wrapper (e.g., `flutter_secure_storage`) for Hive keys.
+- [x] Implement Hive initialisation + encryption helpers that `app` can call at startup.
+- [x] Add secure storage wrapper (e.g., `flutter_secure_storage`) for Hive keys.
 - [ ] Provide logging utilities and global error handling hooks.
 - [ ] Expose notification facades for focus timers, schedule reminders, and habit nudges.
 - [ ] Document Riverpod providers that slices should consume.
