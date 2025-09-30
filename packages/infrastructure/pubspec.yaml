@@ -11,6 +11,8 @@ dependencies:
     path: ../core
   cascade_flow_data:
     path: ../data
+  riverpod: ^2.5.1
 
 dev_dependencies:
+  test: ^1.25.2
   very_good_analysis: ^10.0.0

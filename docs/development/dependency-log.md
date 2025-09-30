@@ -16,6 +16,14 @@ Entries
 
 - Date: 2025-09-30
 - Changed by: @codex
+- Affected pubspec: packages/infrastructure/pubspec.yaml
+- Packages: riverpod@^2.5.1, test@^1.25.2
+- Why: scaffold infrastructure service providers and add unit tests
+- Scope/usage: Hive/secure storage/logging providers with in-memory stubs
+- PR/Issue: n/a
+
+- Date: 2025-09-30
+- Changed by: @codex
 - Affected pubspec: packages/core/pubspec.yaml
 - Packages: test@^1.25.2
 - Why: enable core primitives TDD as part of workspace restructure tasks
