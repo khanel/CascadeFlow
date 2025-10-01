@@ -5,9 +5,9 @@ CascadeFlow adopts a **feature-based Clean Architecture** that keeps business lo
 ## Guiding Principles
 - **Vertical slices first**: Every feature owns its domain, data, and presentation layers inside a dedicated package under `features/`.
 - **Tiny, stable core**: Only universal value objects, failures, and shared events live in `core/`.
-- **Riverpod everywhere**: Dependency injection and state management flow through Riverpod providers—no GetIt.
-- **Infrastructure as a service hub**: Cross-cutting helpers (Hive init, secure storage, notifications, logging) sit in `infrastructure/` and are consumed through providers.
-- **Offline-first, privacy-friendly**: Local storage via encrypted Hive boxes per feature; remote sync is an opt-in future concern.
+- **Riverpod everywhere**: Dependency injection and state management flow through Riverpod providers—no GetIt; rely on `riverpod_annotation`/`riverpod_generator` for typed provider codegen.
+- **Infrastructure as a service hub**: Cross-cutting helpers (Hive CE init, secure storage, notifications, logging) sit in `infrastructure/` and are consumed through providers.
+- **Offline-first, privacy-friendly**: Local storage via encrypted Hive CE boxes per feature; remote sync is an opt-in future concern.
 - **Test-driven delivery**: Practice TDD—write the failing test first, implement the minimal code to pass, then refactor with coverage tracked through Melos.
 
 ## Feature Pillars (Current MVP Order)
@@ -31,7 +31,7 @@ The repository is a Melos workspace. Each directory below becomes a package with
 /                                 # Repo root (Melos workspace)
 ├── app/                          # Flutter runner; bootstraps providers, theme, router
 ├── core/                         # Shared primitives (Failure, Result, value objects, events)
-├── infrastructure/               # Cross-feature services (Hive init, notifications, secure storage, logging)
+├── infrastructure/               # Cross-feature services (Hive CE init, notifications, secure storage, logging)
 └── features/
     ├── ingest/
     ├── goals/
@@ -73,7 +73,7 @@ Purpose: hold immutable building blocks used across multiple features.
 
 ## Infrastructure Package (`infrastructure/`)
 Purpose: offer reusable services via Riverpod providers.
-- Hive initialisation utilities plus encrypted box helpers (using `flutter_secure_storage` for AES keys).
+- Hive CE initialisation utilities plus encrypted box helpers (using `flutter_secure_storage` for AES keys).
 - Logging adapters (e.g., `logger`) and error reporting hooks.
 - Notification scheduler built on `flutter_local_notifications` for focus/break timers, habit nudges, and schedule reminders.
 - Platform utilities such as configuration loaders or secure storage wrappers.
@@ -89,8 +89,8 @@ Each feature encapsulates its stack so contributors can evolve it independently.
 - Repository interfaces describe the data contracts but remain local to the feature.
 
 ### Data layer
-- DTOs and Hive adapters translate between domain entities and persisted models.
-- Local data sources wrap Hive boxes (encrypted per feature) and expose streams + CRUD operations.
+- DTOs and Hive CE adapters translate between domain entities and persisted models.
+- Local data sources wrap Hive CE boxes (encrypted per feature) and expose streams + CRUD operations.
 - Repository implementations orchestrate data sources and map into domain models.
 
 ### Presentation layer
@@ -98,10 +98,11 @@ Each feature encapsulates its stack so contributors can evolve it independently.
 - `Notifier`/`AsyncNotifier` classes encapsulate state changes.
 - Widgets/screens compose the UI for the feature; navigation segments register with the app router.
 - Tests use Riverpod overrides to validate behaviour in isolation.
+- Generated provider files live alongside the source (`part 'foo.g.dart'`) and are maintained via `dart run build_runner watch`.
 
 ## App Package (`app/`)
 Bootstraps the Flutter application:
-- Entry point configures Flutter bindings, initialises Hive via `infrastructure`, and loads secure keys.
+- Entry point configures Flutter bindings, initialises Hive CE via `infrastructure`, and loads secure keys.
 - Wraps the tree in a `ProviderScope` with overrides for feature repositories/services as needed.
 - Hosts theming, localisation, and the GoRouter setup (including `StatefulShellRoute` for tabbed navigation).
 
@@ -120,7 +121,7 @@ Choose the simplest path per interaction; avoid tight compile-time dependencies 
 ## Testing Strategy
 - We work in TDD cycles: red (write a failing test), green (make it pass), refactor (improve design while keeping tests green).
 - **Domain**: Pure unit tests of entities and use cases inside each feature package.
-- **Data**: Tests using temp Hive boxes (with encryption) to validate repositories and data sources.
+- **Data**: Tests using temp Hive CE boxes (with encryption) to validate repositories and data sources.
 - **Presentation**: Widget tests and notifier tests leveraging Riverpod overrides.
 - Melos aggregates coverage so we can track quality trends.
 

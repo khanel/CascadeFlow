@@ -17,8 +17,11 @@ docs/
 │   ├── dependency-policy.md    # Dependency management policy
 │   └── dependency-log.md       # Dependency change tracking
 │
-└── contributing/     # Contributing guidelines
-    └── pull_request_template.md # PR template for contributors
+├── contributing/     # Contributing guidelines
+│   └── pull_request_template.md # PR template for contributors
+│
+├── dependency-packages.md        # Current package recommendations and version pins
+└── dependency-packages-usage.md  # Usage snippets for approved dependencies
 ```
 
 ## 📖 How to Use
@@ -29,6 +32,8 @@ docs/
 - **Planning development?** Review `project/roadmap.md`
 - **Contributing code?** Follow `development/COMMIT_CONVENTION.md`
 - **Adding dependencies?** See `development/dependency-policy.md`
+- **Selecting package versions?** Consult `dependency-packages.md`
+- **Need integration examples?** Use `dependency-packages-usage.md`
 - **Opening a PR?** Use the template in `contributing/pull_request_template.md`
 
 ## 🔄 Cross-References

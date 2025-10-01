@@ -24,21 +24,21 @@ Target users include students, professionals, freelancers, and productivity enth
 Enhancements on the roadmap include deeper analytics, gamification hooks, multi-device sync, and accessibility-first UX.
 
 ## Technology Stack
-- **Framework**: Flutter 3.24+ with Dart 3.5+.
-- **State & DI**: Riverpod (Notifier/AsyncNotifier APIs) as the single source of truth for dependency injection and state management.
+- **Framework**: Flutter 3.27+ with Dart 3.9+ (upgrade from 3.24 to satisfy `hive_ce_flutter`).
+- **State & DI**: Riverpod (Notifier/AsyncNotifier APIs) with `riverpod_annotation`/`riverpod_generator` driving typed provider codegen.
 - **Workspace**: Melos orchestrates the monorepo (bootstrap, analyse, test).
-- **Storage**: Hive for encrypted, offline-first persistence; `flutter_secure_storage` for key handling.
-- **Navigation**: GoRouter with `StatefulShellRoute` for tabbed navigation that preserves stack state.
+- **Storage**: Hive CE (community edition) for encrypted, offline-first persistence; `flutter_secure_storage` for key handling.
+- **Navigation**: GoRouter pinned to `14.2.3` with `StatefulShellRoute` to preserve tab stacks until Flutter 3.29 lands in the toolchain.
 - **Notifications**: `flutter_local_notifications` centralised in the infrastructure package.
-- **Theming**: Material 3 with FlexColorScheme.
-- **Testing**: `flutter_test`, Riverpod testing utilities, and Hive test harnesses.
+- **Theming**: Material 3 with FlexColorScheme `8.0.2` (compatible with Flutter 3.24–3.27).
+- **Testing**: `flutter_test`, Riverpod testing utilities, and Hive CE adapter harnesses.
 
 ## Architecture Summary
 CascadeFlow follows a feature-based Clean Architecture:
 - **App package (`app/`)** – Bootstraps Flutter, ProviderScope, theme, router, and top-level initialisation.
 - **Core package (`core/`)** – Houses universal primitives: failures, Result/Either, shared value objects, cross-feature events.
-- **Infrastructure package (`infrastructure/`)** – Supplies cross-cutting services (Hive init, secure storage, logging, notifications) via Riverpod providers.
-- **Feature packages (`features/<slice>/`)** – Each feature encapsulates its own `domain`, `data`, and `presentation` folders. Domain entities and use cases stay local; data sources manage encrypted Hive boxes; presentation exposes Riverpod providers and widgets for the feature UI.
+- **Infrastructure package (`infrastructure/`)** – Supplies cross-cutting services (Hive CE init, secure storage, logging, notifications) via Riverpod providers.
+- **Feature packages (`features/<slice>/`)** – Each feature encapsulates its own `domain`, `data`, and `presentation` folders. Domain entities and use cases stay local; data sources manage encrypted Hive CE boxes; presentation exposes Riverpod providers and widgets for the feature UI.
 
 Vertical slices reduce coupling, keep `core` intentionally tiny, and map cleanly onto contributor responsibilities. Cross-slice communication happens through shared events or persisted summaries rather than direct dependencies.
 
