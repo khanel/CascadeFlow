@@ -9,13 +9,13 @@ Development cadence: every task runs through TDD—write the failing test, add t
 ## Status Snapshot (2025-09-30)
 - Current focus: convert the repo to feature-based Clean Architecture, wire the Melos workspace, and scope the Ingest slice.
 - Next actions:
-  - Scaffold feature package directories to adopt the slice layout.
+  - ~Scaffold feature package directories to adopt the slice layout.~ ✅
   - Kick off `CaptureItem` domain modelling for the Ingest slice.
   - Outline notification facade design so infrastructure work can continue in parallel.
 - Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief, CONTRIBUTING workflow guide, initial infrastructure stubs (PrintLogger, in-memory Hive + secure storage), logging helper with global error hook, provider registry documentation, `Result.guard`/`guardAsync` helper utilities.
 
 ## Milestone 1 – Workspace Restructure & Tooling
-- [ ] Adopt feature-based directory layout (`/app`, `/core`, `/infrastructure`, `/features/<pillar>`).
+- [x] Adopt feature-based directory layout (`/app`, `/core`, `/infrastructure`, `/features/<pillar>`).
 - [x] Add root `melos.yaml` covering `app`, `core`, `infrastructure`, and each feature package.
 - [x] Update app/feature `pubspec.yaml` files to use path dependencies and Melos scripts (`melos bootstrap`, `melos run analyze`, `melos test`).
 - [ ] Migrate existing code into the new packages without bloating `core`.
