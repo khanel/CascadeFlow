@@ -1,0 +1,22 @@
+name: cascade_flow_tasks
+description: Tasks feature slice (domain, data, presentation).
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: '>=3.9.2 <4.0.0'
+  flutter: '>=3.19.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cascade_flow_core:
+    path: ../../packages/core
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^10.0.0
+
+flutter:
+  uses-material-design: true

@@ -24,6 +24,28 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   very_good_analysis: ^10.0.0
+  melos: ^7.1.1
 
 flutter:
   uses-material-design: true
+
+melos:
+  command:
+    bootstrap:
+      runPubGetInParallel: true
+      usePubspecOverrides: true
+
+  packages:
+    - app/**
+    - core/**
+    - infrastructure/**
+    - features/**
+    - packages/**
+
+  scripts:
+    analyze:
+      description: Run static analysis across the workspace.
+      run: dart run melos:melos exec -c 1 -- flutter analyze
+    test:
+      description: Run Flutter tests at the app level.
+      run: dart run melos:melos exec -c 1 -- flutter test
