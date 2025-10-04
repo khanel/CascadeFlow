@@ -7,18 +7,20 @@ Dependency policy: add packages only as needed, step-by-step with development. S
 Development cadence: every task runs through TDD—write the failing test, add the minimal implementation, then refactor with the suite green.
 
 ## Status Snapshot (2025-09-30)
-- Current focus: convert the repo to feature-based Clean Architecture, wire the Melos workspace, and scope the Ingest slice.
+- Current focus: kick off CaptureItem domain modelling and notification facade design now that the feature-based restructure is in place.
 - Next actions:
   - ~Scaffold feature package directories to adopt the slice layout.~ ✅
+  - ~Migrate existing code into the new packages without bloating `core`.~ ✅
+  - Add placeholder tests (or skip wiring) for packages without suites so `melos run test` stops flagging exit 65.
   - Kick off `CaptureItem` domain modelling for the Ingest slice.
   - Outline notification facade design so infrastructure work can continue in parallel.
-- Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief, CONTRIBUTING workflow guide, initial infrastructure stubs (PrintLogger, in-memory Hive + secure storage), logging helper with global error hook, provider registry documentation, `Result.guard`/`guardAsync` helper utilities.
+- Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief, CONTRIBUTING workflow guide, initial infrastructure stubs (PrintLogger, in-memory Hive + secure storage), logging helper with global error hook, provider registry documentation, `Result.guard`/`guardAsync` helper utilities. Updated workspace test script to skip empty packages.
 
 ## Milestone 1 – Workspace Restructure & Tooling
 - [x] Adopt feature-based directory layout (`/app`, `/core`, `/infrastructure`, `/features/<pillar>`).
 - [x] Add root `melos.yaml` covering `app`, `core`, `infrastructure`, and each feature package.
 - [x] Update app/feature `pubspec.yaml` files to use path dependencies and Melos scripts (`melos bootstrap`, `melos run analyze`, `melos test`).
-- [ ] Migrate existing code into the new packages without bloating `core`.
+- [x] Migrate existing code into the new packages without bloating `core`.
 - [x] Document Melos usage in contributor notes and ensure CI scripts reference it.
 
 ## Milestone 2 – Core Primitives & Event Contracts
