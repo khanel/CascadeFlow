@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:cascade_flow_infrastructure/cascade_flow_infrastructure.dart';
 import 'package:test/test.dart';
 
@@ -22,6 +20,7 @@ void main() {
       );
 
       // Assert
+      expect(logLines, hasLength(1));
       expect(
         logLines.single,
         contains('[ERROR] Uncaught zone error: StateError: boom'),
@@ -34,24 +33,20 @@ void main() {
       StackTrace? capturedStackTrace;
       final logger = PrintLogger(printer: (_) {});
 
-      // Act
-      try {
-        await runWithLogging<void>(
-          logger: logger,
-          body: () {
-            throw StateError('boom');
-          },
-          onError: (error, stackTrace) {
-            capturedError = error;
-            capturedStackTrace = stackTrace;
-          },
-        );
-        fail('Expected runWithLogging to rethrow the error');
-      } on StateError {
-        // Expected path.
-      }
+      Future<void> invoke() => runWithLogging<void>(
+            logger: logger,
+            body: () {
+              throw StateError('boom');
+            },
+            onError: (error, stackTrace) {
+              capturedError = error;
+              capturedStackTrace = stackTrace;
+            },
+          );
 
-      // Assert
+      // Act & Assert
+      await expectLater(invoke, throwsA(isA<StateError>()));
+
       expect(capturedError, isA<StateError>());
       expect(capturedStackTrace, isNotNull);
     });

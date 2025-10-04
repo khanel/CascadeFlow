@@ -29,7 +29,8 @@ void main() {
       expect(identical(logger, loggerAgain), isTrue);
     });
 
-    test('hiveInitializerProvider returns in-memory initializer by default', () {
+    test(
+        'hiveInitializerProvider returns in-memory initializer by default', () {
       // Arrange
       final read = container.read;
 

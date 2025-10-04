@@ -1,5 +1,9 @@
+import 'package:meta/meta.dart';
+
 /// UTC timestamp used in domain primitives and events.
+@immutable
 class Timestamp implements Comparable<Timestamp> {
+  /// Creates a timestamp from a [value], normalising it to UTC.
   Timestamp(DateTime value) : value = _toUtc(value);
 
   Timestamp._(this.value);

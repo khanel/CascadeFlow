@@ -1,51 +1,43 @@
-name: cascade_flow
-description: "CascadeFlow productivity companion app"
-publish_to: 'none'
-version: 1.0.0+1
+name: cascade_flow_workspace
+description: Melos-managed workspace for the CascadeFlow monorepo.
+publish_to: none
+version: 0.1.0
 
 environment:
   sdk: '>=3.9.2 <4.0.0'
-  flutter: '>=3.19.0'
 
-dependencies:
-  flutter:
-    sdk: flutter
-  cupertino_icons: ^1.0.8
-  cascade_flow_core:
-    path: packages/core
-  cascade_flow_data:
-    path: packages/data
-  cascade_flow_infrastructure:
-    path: packages/infrastructure
-  cascade_flow_presentation:
-    path: packages/presentation
+workspace:
+  - app
+  - packages/core
+  - packages/data
+  - packages/infrastructure
+  - packages/presentation
+  - features/ingest
+  - features/goals
+  - features/prioritize
+  - features/tasks
+  - features/habits
+  - features/schedule
+  - features/focus
+  - features/review
+  - features/metrics
+  - features/insights
+  - features/integrations
+
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  very_good_analysis: ^10.0.0
   melos: ^7.1.1
-
-flutter:
-  uses-material-design: true
+  very_good_analysis: ^10.0.0
 
 melos:
-  command:
-    bootstrap:
-      runPubGetInParallel: true
-      usePubspecOverrides: true
-
-  packages:
-    - app/**
-    - core/**
-    - infrastructure/**
-    - features/**
-    - packages/**
-
   scripts:
     analyze:
-      description: Run static analysis across the workspace.
-      run: dart run melos:melos exec -c 1 -- flutter analyze
+      description: Run static analysis across the workspace packages.
+      run: |
+        melos exec --flutter -- flutter analyze
+        melos exec --no-flutter -- dart analyze
     test:
-      description: Run Flutter tests at the app level.
-      run: dart run melos:melos exec -c 1 -- flutter test
+      description: Run tests across the workspace packages.
+      run: |
+        melos exec --flutter -- bash -lc "shopt -s nullglob globstar; files=(test/*_test.dart test/**/*_test.dart); if (( \${#files[@]} )); then flutter test; elif [[ -d test ]]; then echo \"Skipping flutter tests for \${MELOS_PACKAGE_NAME} (no *_test.dart files).\"; else echo \"Skipping flutter tests for \${MELOS_PACKAGE_NAME} (test/ directory missing).\"; fi"
+        melos exec --no-flutter -- bash -lc "shopt -s nullglob globstar; files=(test/*_test.dart test/**/*_test.dart); if (( \${#files[@]} )); then dart test; elif [[ -d test ]]; then echo \"Skipping dart tests for \${MELOS_PACKAGE_NAME} (no *_test.dart files).\"; else echo \"Skipping dart tests for \${MELOS_PACKAGE_NAME} (test/ directory missing).\"; fi"

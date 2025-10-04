@@ -1,4 +1,5 @@
-// Validates the placeholder logger behaviour described in `docs/project/progress.md`
+// Validates the placeholder logger behaviour described in
+// `docs/project/progress.md`
 // while infrastructure services are still stubs for Milestone 3.
 import 'dart:async';
 
@@ -15,14 +16,15 @@ void main() {
       runZoned(
         () {
           const logger = PrintLogger();
-          logger.debug('debug message');
-          logger.info('info message');
-          logger.warning('warn message');
-          logger.error('error message', error: Exception('boom'));
+          logger
+            ..debug('debug message')
+            ..info('info message')
+            ..warning('warn message')
+            ..error('error message', error: Exception('boom'));
         },
-        zoneSpecification: ZoneSpecification(print: (_, __, ___, line) {
-          logs.add(line);
-        }),
+        zoneSpecification: ZoneSpecification(
+          print: (self, parent, zone, line) => logs.add(line),
+        ),
       );
 
       // Assert

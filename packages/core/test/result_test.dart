@@ -5,7 +5,7 @@ void main() {
   group('Result', () {
     test('fold returns success branch', () {
       // Arrange
-      final result = SuccessResult<int, Failure>(42);
+      const result = SuccessResult<int, Failure>(42);
 
       // Act
       final value = result.fold(
@@ -19,8 +19,8 @@ void main() {
 
     test('fold returns failure branch', () {
       // Arrange
-      final failure = DomainFailure(message: 'boom');
-      final result = FailureResult<int, Failure>(failure);
+      const failure = DomainFailure(message: 'boom');
+      const result = FailureResult<int, Failure>(failure);
 
       // Act
       final value = result.fold(
@@ -34,7 +34,7 @@ void main() {
 
     test('map transforms value without touching failure', () {
       // Arrange
-      final result = SuccessResult<int, Failure>(21);
+      const result = SuccessResult<int, Failure>(21);
 
       // Act
       final mapped = result.map((value) => value * 2);
@@ -46,8 +46,8 @@ void main() {
 
     test('map keeps failure untouched', () {
       // Arrange
-      final failure = DomainFailure(message: 'nope');
-      final result = FailureResult<int, Failure>(failure);
+      const failure = DomainFailure(message: 'nope');
+      const result = FailureResult<int, Failure>(failure);
 
       // Act
       final mapped = result.map((value) => value * 2);
@@ -59,7 +59,7 @@ void main() {
 
     test('flatMap allows chaining', () {
       // Arrange
-      final result = SuccessResult<int, Failure>(2)
+      final result = const SuccessResult<int, Failure>(2)
           .flatMap((value) => SuccessResult<int, Failure>(value * 3))
           .flatMap((value) => SuccessResult<int, Failure>(value + 1));
 
@@ -108,7 +108,8 @@ void main() {
 
       // Assert
       expect(result, isA<FailureResult<int, InfrastructureFailure>>());
-      final failure = (result as FailureResult<int, InfrastructureFailure>).failure;
+      final failure = (result as FailureResult<int, InfrastructureFailure>)
+          .failure;
       expect(failure.message, 'Failed to compute');
       expect(failure.cause, isA<StateError>());
       expect(failure.stackTrace, isNotNull);
@@ -148,8 +149,8 @@ void main() {
 
       // Assert
       expect(result, isA<FailureResult<void, InfrastructureFailure>>());
-      final failure =
-          (result as FailureResult<void, InfrastructureFailure>).failure;
+      final failure = (result as FailureResult<void, InfrastructureFailure>)
+          .failure;
       expect(failure.message, 'Async failure');
       expect(failure.cause, isA<ArgumentError>());
       expect(failure.stackTrace, isNotNull);

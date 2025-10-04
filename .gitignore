@@ -41,9 +41,9 @@ app.*.symbols
 app.*.map.json
 
 # Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
+/app/android/app/debug
+/app/android/app/profile
+/app/android/app/release
 
 # IDEs and tooling
 .vscode/
@@ -52,30 +52,30 @@ app.*.map.json
 .packages
 .flutter-plugins
 .flutter-plugins-dependencies
-lib/generated_plugin_registrant.dart
-lib/l10n/
+app/lib/generated_plugin_registrant.dart
+app/lib/l10n/
 
 # Android/Gradle secrets
-android/local.properties
-android/key.properties
+app/android/local.properties
+app/android/key.properties
 *.keystore
 *.jks
 
 # iOS/macOS build outputs
-ios/Flutter/App.framework
-ios/Flutter/Flutter.framework
-ios/Flutter/Generated.xcconfig
-ios/Flutter/ephemeral/
-ios/Runner.xcworkspace/
-ios/Pods/
-macos/Flutter/ephemeral/
+app/ios/Flutter/App.framework
+app/ios/Flutter/Flutter.framework
+app/ios/Flutter/Generated.xcconfig
+app/ios/Flutter/ephemeral/
+app/ios/Runner.xcworkspace/
+app/ios/Pods/
+app/macos/Flutter/ephemeral/
 
 # Windows/Linux build outputs
-windows/runner/Debug/
-windows/runner/Release/
-windows/runner/x64/
-windows/runner/x86/
-linux/flutter/ephemeral/
+app/windows/runner/Debug/
+app/windows/runner/Release/
+app/windows/runner/x64/
+app/windows/runner/x86/
+app/linux/flutter/ephemeral/
 
 # Reports and temp files
 reports/

@@ -2,16 +2,22 @@ import 'dart:async';
 
 import 'package:cascade_flow_core/cascade_flow_core.dart';
 
+/// In-memory stub used to simulate Hive initialisation during local testing.
 class InMemoryHiveInitializer {
+  /// Tracks whether `initialize` has already been invoked.
   Future<void>? _initialization;
-  final Map<String, _InMemoryHiveBox<dynamic>> _boxes =
-      <String, _InMemoryHiveBox<dynamic>>{};
 
+  /// Lazily created boxes keyed by their Hive name.
+  final Map<String, InMemoryHiveBox<dynamic>> _boxes =
+      <String, InMemoryHiveBox<dynamic>>{};
+
+  /// Marks the initializer as ready. Subsequent calls reuse the same future.
   Future<void> initialize() {
     return _initialization ??= Future<void>.value();
   }
 
-  Future<_InMemoryHiveBox<T>> openEncryptedBox<T>(String name) async {
+  /// Opens (or creates) an in-memory encrypted box with the given [name].
+  Future<InMemoryHiveBox<T>> openEncryptedBox<T>(String name) async {
     final initialization = _initialization;
     if (initialization == null) {
       throw const InfrastructureFailure(
@@ -20,47 +26,57 @@ class InMemoryHiveInitializer {
     }
     await initialization;
 
-    final existing = _boxes[name] as _InMemoryHiveBox<T>?;
+    final existing = _boxes[name] as InMemoryHiveBox<T>?;
     if (existing != null) {
       return existing;
     }
 
-    final box = _InMemoryHiveBox<T>(name: name);
-    _boxes[name] = box as _InMemoryHiveBox<dynamic>;
+    final box = InMemoryHiveBox<T>(name: name);
+    _boxes[name] = box as InMemoryHiveBox<dynamic>;
     return box;
   }
 }
 
-class _InMemoryHiveBox<T> {
-  _InMemoryHiveBox({required this.name});
+/// Minimal box abstraction that mimics the Hive API relied upon by tests.
+class InMemoryHiveBox<T> {
+  /// Creates an in-memory box identified by [name].
+  InMemoryHiveBox({required this.name});
 
+  /// Name of the backing box.
   final String name;
+
   final Map<String, T> _items = <String, T>{};
 
+  /// Stores [value] under [key].
   Future<void> put(String key, T value) {
     _items[key] = value;
     return Future<void>.value();
   }
 
+  /// Retrieves a value for [key], returning `null` when it is absent.
   Future<T?> get(String key) {
     return Future<T?>.value(_items[key]);
   }
 
+  /// Returns an immutable snapshot of the stored values.
   Future<List<T>> values() {
     return Future<List<T>>.value(List.unmodifiable(_items.values));
   }
 
+  /// Removes every stored value.
   Future<void> clear() {
     _items.clear();
     return Future<void>.value();
   }
 
+  /// Returns the value at [key], throwing when it has not been written yet.
   T require(String key) {
-    if (!_items.containsKey(key)) {
+    final value = _items[key];
+    if (value == null && !_items.containsKey(key)) {
       throw InfrastructureFailure(
         message: 'Key "$key" missing from box "$name".',
       );
     }
-    return _items[key] as T;
+    return value as T;
   }
 }

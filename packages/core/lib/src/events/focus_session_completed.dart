@@ -1,9 +1,10 @@
-import '../domain_event.dart';
-import '../value_objects/entity_id.dart';
-import '../value_objects/timestamp.dart';
+import 'package:cascade_flow_core/src/domain_event.dart';
+import 'package:cascade_flow_core/src/value_objects/entity_id.dart';
+import 'package:cascade_flow_core/src/value_objects/timestamp.dart';
 
 /// Event emitted when a focus session concludes.
 class FocusSessionCompleted extends DomainEvent {
+  /// Builds an event emitted after a focus session ends.
   factory FocusSessionCompleted({
     required EntityId sessionId,
     required Duration duration,
@@ -23,13 +24,13 @@ class FocusSessionCompleted extends DomainEvent {
     );
   }
 
+  /// Internal constructor that wires values into the base event.
   FocusSessionCompleted._({
     required this.sessionId,
     required this.duration,
     required this.completedAt,
-    EntityId? eventId,
-    required Timestamp occurredOn,
-  }) : super(eventId: eventId, occurredOn: occurredOn);
+    required Timestamp super.occurredOn, super.eventId,
+  });
 
   /// Identifier of the focus session that completed.
   final EntityId sessionId;

@@ -7,11 +7,13 @@ environment:
   sdk: '>=3.9.2 <4.0.0'
   flutter: '>=3.19.0'
 
+resolution: workspace
+
 dependencies:
-  flutter:
-    sdk: flutter
   cascade_flow_core:
     path: ../../packages/core
+  flutter:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:

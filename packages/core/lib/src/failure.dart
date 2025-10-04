@@ -14,21 +14,41 @@ sealed class Failure implements Exception {
   @override
   String toString() {
     final causeDescription = cause != null ? ', cause: $cause' : '';
-    return '${runtimeType}(message: $message$causeDescription)';
+    final typeName = switch (this) {
+      ValidationFailure _ => 'ValidationFailure',
+      DomainFailure _ => 'DomainFailure',
+      InfrastructureFailure _ => 'InfrastructureFailure',
+    };
+    return '$typeName(message: $message$causeDescription)';
   }
 }
 
 /// Failure triggered by invalid user or system input.
 class ValidationFailure extends Failure {
-  const ValidationFailure({required super.message, super.cause, super.stackTrace});
+  /// Creates a failure for invalid user/system input.
+  const ValidationFailure({
+    required super.message,
+    super.cause,
+    super.stackTrace,
+  });
 }
 
 /// Failure representing broken invariants or domain rules.
 class DomainFailure extends Failure {
-  const DomainFailure({required super.message, super.cause, super.stackTrace});
+  /// Creates a failure representing a broken domain invariant.
+  const DomainFailure({
+    required super.message,
+    super.cause,
+    super.stackTrace,
+  });
 }
 
 /// Failure thrown when infrastructure pieces (storage, network, etc.) go wrong.
 class InfrastructureFailure extends Failure {
-  const InfrastructureFailure({required super.message, super.cause, super.stackTrace});
+  /// Creates a failure for infrastructure or platform errors.
+  const InfrastructureFailure({
+    required super.message,
+    super.cause,
+    super.stackTrace,
+  });
 }

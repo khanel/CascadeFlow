@@ -1,7 +1,7 @@
-name: cascade_flow_presentation
-description: Presentation layer widgets and Riverpod providers for CascadeFlow.
+name: cascade_flow_app
+description: Flutter runner for CascadeFlow.
 publish_to: none
-version: 0.1.0
+version: 1.0.0+1
 
 environment:
   sdk: '>=3.9.2 <4.0.0'
@@ -11,9 +11,14 @@ resolution: workspace
 
 dependencies:
   cascade_flow_core:
-    path: ../core
+    path: ../packages/core
+  cascade_flow_data:
+    path: ../packages/data
   cascade_flow_infrastructure:
-    path: ../infrastructure
+    path: ../packages/infrastructure
+  cascade_flow_presentation:
+    path: ../packages/presentation
+  cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter
 

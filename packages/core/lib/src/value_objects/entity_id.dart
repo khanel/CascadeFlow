@@ -1,10 +1,16 @@
 import 'dart:math';
 
-import '../failure.dart';
+import 'package:cascade_flow_core/src/failure.dart';
+import 'package:meta/meta.dart';
 
 /// Strongly typed wrapper for entity identifiers.
+@immutable
 class EntityId {
+  /// Creates an identifier from a raw [value], validating its structure.
   EntityId(String value) : value = _validate(value);
+
+  /// Generates a random identifier using cryptographically secure randomness.
+  factory EntityId.generate() => EntityId._(_generate());
 
   EntityId._(this.value);
 
@@ -13,9 +19,6 @@ class EntityId {
   static final Random _secureRandom = Random.secure();
   static final RegExp _validationPattern = RegExp(r'^[a-zA-Z0-9_-]+$');
 
-  /// Generates a random identifier using cryptographically secure randomness.
-  factory EntityId.generate() => EntityId._(_generate());
-
   /// Raw identifier string.
   final String value;
 
@@ -23,7 +26,7 @@ class EntityId {
   static String _validate(String value) {
     final trimmed = value.trim();
     if (trimmed.isEmpty) {
-      throw ValidationFailure(message: 'EntityId cannot be empty');
+      throw const ValidationFailure(message: 'EntityId cannot be empty');
     }
     if (!_validationPattern.hasMatch(trimmed)) {
       throw ValidationFailure(
@@ -33,6 +36,7 @@ class EntityId {
     return trimmed;
   }
 
+  /// Generates a pseudo-random identifier string.
   static String _generate() {
     final buffer = StringBuffer();
     for (var i = 0; i < _defaultLength; i++) {

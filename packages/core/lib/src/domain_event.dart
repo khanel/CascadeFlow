@@ -1,8 +1,9 @@
-import 'value_objects/entity_id.dart';
-import 'value_objects/timestamp.dart';
+import 'package:cascade_flow_core/src/value_objects/entity_id.dart';
+import 'package:cascade_flow_core/src/value_objects/timestamp.dart';
 
 /// Base contract for domain events emitted by vertical slices.
 abstract class DomainEvent {
+  /// Creates a domain event with optional identifiers for testing.
   DomainEvent({
     EntityId? eventId,
     Timestamp? occurredOn,

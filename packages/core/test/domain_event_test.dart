@@ -18,7 +18,7 @@ void main() {
 
     test('accepts provided values', () {
       // Arrange
-      final occurredOn = Timestamp(DateTime.utc(2025, 1, 1));
+      final occurredOn = Timestamp(DateTime.utc(2025));
       final eventId = EntityId('event-123');
 
       // Act

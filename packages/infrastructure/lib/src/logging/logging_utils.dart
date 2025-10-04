@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'print_logger.dart';
+import 'package:cascade_flow_infrastructure/src/logging/print_logger.dart';
 
 /// Runs [body] while ensuring uncaught errors are logged before being rethrown.
 Future<T> runWithLogging<T>({
@@ -10,14 +10,18 @@ Future<T> runWithLogging<T>({
 }) async {
   try {
     return await Future<T>.sync(body);
-  } catch (error, stackTrace) {
+  } on Object catch (error, stackTrace) {
     _logUnhandledError(logger, error, stackTrace);
     onError?.call(error, stackTrace);
     rethrow;
   }
 }
 
-typedef LogErrorHandler = void Function(Object error, StackTrace stackTrace);
+/// Callback invoked after the error has been logged.
+typedef LogErrorHandler = void Function(
+  Object error,
+  StackTrace stackTrace,
+);
 
 void _logUnhandledError(
   PrintLogger logger,
@@ -33,8 +37,8 @@ void _logUnhandledError(
 String _describeError(Object error) => switch (error) {
       StateError(:final message) => 'StateError: $message',
       ArgumentError(:final message) => 'ArgumentError: $message',
-      AssertionError(:final message?) when message != null =>
-        'AssertionError: $message',
+      AssertionError(:final message?) => 'AssertionError: $message',
+      AssertionError() => 'AssertionError',
       FormatException(:final message) => 'FormatException: $message',
       _ => _fallbackDescription(error),
     };

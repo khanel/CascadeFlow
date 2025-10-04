@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
+/// Entry point for the CascadeFlow application.
 void main() {
   runApp(const MyApp());
 }
 
+/// Root widget that configures application-level theme and home screen.
 class MyApp extends StatelessWidget {
+  /// Creates the root widget for CascadeFlow.
   const MyApp({super.key});
 
   // This widget is the root of your application.
@@ -35,8 +38,10 @@ class MyApp extends StatelessWidget {
   }
 }
 
+/// Placeholder home page until feature slices wire in real navigation.
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  /// Creates a placeholder tab until navigation is wired.
+  const MyHomePage({required this.title, super.key});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -47,15 +52,18 @@ class MyHomePage extends StatefulWidget {
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
 
+  /// Title displayed in the demo AppBar.
   final String title;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+/// State backing the placeholder counter demo.
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
+  /// Increments the demo counter shown on screen.
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has

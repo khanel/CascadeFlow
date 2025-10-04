@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'failure.dart';
+import 'package:cascade_flow_core/src/failure.dart';
 
 /// Represents the outcome of a computation that can succeed or fail.
 typedef FailureBuilder<F extends Failure> =
@@ -9,6 +9,7 @@ typedef FailureBuilder<F extends Failure> =
       StackTrace stackTrace,
     );
 
+/// Discriminated union that wraps either a value or a failure.
 sealed class Result<T, F extends Failure> {
   const Result();
 
@@ -27,7 +28,8 @@ sealed class Result<T, F extends Failure> {
     FailureResult<T, F>(failure: final failure) => onFailure(failure),
   };
 
-  /// Applies a transformation to the successful value while preserving failures.
+  /// Applies a transformation to the successful value while 
+  /// preserving failures.
   Result<R, F> map<R>(R Function(T value) transform) => switch (this) {
     SuccessResult<T, F>(value: final value) => SuccessResult<R, F>(
       transform(value),
@@ -59,12 +61,13 @@ sealed class Result<T, F extends Failure> {
   }) {
     try {
       return SuccessResult<T, F>(body());
-    } catch (error, stackTrace) {
+    } on Object catch (error, stackTrace) {
       return _failure(onError, error, stackTrace);
     }
   }
 
-  /// Executes async [body] and captures any thrown error into a [FailureResult].
+  /// Executes async [body] and captures any thrown error into a
+  /// [FailureResult].
   static Future<Result<T, F>> guardAsync<T, F extends Failure>({
     required FutureOr<T> Function() body,
     required FailureBuilder<F> onError,
@@ -72,7 +75,7 @@ sealed class Result<T, F extends Failure> {
     try {
       final value = await Future<T>.sync(body);
       return SuccessResult<T, F>(value);
-    } catch (error, stackTrace) {
+    } on Object catch (error, stackTrace) {
       return _failure(onError, error, stackTrace);
     }
   }
@@ -88,14 +91,18 @@ sealed class Result<T, F extends Failure> {
 
 /// Successful branch containing a value of type [T].
 class SuccessResult<T, F extends Failure> extends Result<T, F> {
+  /// Creates a result that carries a successful [value].
   const SuccessResult(this.value);
 
+  /// Value produced by the successful computation.
   final T value;
 }
 
 /// Failed branch containing a [Failure].
 class FailureResult<T, F extends Failure> extends Result<T, F> {
+  /// Creates a result that carries a [failure].
   const FailureResult(this.failure);
 
+  /// Failure describing why the computation did not succeed.
   final F failure;
 }
