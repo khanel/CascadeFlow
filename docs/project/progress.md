@@ -12,9 +12,9 @@ Development cadence: every task runs through TDD—write the failing test, add t
   - ~Scaffold feature package directories to adopt the slice layout.~ ✅
   - ~Migrate existing code into the new packages without bloating `core`.~ ✅
   - ~Add placeholder tests (or skip wiring) for packages without suites so `melos run test` stops flagging exit 65.~ ✅
-  - Kick off `CaptureItem` domain modelling for the Ingest slice.
+  - ~Kick off `CaptureItem` domain modelling for the Ingest slice.~ ✅
   - Outline notification facade design so infrastructure work can continue in parallel.
-- Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief, CONTRIBUTING workflow guide, initial infrastructure stubs (PrintLogger, in-memory Hive + secure storage), logging helper with global error hook, provider registry documentation, `Result.guard`/`guardAsync` helper utilities. Updated workspace test script to skip empty packages, seeded placeholder test scaffolds across unwired packages.
+- Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief, CONTRIBUTING workflow guide, initial infrastructure stubs (PrintLogger, in-memory Hive + secure storage), logging helper with global error hook, provider registry documentation, `Result.guard`/`guardAsync` helper utilities. Updated workspace test script to skip empty packages, seeded placeholder test scaffolds across unwired packages, established `CaptureItem` domain entity with validation/context metadata.
 
 ## Milestone 1 – Workspace Restructure & Tooling
 - [x] Adopt feature-based directory layout (`/app`, `/core`, `/infrastructure`, `/features/<pillar>`).
@@ -44,7 +44,7 @@ Development cadence: every task runs through TDD—write the failing test, add t
 
 ## Milestone 5 – Feature: Ingest
 ### Domain (`features/ingest/domain`)
-- [ ] Define `CaptureItem` entity with validation and context metadata.
+- [x] Define `CaptureItem` entity with validation and context metadata.
 - [ ] Implement use cases: `CaptureQuickEntry`, `ArchiveCaptureItem`.
 
 ### Data (`features/ingest/data`)
