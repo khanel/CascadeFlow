@@ -46,7 +46,7 @@ void main() {
       );
 
       // Act
-      final act = () => CaptureItem.create(
+      void act() => CaptureItem.create(
             id: EntityId.generate(),
             content: '   ',
             context: context,
@@ -78,7 +78,7 @@ void main() {
       };
 
       // Act
-      final act = () => CaptureItem.create(
+      void act() => CaptureItem.create(
             id: EntityId.generate(),
             content: 'Check bad metadata',
             context: context,

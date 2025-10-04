@@ -14,6 +14,8 @@ dependencies:
     path: ../../packages/core
   flutter:
     sdk: flutter
+  collection: ^1.18.0
+  meta: ^1.11.0
 
 dev_dependencies:
   flutter_test:

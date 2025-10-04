@@ -30,6 +30,14 @@ Entries
 - Scope/usage: unit tests validating Result, EntityId, and domain events
 - PR/Issue: n/a
 
+- Date: 2025-10-01
+- Changed by: @codex
+- Affected pubspec: features/ingest/pubspec.yaml
+- Packages: collection@^1.18.0, meta@^1.11.0
+- Why: support immutable equality/map comparison and leverage meta annotations in CaptureItem domain entity
+- Scope/usage: CaptureItem metadata comparison, @immutable annotations for domain types
+- PR/Issue: n/a
+
 - Date:
 - Changed by:
 - Affected pubspec:
@@ -37,4 +45,3 @@ Entries
 - Why:
 - Scope/usage:
 - PR/Issue:
-
