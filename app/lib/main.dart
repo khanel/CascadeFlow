@@ -10,9 +10,12 @@ final GoRouter _router = GoRouter(
   initialLocation: _Paths.capture,
   routes: <RouteBase>[
     StatefulShellRoute.indexedStack(
-      builder: (BuildContext context, GoRouterState state,
-              StatefulNavigationShell navigationShell) =>
-          _AppShell(navigationShell: navigationShell),
+      builder:
+          (
+            BuildContext context,
+            GoRouterState state,
+            StatefulNavigationShell navigationShell,
+          ) => _AppShell(navigationShell: navigationShell),
       branches: <StatefulShellBranch>[
         StatefulShellBranch(
           routes: <RouteBase>[
@@ -75,6 +78,7 @@ final GoRouter _router = GoRouter(
 
 /// Root widget that wires theming and routing.
 class CascadeFlowApp extends StatelessWidget {
+  /// Creates the CascadeFlow root application widget.
   const CascadeFlowApp({super.key});
 
   @override

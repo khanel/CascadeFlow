@@ -18,10 +18,10 @@ dependencies:
     path: ../packages/infrastructure
   cascade_flow_presentation:
     path: ../packages/presentation
-  go_router: ^16.2.4
   cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter
+  go_router: ^16.2.4
 
 dev_dependencies:
   flutter_test:
