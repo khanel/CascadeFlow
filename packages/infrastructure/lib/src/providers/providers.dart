@@ -1,9 +1,9 @@
 import 'package:cascade_flow_infrastructure/logging.dart';
-import 'package:cascade_flow_infrastructure/notifications.dart';
 import 'package:cascade_flow_infrastructure/storage.dart';
 import 'package:riverpod/riverpod.dart';
 
 import '../notifications/noop_notification_scheduler.dart';
+import '../notifications/notification_facade.dart';
 
 /// Provides the shared [PrintLogger] used across the app and infrastructure.
 final loggerProvider = Provider<PrintLogger>(
@@ -26,23 +26,21 @@ final notificationSchedulerProvider = Provider<NotificationScheduler>(
   (ref) => const NoopNotificationScheduler(),
 );
 
+NotificationFacade _buildNotificationFacade(Ref ref) => NotificationFacade(
+      scheduler: ref.watch(notificationSchedulerProvider),
+    );
+
 /// Schedules focus-related notifications (Pomodoro timers, breaks, etc.).
 final focusNotificationFacadeProvider = Provider<NotificationFacade>(
-  (ref) => NotificationFacade(
-    scheduler: ref.watch(notificationSchedulerProvider),
-  ),
+  _buildNotificationFacade,
 );
 
 /// Schedules reminders for upcoming calendar and plan blocks.
 final scheduleNotificationFacadeProvider = Provider<NotificationFacade>(
-  (ref) => NotificationFacade(
-    scheduler: ref.watch(notificationSchedulerProvider),
-  ),
+  _buildNotificationFacade,
 );
 
 /// Schedules habit cadence nudges and streak reinforcement notifications.
 final habitNotificationFacadeProvider = Provider<NotificationFacade>(
-  (ref) => NotificationFacade(
-    scheduler: ref.watch(notificationSchedulerProvider),
-  ),
+  _buildNotificationFacade,
 );

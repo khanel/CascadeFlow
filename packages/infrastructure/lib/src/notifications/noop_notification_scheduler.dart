@@ -1,4 +1,4 @@
-import 'package:cascade_flow_infrastructure/notifications.dart';
+import 'notification_facade.dart';
 
 /// Scheduler stub used until platform integrations land.
 class NoopNotificationScheduler implements NotificationScheduler {
