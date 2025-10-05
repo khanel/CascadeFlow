@@ -1,130 +1,219 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-/// Entry point for the CascadeFlow application.
 void main() {
-  runApp(const MyApp());
+  runApp(const CascadeFlowApp());
 }
 
-/// Root widget that configures application-level theme and home screen.
-class MyApp extends StatelessWidget {
-  /// Creates the root widget for CascadeFlow.
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-/// Placeholder home page until feature slices wire in real navigation.
-class MyHomePage extends StatefulWidget {
-  /// Creates a placeholder tab until navigation is wired.
-  const MyHomePage({required this.title, super.key});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  /// Title displayed in the demo AppBar.
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-/// State backing the placeholder counter demo.
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  /// Increments the demo counter shown on screen.
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+/// Top-level router configuration for the app.
+final GoRouter _router = GoRouter(
+  initialLocation: _Paths.capture,
+  routes: <RouteBase>[
+    StatefulShellRoute.indexedStack(
+      builder: (BuildContext context, GoRouterState state,
+              StatefulNavigationShell navigationShell) =>
+          _AppShell(navigationShell: navigationShell),
+      branches: <StatefulShellBranch>[
+        StatefulShellBranch(
+          routes: <RouteBase>[
+            GoRoute(
+              path: _Paths.capture,
+              builder: (BuildContext context, GoRouterState state) =>
+                  const _CapturePage(),
             ),
           ],
         ),
+        StatefulShellBranch(
+          routes: <RouteBase>[
+            GoRoute(
+              path: _Paths.plan,
+              builder: (BuildContext context, GoRouterState state) =>
+                  const _PlanPage(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: <RouteBase>[
+            GoRoute(
+              path: _Paths.execute,
+              builder: (BuildContext context, GoRouterState state) =>
+                  const _ExecutePage(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: <RouteBase>[
+            GoRoute(
+              path: _Paths.review,
+              builder: (BuildContext context, GoRouterState state) =>
+                  const _ReviewPage(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: <RouteBase>[
+            GoRoute(
+              path: _Paths.insights,
+              builder: (BuildContext context, GoRouterState state) =>
+                  const _InsightsPage(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: <RouteBase>[
+            GoRoute(
+              path: _Paths.settings,
+              builder: (BuildContext context, GoRouterState state) =>
+                  const _SettingsPage(),
+            ),
+          ],
+        ),
+      ],
+    ),
+  ],
+);
+
+/// Root widget that wires theming and routing.
+class CascadeFlowApp extends StatelessWidget {
+  const CascadeFlowApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      title: 'CascadeFlow',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorSchemeSeed: Colors.indigo,
+        useMaterial3: true,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      routerConfig: _router,
     );
   }
+}
+
+/// Hosts the tabbed shell navigation backed by [StatefulNavigationShell].
+class _AppShell extends StatefulWidget {
+  const _AppShell({required this.navigationShell});
+
+  final StatefulNavigationShell navigationShell;
+
+  @override
+  State<_AppShell> createState() => _AppShellState();
+}
+
+class _AppShellState extends State<_AppShell> {
+  void _onDestinationSelected(int index) {
+    widget.navigationShell.goBranch(index);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: widget.navigationShell,
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: widget.navigationShell.currentIndex,
+        onDestinationSelected: _onDestinationSelected,
+        destinations: const <NavigationDestination>[
+          NavigationDestination(
+            icon: Icon(Icons.inbox_outlined),
+            selectedIcon: Icon(Icons.inbox),
+            label: 'Capture',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.event_note_outlined),
+            selectedIcon: Icon(Icons.event_note),
+            label: 'Plan',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.play_circle_outline),
+            selectedIcon: Icon(Icons.play_circle),
+            label: 'Execute',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.rate_review_outlined),
+            selectedIcon: Icon(Icons.rate_review),
+            label: 'Review',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.insights_outlined),
+            selectedIcon: Icon(Icons.insights),
+            label: 'Insights',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CapturePage extends StatelessWidget {
+  const _CapturePage();
+
+  @override
+  Widget build(BuildContext context) => const _PlaceholderView('Capture');
+}
+
+class _PlanPage extends StatelessWidget {
+  const _PlanPage();
+
+  @override
+  Widget build(BuildContext context) => const _PlaceholderView('Plan');
+}
+
+class _ExecutePage extends StatelessWidget {
+  const _ExecutePage();
+
+  @override
+  Widget build(BuildContext context) => const _PlaceholderView('Execute');
+}
+
+class _ReviewPage extends StatelessWidget {
+  const _ReviewPage();
+
+  @override
+  Widget build(BuildContext context) => const _PlaceholderView('Review');
+}
+
+class _InsightsPage extends StatelessWidget {
+  const _InsightsPage();
+
+  @override
+  Widget build(BuildContext context) => const _PlaceholderView('Insights');
+}
+
+class _SettingsPage extends StatelessWidget {
+  const _SettingsPage();
+
+  @override
+  Widget build(BuildContext context) => const _PlaceholderView('Settings');
+}
+
+class _PlaceholderView extends StatelessWidget {
+  const _PlaceholderView(this.title);
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      body: Center(
+        child: Text('$title placeholder'),
+      ),
+    );
+  }
+}
+
+/// Route path constants for primary navigation branches.
+abstract final class _Paths {
+  static const String capture = '/capture';
+  static const String plan = '/plan';
+  static const String execute = '/execute';
+  static const String review = '/review';
+  static const String insights = '/insights';
+  static const String settings = '/settings';
 }
