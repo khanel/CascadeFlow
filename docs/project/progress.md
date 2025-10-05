@@ -9,7 +9,7 @@ Development cadence: every task runs through TDD—write the failing test, add t
 ## Status Snapshot (2025-09-30)
 - Current focus: kick off CaptureItem domain modelling and notification facade design now that the feature-based restructure is in place.
 - Next actions:
-  - Initialise theme, ProviderScope, Hive, secure storage, and notifications in the app bootstrap.
+  - Execute the bootstrap initialisation checklist under Milestone 4.
   - Add placeholder routes/screens for each navigation branch to unblock feature integration work.
   - Flesh out presentation scaffolds so slice packages can begin wiring real UI flows.
 - Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief, CONTRIBUTING workflow guide, initial infrastructure stubs (PrintLogger, in-memory Hive + secure storage), logging helper with global error hook, provider registry documentation, `Result.guard`/`guardAsync` helper utilities. Updated workspace test script to skip empty packages, seeded placeholder test scaffolds across unwired packages, established `CaptureItem` domain entity with validation/context metadata. Ensured tab re-selection resets each branch to its root while preserving cross-branch navigation stacks using go_router's `StatefulNavigationShell`.
@@ -37,7 +37,12 @@ Development cadence: every task runs through TDD—write the failing test, add t
 ## Milestone 4 – App Composition & Navigation
 - [x] Configure `StatefulShellRoute` branches aligned with pillars (Capture, Plan, Execute, Review, Insights, Settings).
 - [x] Ensure each branch preserves its navigation stack when switching tabs.
-- [ ] Initialise theme, ProviderScope, Hive, secure storage, and notifications in the `/app` bootstrap.
+- [ ] Complete bootstrap initialisation:
+  - [ ] Apply the shared light/dark themes and adaptive layout breakpoints to the root `MaterialApp`.
+  - [ ] Wrap the entry widget with `ProviderScope` and register global overrides/providers.
+  - [ ] Introduce an async bootstrap runner that requests the secure storage key and configures Hive before `runApp`.
+  - [ ] Register required Hive adapters and open base boxes used by the app shell.
+  - [ ] Initialise the notification facade (permissions, channels, background handlers) prior to UI launch.
 - [ ] Add placeholder routes/screens for each branch to unblock feature integration.
 
 ## Milestone 5 – Feature: Ingest
