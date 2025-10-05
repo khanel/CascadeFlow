@@ -33,7 +33,7 @@ Development cadence: every task runs through TDD—write the failing test, add t
 - [x] Implement Hive initialisation + encryption helpers that `app` can call at startup.
 - [x] Add secure storage wrapper (e.g., `flutter_secure_storage`) for Hive keys.
 - [x] Provide logging utilities and global error handling hooks.
-- [ ] Expose notification facades for focus timers, schedule reminders, and habit nudges.
+- [x] Expose notification facades for focus timers, schedule reminders, and habit nudges.
 - [x] Document Riverpod providers that slices should consume.
 
 ## Milestone 4 – App Composition & Navigation
