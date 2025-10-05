@@ -9,12 +9,10 @@ Development cadence: every task runs through TDD—write the failing test, add t
 ## Status Snapshot (2025-09-30)
 - Current focus: kick off CaptureItem domain modelling and notification facade design now that the feature-based restructure is in place.
 - Next actions:
-  - ~Scaffold feature package directories to adopt the slice layout.~ ✅
-  - ~Migrate existing code into the new packages without bloating `core`.~ ✅
-  - ~Add placeholder tests (or skip wiring) for packages without suites so `melos run test` stops flagging exit 65.~ ✅
-  - ~Kick off `CaptureItem` domain modelling for the Ingest slice.~ ✅
-  - ~Outline notification facade design so infrastructure work can continue in parallel.~ ✅
-- Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief, CONTRIBUTING workflow guide, initial infrastructure stubs (PrintLogger, in-memory Hive + secure storage), logging helper with global error hook, provider registry documentation, `Result.guard`/`guardAsync` helper utilities. Updated workspace test script to skip empty packages, seeded placeholder test scaffolds across unwired packages, established `CaptureItem` domain entity with validation/context metadata.
+  - Initialise theme, ProviderScope, Hive, secure storage, and notifications in the app bootstrap.
+  - Add placeholder routes/screens for each navigation branch to unblock feature integration work.
+  - Flesh out presentation scaffolds so slice packages can begin wiring real UI flows.
+- Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief, CONTRIBUTING workflow guide, initial infrastructure stubs (PrintLogger, in-memory Hive + secure storage), logging helper with global error hook, provider registry documentation, `Result.guard`/`guardAsync` helper utilities. Updated workspace test script to skip empty packages, seeded placeholder test scaffolds across unwired packages, established `CaptureItem` domain entity with validation/context metadata. Ensured tab re-selection resets each branch to its root while preserving cross-branch navigation stacks using go_router's `StatefulNavigationShell`.
 
 ## Milestone 1 – Workspace Restructure & Tooling
 - [x] Adopt feature-based directory layout (`/app`, `/core`, `/infrastructure`, `/features/<pillar>`).
@@ -38,7 +36,7 @@ Development cadence: every task runs through TDD—write the failing test, add t
 
 ## Milestone 4 – App Composition & Navigation
 - [x] Configure `StatefulShellRoute` branches aligned with pillars (Capture, Plan, Execute, Review, Insights, Settings).
-- [ ] Ensure each branch preserves its navigation stack when switching tabs.
+- [x] Ensure each branch preserves its navigation stack when switching tabs.
 - [ ] Initialise theme, ProviderScope, Hive, secure storage, and notifications in the `/app` bootstrap.
 - [ ] Add placeholder routes/screens for each branch to unblock feature integration.
 
