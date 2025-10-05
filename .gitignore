@@ -81,3 +81,6 @@ app/linux/flutter/ephemeral/
 reports/
 .tmp/
 .temp/
+
+# Flutter build artifacts
+*.Z
