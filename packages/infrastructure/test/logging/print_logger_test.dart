@@ -15,8 +15,7 @@ void main() {
       // Act
       runZoned(
         () {
-          const logger = PrintLogger();
-          logger
+          const PrintLogger()
             ..debug('debug message')
             ..info('info message')
             ..warning('warn message')
