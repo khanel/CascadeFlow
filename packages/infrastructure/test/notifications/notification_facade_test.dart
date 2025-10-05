@@ -1,5 +1,5 @@
 import 'package:cascade_flow_infrastructure/notifications.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 
 void main() {
   group('NotificationFacade', () {
@@ -17,14 +17,16 @@ void main() {
       expect(facade.clearAll, isNotNull);
     });
 
-    test('delegates schedule requests to provided scheduler abstraction', () async {
+    test(
+        'delegates schedule requests to provided scheduler abstraction',
+        () async {
       // Arrange
       final scheduler = RecordingNotificationScheduler();
       final facade = NotificationFacade(scheduler: scheduler);
       final request = NotificationRequest(
         id: 'focus_break',
         channel: NotificationChannel.focus,
-        payload: {'duration': '25m'},
+        payload: const {'duration': '25m'},
         triggerAt: DateTime.utc(2025, 10, 1, 12),
       );
 

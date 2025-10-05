@@ -38,6 +38,14 @@ Entries
 - Scope/usage: CaptureItem metadata comparison, @immutable annotations for domain types
 - PR/Issue: n/a
 
+- Date: 2025-10-01
+- Changed by: @codex
+- Affected pubspec: packages/infrastructure/pubspec.yaml
+- Packages: collection@^1.18.0, meta@^1.11.0
+- Why: notification facade immutability and deep equality helpers
+- Scope/usage: NotificationRequest payload handling and annotations
+- PR/Issue: n/a
+
 - Date:
 - Changed by:
 - Affected pubspec:
