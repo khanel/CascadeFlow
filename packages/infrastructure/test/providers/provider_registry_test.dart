@@ -1,6 +1,7 @@
 // Confirms provider wiring remains aligned with the Milestone 3 stubs outlined
 // in `docs/project/progress.md`.
 import 'package:cascade_flow_infrastructure/cascade_flow_infrastructure.dart';
+import 'package:cascade_flow_infrastructure/notifications.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
 
@@ -39,6 +40,56 @@ void main() {
 
       // Assert
       expect(initializer, isA<InMemoryHiveInitializer>());
+    });
+
+    test('notificationSchedulerProvider exposes NotificationScheduler', () {
+      // Arrange
+      final read = container.read;
+
+      // Act
+      final scheduler = read(notificationSchedulerProvider);
+
+      // Assert
+      expect(scheduler, isA<NotificationScheduler>());
+    });
+
+    test('focusNotificationFacadeProvider returns singleton facade', () {
+      // Arrange
+      final read = container.read;
+
+      // Act
+      final facade = read(focusNotificationFacadeProvider);
+      final facadeAgain = read(focusNotificationFacadeProvider);
+
+      // Assert
+      expect(facade, isA<NotificationFacade>());
+      expect(identical(facade, facadeAgain), isTrue);
+    });
+
+    test('scheduleNotificationFacadeProvider returns singleton facade', () {
+      // Arrange
+      final read = container.read;
+
+      // Act
+      final facade = read(scheduleNotificationFacadeProvider);
+      final facadeAgain = read(scheduleNotificationFacadeProvider);
+
+      // Assert
+      expect(facade, isA<NotificationFacade>());
+      expect(identical(facade, facadeAgain), isTrue);
+    });
+
+    test('habitNotificationFacadeProvider returns singleton facade', () {
+      // Arrange
+      final read = container.read;
+
+      // Act
+      final facade = read(habitNotificationFacadeProvider);
+      final facadeAgain = read(habitNotificationFacadeProvider);
+
+      // Assert
+      expect(facade, isA<NotificationFacade>());
+      expect(identical(facade, facadeAgain), isTrue);
     });
   });
 }
