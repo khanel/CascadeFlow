@@ -23,6 +23,13 @@ final GoRouter _router = GoRouter(
               path: _Paths.capture,
               builder: (BuildContext context, GoRouterState state) =>
                   const _CapturePage(),
+              routes: <RouteBase>[
+                GoRoute(
+                  path: 'details',
+                  builder: (BuildContext context, GoRouterState state) =>
+                      const _CaptureDetailsPage(),
+                ),
+              ],
             ),
           ],
         ),
@@ -107,7 +114,10 @@ class _AppShell extends StatefulWidget {
 
 class _AppShellState extends State<_AppShell> {
   void _onDestinationSelected(int index) {
-    widget.navigationShell.goBranch(index);
+    widget.navigationShell.goBranch(
+      index,
+      initialLocation: index == widget.navigationShell.currentIndex,
+    );
   }
 
   @override
@@ -159,6 +169,13 @@ class _CapturePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const _PlaceholderView('Capture');
+}
+
+class _CaptureDetailsPage extends StatelessWidget {
+  const _CaptureDetailsPage();
+
+  @override
+  Widget build(BuildContext context) => const _PlaceholderView('Capture details');
 }
 
 class _PlanPage extends StatelessWidget {
