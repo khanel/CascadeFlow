@@ -28,7 +28,7 @@ Enhancements on the roadmap include deeper analytics, gamification hooks, multi-
 - **State & DI**: Riverpod (Notifier/AsyncNotifier APIs) with `riverpod_annotation`/`riverpod_generator` driving typed provider codegen.
 - **Workspace**: Melos orchestrates the monorepo (bootstrap, analyse, test).
 - **Storage**: Hive CE (community edition) for encrypted, offline-first persistence; `flutter_secure_storage` for key handling.
-- **Navigation**: GoRouter pinned to `14.2.3` with `StatefulShellRoute` to preserve tab stacks until Flutter 3.29 lands in the toolchain.
+- **Navigation**: GoRouter updated to `16.2.4`, leveraging `StatefulShellRoute` to preserve tab stacks on Flutter 3.29+.
 - **Notifications**: `flutter_local_notifications` centralised in the infrastructure package.
 - **Theming**: Material 3 with FlexColorScheme `8.0.2` (compatible with Flutter 3.24–3.27).
 - **Testing**: `flutter_test`, Riverpod testing utilities, and Hive CE adapter harnesses.

@@ -33,7 +33,7 @@ _Notes_: `sembast` (3.8.5+1) remains an escape hatch if we must stay on Flutter 
 | Package (Doc) | Latest Version | Flutter Constraint | Alternatives Reviewed | Recommendation |
 | --- | --- | --- | --- | --- |
 | `flutter_riverpod` | `3.0.1` | `>=3.0.0` | `hooks_riverpod` | Keep; matches chosen state management strategy.
-| `go_router` | `16.2.4` | `>=3.29.0` | `auto_route 10.1.2`, `beamer 1.7.0` | Pin to `go_router 14.2.3` (Flutter `>=3.16.0`) until the project upgrades to Flutter 3.29+. Still official and well-supported.
+| `go_router` | `16.2.4` | `>=3.29.0` | `auto_route 10.1.2`, `beamer 1.7.0` | Adopt latest `go_router 16.2.4`; requires Flutter `>=3.29.0` but keeps us aligned with upstream navigation fixes.
 | `intl` | `0.20.2` | SDK `^3.3.0` | `slang`, `timeago` | Keep; canonical i18n library with 5k+ likes.
 | `flex_color_scheme` | `8.3.0` | `>=3.35.0` | `material_color_utilities`, `theme_tailor` | Use `flex_color_scheme 8.0.2` (Flutter `>=3.24.0`) to stay within current toolchain while retaining Material 3 helpers.
 | `flutter_local_notifications` | `19.4.2` | `>=3.22.0` | `awesome_notifications` | Keep; still the most feature-complete, with higher platform coverage.
@@ -41,5 +41,5 @@ _Notes_: `sembast` (3.8.5+1) remains an escape hatch if we must stay on Flutter 
 ## Summary
 
 - Immediate upgrades: switch to `hive_ce`/`hive_ce_flutter` and add Riverpod codegen tooling (`riverpod_annotation`, `riverpod_generator`, `build_runner`).
-- Version pins: `go_router 14.2.3` and `flex_color_scheme 8.0.2` keep us compatible with Flutter 3.24 while staying close to upstream.
+- Version pins: `flex_color_scheme 8.0.2` keeps us compatible with Flutter 3.24 while staying close to upstream. Navigation now tracks latest `go_router 16.2.4` alongside Flutter 3.29+.
 - Next review: revisit Hive CE vs upstream Hive once Hive 4.0.0 lands with stable Dart 3 constraints, and reassess `go_router`/`flex_color_scheme` after upgrading Flutter.

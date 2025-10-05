@@ -40,7 +40,7 @@ This project adds dependencies only when there is a concrete, immediate need in 
 - Domain: `fpdart`
 - Data: `hive_ce`, `hive_ce_flutter`, `path_provider`
 - Infrastructure: `riverpod`, `riverpod_annotation`, `riverpod_generator`, `logger`, `flutter_secure_storage`
-- Presentation: `flutter_riverpod`, `go_router` (pin to `14.2.3` until Flutter `>=3.29`), `intl`, `flex_color_scheme` (use `8.0.2` with Flutter `3.24`)
+- Presentation: `flutter_riverpod`, `go_router` (track latest `16.2.4`, requires Flutter `>=3.29`), `intl`, `flex_color_scheme` (use `8.0.2` with Flutter `3.24`)
 
 When adopting generated providers, include `build_runner` in `dev_dependencies` and run `dart run build_runner watch --delete-conflicting-outputs` within the affected package.
 

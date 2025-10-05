@@ -37,7 +37,7 @@ Development cadence: every task runs through TDD—write the failing test, add t
 - [x] Document Riverpod providers that slices should consume.
 
 ## Milestone 4 – App Composition & Navigation
-- [ ] Configure `StatefulShellRoute` branches aligned with pillars (Capture, Plan, Execute, Review, Insights, Settings).
+- [x] Configure `StatefulShellRoute` branches aligned with pillars (Capture, Plan, Execute, Review, Insights, Settings).
 - [ ] Ensure each branch preserves its navigation stack when switching tabs.
 - [ ] Initialise theme, ProviderScope, Hive, secure storage, and notifications in the `/app` bootstrap.
 - [ ] Add placeholder routes/screens for each branch to unblock feature integration.
