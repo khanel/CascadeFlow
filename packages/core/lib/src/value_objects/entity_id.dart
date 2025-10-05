@@ -7,12 +7,13 @@ import 'package:meta/meta.dart';
 @immutable
 class EntityId {
   /// Creates an identifier from a raw [value], validating its structure.
-  EntityId(String value) : value = _validate(value);
+  factory EntityId(String value) => EntityId._(_validate(value));
 
   /// Generates a random identifier using cryptographically secure randomness.
   factory EntityId.generate() => EntityId._(_generate());
 
-  EntityId._(this.value);
+  /// Internal const constructor used by validated factories.
+  const EntityId._(this.value);
 
   static const int _defaultLength = 24;
   static const String _charset = 'abcdefghijklmnopqrstuvwxyz0123456789';

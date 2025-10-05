@@ -4,9 +4,10 @@ import 'package:meta/meta.dart';
 @immutable
 class Timestamp implements Comparable<Timestamp> {
   /// Creates a timestamp from a [value], normalising it to UTC.
-  Timestamp(DateTime value) : value = _toUtc(value);
+  factory Timestamp(DateTime value) => Timestamp._(_toUtc(value));
 
-  Timestamp._(this.value);
+  /// Internal const constructor for canonical timestamps.
+  const Timestamp._(this.value);
 
   /// Builds a timestamp from the current instant.
   factory Timestamp.now() => Timestamp._(DateTime.now().toUtc());

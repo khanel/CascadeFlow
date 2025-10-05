@@ -12,9 +12,9 @@ resolution: workspace
 dependencies:
   cascade_flow_core:
     path: ../../packages/core
+  collection: ^1.18.0
   flutter:
     sdk: flutter
-  collection: ^1.18.0
   meta: ^1.11.0
 
 dev_dependencies:
