@@ -175,7 +175,8 @@ class _CaptureDetailsPage extends StatelessWidget {
   const _CaptureDetailsPage();
 
   @override
-  Widget build(BuildContext context) => const _PlaceholderView('Capture details');
+  Widget build(BuildContext context) =>
+      const _PlaceholderView('Capture details');
 }
 
 class _PlanPage extends StatelessWidget {
