@@ -1,4 +1,5 @@
 import 'package:cascade_flow_app/main.dart';
+import 'package:cascade_flow_app/src/bootstrap/cascade_layout_scope.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -34,20 +35,23 @@ void main() {
       expect(
         materialApp.builder,
         isNotNull,
-        reason: 'Root MaterialApp should wrap content with adaptive layout scope.',
+        reason: 'Root MaterialApp should wrap content with a layout scope.',
       );
 
-      final layoutScopeFinder = find.byWidgetPredicate(
-        (Widget widget) =>
-            widget is InheritedWidget &&
-            widget.runtimeType.toString() == 'CascadeLayoutScope',
-      );
+      final layoutScopeFinder = find.byType(CascadeLayoutScope);
 
       expect(
         layoutScopeFinder,
         findsOneWidget,
         reason: 'Adaptive layout scope should be mounted in the tree.',
       );
+
+      final layoutScope = tester.widget<CascadeLayoutScope>(layoutScopeFinder);
+      expect(layoutScope.breakpoints, CascadeLayoutBreakpoints.standard);
+
+      final scopeContext = tester.element(layoutScopeFinder);
+      final resolvedScope = CascadeLayoutScope.of(scopeContext);
+      expect(resolvedScope.size, CascadeLayoutSize.medium);
     },
   );
 }
