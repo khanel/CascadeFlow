@@ -93,13 +93,48 @@ class CascadeFlowApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'CascadeFlow',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorSchemeSeed: Colors.indigo,
-        useMaterial3: true,
-      ),
+      theme: CascadeAppTheme.light,
+      darkTheme: CascadeAppTheme.dark,
+      themeMode: CascadeAppTheme.mode,
+      builder: (BuildContext context, Widget? child) {
+        return CascadeLayoutScope(
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
       routerConfig: _router,
     );
   }
+}
+
+/// Shared theme configuration for the root application widget.
+abstract final class CascadeAppTheme {
+  static ThemeData _buildTheme(Brightness brightness) => ThemeData(
+        colorSchemeSeed: Colors.indigo,
+        useMaterial3: true,
+        brightness: brightness,
+      );
+
+  static final ThemeData light = _buildTheme(Brightness.light);
+  static final ThemeData dark = _buildTheme(Brightness.dark);
+  static const ThemeMode mode = ThemeMode.system;
+}
+
+/// Inherited scope used to expose adaptive layout information.
+class CascadeLayoutScope extends InheritedWidget {
+  const CascadeLayoutScope({super.key, required super.child});
+
+  static CascadeLayoutScope? maybeOf(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<CascadeLayoutScope>();
+  }
+
+  static CascadeLayoutScope of(BuildContext context) {
+    final scope = maybeOf(context);
+    assert(scope != null, 'CascadeLayoutScope not found in context.');
+    return scope!;
+  }
+
+  @override
+  bool updateShouldNotify(CascadeLayoutScope oldWidget) => false;
 }
 
 /// Hosts the tabbed shell navigation backed by [StatefulNavigationShell].
