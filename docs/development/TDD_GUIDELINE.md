@@ -8,6 +8,11 @@ Test-Driven Development (TDD) is a software development methodology where tests 
 
 TDD follows a repetitive three-phase cycle, often visualized as Red → Green → Blue (Refactor). Each phase has a distinct purpose and must be completed before moving to the next.
 
+**Important Guidelines:**
+- Each phase must be committed as a separate git commit to maintain traceability and clear separation of concerns
+- Test files should only be modified during the RED phase; no test editing is allowed during the GREEN phase
+- During the BLUE (refactor) phase, only logically allowed changes can be applied, and the main logic must be preserved and unchanged
+
 ---
 
 ### Phase 1: RED - Write a Failing Test
@@ -39,6 +44,8 @@ TDD follows a repetitive three-phase cycle, often visualized as Red → Green �
 
 **Why this matters:** Starting with a failing test ensures you understand the requirement and that your test can actually detect problems. It proves your test has value.
 
+**Commit Requirement:** This phase must be committed as a separate git commit with a descriptive message indicating this is for tests only.
+
 ---
 
 ### Phase 2: GREEN - Make the Test Pass
@@ -60,6 +67,10 @@ TDD follows a repetitive three-phase cycle, often visualized as Red → Green �
 - Focus solely on making the test pass, not on perfect code
 
 **Why this matters:** This phase proves that your test works and establishes a baseline. Keeping implementations simple prevents over-engineering and premature optimization.
+
+**Restrictions:** No test code should be modified during this phase. Test editing is only allowed in the RED phase.
+**Coding Separation:** Each TDD cycle should implement one logical, separable piece of functionality. Break down complex features into multiple RED-GREEN-BLUE cycles, with each cycle committed separately.
+**Commit Requirement:** This phase must be committed as a separate git commit containing only the production code changes that make the test pass.
 
 ---
 
@@ -83,6 +94,10 @@ Refactoring means restructuring existing code to improve its design, readability
 6. **Commit when done** - Save your work once tests pass and code is clean
 
 **IMPORTANT:** During the Blue phase, you refactor only the production/implementation code. Tests are not touched during refactoring—they remain unchanged to ensure they can detect if you accidentally alter behavior.
+
+**Restrictions:** Only logically allowed changes can be applied during refactoring. The main business logic implemented in the GREEN phase must remain preserved and unchanged. Refactoring is limited to structural improvements, code organization, naming, and other non-behavioral modifications that don't alter the core functionality.
+
+**Commit Requirement:** This phase must be committed as a separate git commit containing only the refactoring changes to production code.
 
 ---
 
