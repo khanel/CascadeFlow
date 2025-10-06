@@ -107,6 +107,16 @@ class CascadeFlowApp extends StatelessWidget {
   /// Creates the CascadeFlow root application widget.
   const CascadeFlowApp({super.key});
 
+  CascadeLayoutData _layoutDataFor(BuildContext context) {
+    final width = MediaQuery.maybeOf(context)?.size.width ?? 0;
+
+    const breakpoints = CascadeLayoutBreakpoints.standard;
+    return CascadeLayoutData(
+      breakpoints: breakpoints,
+      size: breakpoints.resolve(width),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
@@ -115,18 +125,12 @@ class CascadeFlowApp extends StatelessWidget {
       theme: CascadeAppTheme.light,
       darkTheme: CascadeAppTheme.dark,
       builder: (BuildContext context, Widget? child) {
-        final mediaQuery = MediaQuery.maybeOf(context);
-        final width = mediaQuery?.size.width ?? 0;
-
-        const breakpoints = CascadeLayoutBreakpoints.standard;
-        final layoutData = CascadeLayoutData(
-          breakpoints: breakpoints,
-          size: breakpoints.resolve(width),
-        );
+        final layoutData = _layoutDataFor(context);
+        final Widget content = child ?? const SizedBox.shrink();
 
         return CascadeLayoutScope(
           data: layoutData,
-          child: child ?? const SizedBox.shrink(),
+          child: content,
         );
       },
       routerConfig: _router,
