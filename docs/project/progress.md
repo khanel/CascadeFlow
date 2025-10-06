@@ -39,7 +39,7 @@ Development cadence: every task runs through TDD—write the failing test, add t
 - [x] Ensure each branch preserves its navigation stack when switching tabs.
 - [ ] Complete bootstrap initialisation:
   - [x] Apply the shared light/dark themes and adaptive layout breakpoints to the root `MaterialApp`.
-  - [ ] Wrap the entry widget with `ProviderScope` and register global overrides/providers.
+  - [x] Wrap the entry widget with `ProviderScope` and register global overrides/providers.
   - [ ] Introduce an async bootstrap runner that requests the secure storage key and configures Hive before `runApp`.
   - [ ] Register required Hive adapters and open base boxes used by the app shell.
   - [ ] Initialise the notification facade (permissions, channels, background handlers) prior to UI launch.

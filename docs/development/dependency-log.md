@@ -46,6 +46,14 @@ Entries
 - Scope/usage: NotificationRequest payload handling and annotations
 - PR/Issue: n/a
 
+- Date: 2025-10-02
+- Changed by: @codex
+- Affected pubspec: app/pubspec.yaml
+- Packages: flutter_riverpod@^3.0.1
+- Why: enable ProviderScope bootstrapping for global overrides (Milestone 4)
+- Scope/usage: Root app widget wraps MaterialApp with ProviderScope
+- PR/Issue: n/a
+
 - Date:
 - Changed by:
 - Affected pubspec:
