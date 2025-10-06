@@ -1,10 +1,27 @@
 import 'package:cascade_flow_app/src/bootstrap/cascade_app_theme.dart';
 import 'package:cascade_flow_app/src/bootstrap/cascade_layout_scope.dart';
+import 'package:cascade_flow_infrastructure/cascade_flow_infrastructure.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 void main() {
-  runApp(const CascadeFlowApp());
+  runApp(const CascadeBootstrap());
+}
+
+/// Wraps the application with global provider overrides shared across slices.
+class CascadeBootstrap extends StatelessWidget {
+  const CascadeBootstrap({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ProviderScope(
+      overrides: [
+        loggerProvider.overrideWithValue(const PrintLogger()),
+      ],
+      child: const CascadeFlowApp(),
+    );
+  }
 }
 
 /// Top-level router configuration for the app.
