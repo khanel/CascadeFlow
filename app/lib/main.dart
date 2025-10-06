@@ -11,6 +11,7 @@ void main() {
 
 /// Wraps the application with global provider overrides shared across slices.
 class CascadeBootstrap extends StatelessWidget {
+  /// Creates a bootstrap wrapper supplying global provider overrides.
   const CascadeBootstrap({super.key});
 
   @override
@@ -107,6 +108,7 @@ class CascadeFlowApp extends StatelessWidget {
   /// Creates the CascadeFlow root application widget.
   const CascadeFlowApp({super.key});
 
+  /// Resolves layout data for the current `MediaQuery` context.
   CascadeLayoutData _layoutDataFor(BuildContext context) {
     final width = MediaQuery.maybeOf(context)?.size.width ?? 0;
 
@@ -126,7 +128,7 @@ class CascadeFlowApp extends StatelessWidget {
       darkTheme: CascadeAppTheme.dark,
       builder: (BuildContext context, Widget? child) {
         final layoutData = _layoutDataFor(context);
-        final Widget content = child ?? const SizedBox.shrink();
+        final content = child ?? const SizedBox.shrink();
 
         return CascadeLayoutScope(
           data: layoutData,

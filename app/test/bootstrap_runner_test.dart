@@ -24,7 +24,9 @@ class _RecordingHiveInitializer extends InMemoryHiveInitializer {
 }
 
 void main() {
-  test('bootstrap runner requests encryption key and initialises Hive', () async {
+  test(
+    'bootstrap runner requests encryption key and initialises Hive',
+    () async {
     final secureStorage = _RecordingSecureStorage();
     final hiveInitializer = _RecordingHiveInitializer();
 
@@ -37,7 +39,10 @@ void main() {
 
     await runCascadeBootstrap(container);
 
-    expect(secureStorage.readKeys.single, 'cascadeflow.hive_encryption_key');
+    expect(
+      secureStorage.readKeys.single,
+      'cascadeflow.hive_encryption_key',
+    );
     expect(hiveInitializer.initializeCalled, isTrue);
 
     container.dispose();
