@@ -38,7 +38,7 @@ Development cadence: every task runs through TDD—write the failing test, add t
 - [x] Configure `StatefulShellRoute` branches aligned with pillars (Capture, Plan, Execute, Review, Insights, Settings).
 - [x] Ensure each branch preserves its navigation stack when switching tabs.
 - [ ] Complete bootstrap initialisation:
-  - [ ] Apply the shared light/dark themes and adaptive layout breakpoints to the root `MaterialApp`.
+  - [x] Apply the shared light/dark themes and adaptive layout breakpoints to the root `MaterialApp`.
   - [ ] Wrap the entry widget with `ProviderScope` and register global overrides/providers.
   - [ ] Introduce an async bootstrap runner that requests the secure storage key and configures Hive before `runApp`.
   - [ ] Register required Hive adapters and open base boxes used by the app shell.
