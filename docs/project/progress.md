@@ -42,6 +42,8 @@ Development cadence: every task runs through TDD—write the failing test, add t
   - [x] Wrap the entry widget with `ProviderScope` and register global overrides/providers.
   - [x] Introduce an async bootstrap runner that requests the secure storage key and configures Hive before `runApp`.
   - [ ] Register required Hive adapters and open base boxes used by the app shell.
+    - [x] Open app shell base boxes (`app.preferences`, `app.navigation_state`).
+    - [ ] Wire Hive adapter registration.
   - [ ] Initialise the notification facade (permissions, channels, background handlers) prior to UI launch.
 - [ ] Add placeholder routes/screens for each branch to unblock feature integration.
 
