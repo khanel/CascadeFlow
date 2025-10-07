@@ -24,4 +24,15 @@ Future<void> runCascadeBootstrap(ProviderContainer container) async {
   for (final boxName in _baseHiveBoxes) {
     await hiveInitializer.openEncryptedBox<dynamic>(boxName);
   }
+
+  final focusNotifications = container.read(focusNotificationFacadeProvider);
+  final scheduleNotifications =
+      container.read(scheduleNotificationFacadeProvider);
+  final habitNotifications = container.read(habitNotificationFacadeProvider);
+
+  await Future.wait<void>([
+    focusNotifications.clearAll(),
+    scheduleNotifications.clearAll(),
+    habitNotifications.clearAll(),
+  ]);
 }
