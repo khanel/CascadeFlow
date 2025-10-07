@@ -42,14 +42,9 @@ class ArchiveCaptureItem {
         }
 
         final timestamp = _nowProvider();
-        final archived = CaptureItem.create(
-          id: item.id,
-          content: item.content,
-          context: item.context,
-          createdAt: item.createdAt,
-          updatedAt: timestamp,
+        final archived = item.copyWith(
           status: CaptureStatus.archived,
-          metadata: Map<String, String>.from(item.metadata),
+          updatedAt: timestamp,
         );
 
         _publishEvent(

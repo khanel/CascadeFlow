@@ -136,6 +136,33 @@ class CaptureItem {
     return 'CaptureItem(id: $id, status: $status, '
         'createdAt: $createdAt, updatedAt: $updatedAt)';
   }
+
+  /// Returns a copy of this item with the provided overrides.
+  CaptureItem copyWith({
+    String? content,
+    CaptureContext? context,
+    CaptureStatus? status,
+    Timestamp? createdAt,
+    Timestamp? updatedAt,
+    Map<String, String>? metadata,
+  }) {
+    final nextMetadata = metadata == null
+        ? this.metadata
+        : Map<String, String>.unmodifiable(metadata);
+
+    final nextUpdatedAt = updatedAt ?? this.updatedAt;
+    _guardUpdatedAt(createdAt ?? this.createdAt, nextUpdatedAt);
+
+    return CaptureItem._(
+      id: id,
+      content: content ?? this.content,
+      context: context ?? this.context,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: nextUpdatedAt,
+      metadata: nextMetadata,
+    );
+  }
 }
 
 /// Contextual information describing how a capture was created.
