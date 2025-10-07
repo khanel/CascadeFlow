@@ -21,8 +21,12 @@ class _RecordingSecureStorage extends InMemorySecureStorage {
 }
 
 class _RecordingHiveInitializer extends InMemoryHiveInitializer {
+  _RecordingHiveInitializer({void Function(String name)? onBoxOpened})
+      : _onBoxOpened = onBoxOpened;
+
   bool initializeCalled = false;
   final List<String> openedBoxes = <String>[];
+  final void Function(String name)? _onBoxOpened;
 
   @override
   Future<void> initialize() {
@@ -32,8 +36,23 @@ class _RecordingHiveInitializer extends InMemoryHiveInitializer {
 
   @override
   Future<InMemoryHiveBox<T>> openEncryptedBox<T>(String name) {
+    _onBoxOpened?.call(name);
     openedBoxes.add(name);
     return super.openEncryptedBox<T>(name);
+  }
+}
+
+class _RecordingHiveAdapterRegistrar implements HiveAdapterRegistrar {
+  _RecordingHiveAdapterRegistrar({void Function()? onRegister})
+      : _onRegister = onRegister;
+
+  bool registerCalled = false;
+  final void Function()? _onRegister;
+
+  @override
+  Future<void> registerAdapters() async {
+    registerCalled = true;
+    _onRegister?.call();
   }
 }
 
@@ -77,6 +96,37 @@ void main() {
         hiveInitializer.openedBoxes,
         containsAll(_expectedBaseBoxes),
       );
+
+      container.dispose();
+    },
+  );
+
+  test(
+    'bootstrap runner registers Hive adapters before opening base boxes',
+    () async {
+      final order = <String>[];
+
+      final registrar = _RecordingHiveAdapterRegistrar(
+        onRegister: () => order.add('register'),
+      );
+      final secureStorage = _RecordingSecureStorage();
+      final hiveInitializer = _RecordingHiveInitializer(
+        onBoxOpened: (name) => order.add('open:$name'),
+      );
+
+      final container = ProviderContainer(
+        overrides: [
+          secureStorageProvider.overrideWithValue(secureStorage),
+          hiveInitializerProvider.overrideWithValue(hiveInitializer),
+          hiveAdapterRegistrarProvider.overrideWithValue(registrar),
+        ],
+      );
+
+      await runCascadeBootstrap(container);
+
+      expect(registrar.registerCalled, isTrue);
+      expect(order, isNotEmpty);
+      expect(order.first, 'register');
 
       container.dispose();
     },
