@@ -47,11 +47,11 @@ void main() {
 
       // Act
       void act() => CaptureItem.create(
-            id: EntityId.generate(),
-            content: '   ',
-            context: context,
-            createdAt: createdAt,
-          );
+        id: EntityId.generate(),
+        content: '   ',
+        context: context,
+        createdAt: createdAt,
+      );
 
       // Assert
       expect(
@@ -79,12 +79,12 @@ void main() {
 
       // Act
       void act() => CaptureItem.create(
-            id: EntityId.generate(),
-            content: 'Check bad metadata',
-            context: context,
-            createdAt: createdAt,
-            metadata: metadata,
-          );
+        id: EntityId.generate(),
+        content: 'Check bad metadata',
+        context: context,
+        createdAt: createdAt,
+        metadata: metadata,
+      );
 
       // Assert
       expect(

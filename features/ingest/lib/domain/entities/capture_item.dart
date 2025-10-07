@@ -122,14 +122,14 @@ class CaptureItem {
 
   @override
   int get hashCode => Object.hash(
-        id,
-        content,
-        context,
-        status,
-        createdAt,
-        updatedAt,
-        _metadataEquality.hash(metadata),
-      );
+    id,
+    content,
+    context,
+    status,
+    createdAt,
+    updatedAt,
+    _metadataEquality.hash(metadata),
+  );
 
   @override
   String toString() {

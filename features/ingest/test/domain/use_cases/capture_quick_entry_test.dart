@@ -5,21 +5,28 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('CaptureQuickEntry', () {
-    test('creates capture item with defaults and publishes event', () async {
-      // ARRANGE
-      final generatedId = EntityId('capture-123');
-      final now = Timestamp(DateTime.utc(2025, 1, 1));
-      final publishedEvents = <DomainEvent>[];
+    late EntityId captureId;
+    late Timestamp now;
+    late List<DomainEvent> publishedEvents;
+    late CaptureQuickEntry useCase;
 
-      final useCase = CaptureQuickEntry(
-        idGenerator: () => generatedId,
+    setUp(() {
+      captureId = EntityId('capture-123');
+      now = Timestamp(DateTime.utc(2025));
+      publishedEvents = <DomainEvent>[];
+      useCase = CaptureQuickEntry(
+        idGenerator: () => captureId,
         nowProvider: () => now,
         publishEvent: publishedEvents.add,
       );
+    });
+
+    test('creates capture item with defaults and publishes event', () async {
+      // ARRANGE
 
       // ACT
       final result = useCase(
-        request: CaptureQuickEntryRequest(
+        request: const CaptureQuickEntryRequest(
           rawContent: '  Capture idea ',
           channel: 'quick_sheet',
           metadata: {'foo_bar': ' baz '},
@@ -30,7 +37,7 @@ void main() {
       expect(result, isA<SuccessResult<CaptureItem, Failure>>());
       final success = result as SuccessResult<CaptureItem, Failure>;
       final item = success.value;
-      expect(item.id, generatedId);
+      expect(item.id, captureId);
       expect(item.content, 'Capture idea');
       expect(item.context.source, CaptureSource.quickCapture);
       expect(item.context.channel, 'quick_sheet');
@@ -41,23 +48,18 @@ void main() {
 
       expect(publishedEvents, hasLength(1));
       final event = publishedEvents.single as CaptureItemFiled;
-      expect(event.captureId, generatedId);
+      expect(event.captureId, captureId);
       expect(event.summary, 'Capture idea');
       expect(event.occurredOn, now);
     });
 
     test('returns validation failure when content is blank', () async {
       // ARRANGE
-      final publishedEvents = <DomainEvent>[];
-      final useCase = CaptureQuickEntry(
-        idGenerator: () => EntityId('capture-001'),
-        nowProvider: () => Timestamp(DateTime.utc(2025, 1, 1)),
-        publishEvent: publishedEvents.add,
-      );
+      captureId = EntityId('capture-001');
 
       // ACT
       final result = useCase(
-        request: CaptureQuickEntryRequest(
+        request: const CaptureQuickEntryRequest(
           rawContent: '   ',
         ),
       );

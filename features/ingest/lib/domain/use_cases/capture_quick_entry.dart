@@ -1,14 +1,21 @@
 import 'package:cascade_flow_core/cascade_flow_core.dart';
 import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
 
+/// Default channel name applied when none is provided by the request.
 const String _defaultChannel = 'quick_entry';
 
+/// Generates identifiers for new capture items.
 typedef CaptureQuickEntryIdGenerator = EntityId Function();
+
+/// Supplies the current time for capture operations.
 typedef CaptureQuickEntryClock = Timestamp Function();
+
+/// Publishes domain events emitted by the use case.
 typedef CaptureQuickEntryEventPublisher = void Function(DomainEvent event);
 
 /// Payload describing a quick capture entry request.
 class CaptureQuickEntryRequest {
+  /// Creates a request describing the raw capture input and optional context.
   const CaptureQuickEntryRequest({
     required this.rawContent,
     this.channel,
@@ -16,26 +23,36 @@ class CaptureQuickEntryRequest {
     this.metadata,
   });
 
+  /// Raw, unnormalized content supplied by the user or integration.
   final String rawContent;
+
+  /// Optional channel that produced the capture (defaults to the shared
+  /// quick-entry channel).
   final String? channel;
+
+  /// Optional fully-specified context supplied by the caller.
   final CaptureContext? context;
+
+  /// Optional metadata written alongside the capture item.
   final Map<String, String>? metadata;
 }
 
 /// Use case responsible for capturing a quick entry into the inbox.
 class CaptureQuickEntry {
+  /// Creates a use case that captures quick entries.
   CaptureQuickEntry({
     required CaptureQuickEntryIdGenerator idGenerator,
     required CaptureQuickEntryClock nowProvider,
     required CaptureQuickEntryEventPublisher publishEvent,
-  })  : _idGenerator = idGenerator,
-        _nowProvider = nowProvider,
-        _publishEvent = publishEvent;
+  }) : _idGenerator = idGenerator,
+       _nowProvider = nowProvider,
+       _publishEvent = publishEvent;
 
   final CaptureQuickEntryIdGenerator _idGenerator;
   final CaptureQuickEntryClock _nowProvider;
   final CaptureQuickEntryEventPublisher _publishEvent;
 
+  /// Executes the use case and returns a `Result` describing the outcome.
   Result<CaptureItem, Failure> call({
     required CaptureQuickEntryRequest request,
   }) {
@@ -77,6 +94,7 @@ class CaptureQuickEntry {
     );
   }
 
+  /// Resolves the context provided by the request or supplies defaults.
   CaptureContext _resolveContext(CaptureQuickEntryRequest request) {
     final provided = request.context;
     if (provided != null) {
@@ -84,10 +102,9 @@ class CaptureQuickEntry {
     }
 
     final trimmedChannel = request.channel?.trim();
-    final resolvedChannel =
-        trimmedChannel == null || trimmedChannel.isEmpty
-            ? _defaultChannel
-            : trimmedChannel;
+    final resolvedChannel = trimmedChannel == null || trimmedChannel.isEmpty
+        ? _defaultChannel
+        : trimmedChannel;
 
     return CaptureContext(
       source: CaptureSource.quickCapture,
