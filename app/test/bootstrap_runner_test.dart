@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 const List<String> _expectedBaseBoxes = <String>[
   'app.preferences',
   'app.navigation_state',
+  'app.adapter_registry',
 ];
 
 class _RecordingSecureStorage extends InMemorySecureStorage {
