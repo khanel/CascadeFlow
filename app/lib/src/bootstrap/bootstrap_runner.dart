@@ -26,9 +26,11 @@ Future<void> runCascadeBootstrap(ProviderContainer container) async {
   await encryptionKeyFuture;
   await hiveInitializationFuture;
 
-  for (final boxName in _baseHiveBoxes) {
-    await hiveInitializer.openEncryptedBox<dynamic>(boxName);
-  }
+  await Future.wait(
+    _baseHiveBoxes.map(
+      (boxName) => hiveInitializer.openEncryptedBox<dynamic>(boxName),
+    ),
+  );
 
   await Future.wait<void>(<Future<void>>[
     focusNotifications.clearAll(),
