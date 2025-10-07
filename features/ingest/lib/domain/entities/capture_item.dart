@@ -146,21 +146,14 @@ class CaptureItem {
     Timestamp? updatedAt,
     Map<String, String>? metadata,
   }) {
-    final nextMetadata = metadata == null
-        ? this.metadata
-        : Map<String, String>.unmodifiable(metadata);
-
-    final nextUpdatedAt = updatedAt ?? this.updatedAt;
-    _guardUpdatedAt(createdAt ?? this.createdAt, nextUpdatedAt);
-
-    return CaptureItem._(
+    return CaptureItem.create(
       id: id,
       content: content ?? this.content,
       context: context ?? this.context,
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
-      updatedAt: nextUpdatedAt,
-      metadata: nextMetadata,
+      updatedAt: updatedAt ?? this.updatedAt,
+      metadata: metadata ?? this.metadata,
     );
   }
 }
