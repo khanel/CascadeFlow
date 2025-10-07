@@ -14,6 +14,10 @@ const List<String> _baseHiveBoxes = <String>[
 Future<void> runCascadeBootstrap(ProviderContainer container) async {
   final secureStorage = container.read(secureStorageProvider);
   final hiveInitializer = container.read(hiveInitializerProvider);
+  final focusNotifications = container.read(focusNotificationFacadeProvider);
+  final scheduleNotifications =
+      container.read(scheduleNotificationFacadeProvider);
+  final habitNotifications = container.read(habitNotificationFacadeProvider);
 
   final encryptionKeyFuture = secureStorage.read(key: _hiveEncryptionKey);
   final hiveInitializationFuture = hiveInitializer.initialize();
@@ -25,12 +29,7 @@ Future<void> runCascadeBootstrap(ProviderContainer container) async {
     await hiveInitializer.openEncryptedBox<dynamic>(boxName);
   }
 
-  final focusNotifications = container.read(focusNotificationFacadeProvider);
-  final scheduleNotifications =
-      container.read(scheduleNotificationFacadeProvider);
-  final habitNotifications = container.read(habitNotificationFacadeProvider);
-
-  await Future.wait<void>([
+  await Future.wait<void>(<Future<void>>[
     focusNotifications.clearAll(),
     scheduleNotifications.clearAll(),
     habitNotifications.clearAll(),
