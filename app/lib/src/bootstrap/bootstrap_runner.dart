@@ -4,6 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Storage key used to retrieve the Hive encryption secret.
 const String _hiveEncryptionKey = 'cascadeflow.hive_encryption_key';
 
+/// Boxes the app shell expects to be ready before UI launch.
+const List<String> _baseHiveBoxes = <String>[
+  'app.preferences',
+  'app.navigation_state',
+];
+
 /// Executes startup tasks required before rendering the app shell.
 Future<void> runCascadeBootstrap(ProviderContainer container) async {
   final secureStorage = container.read(secureStorageProvider);
@@ -15,6 +21,7 @@ Future<void> runCascadeBootstrap(ProviderContainer container) async {
   await encryptionKeyFuture;
   await hiveInitializationFuture;
 
-  await hiveInitializer.openEncryptedBox<dynamic>('app.preferences');
-  await hiveInitializer.openEncryptedBox<dynamic>('app.navigation_state');
+  for (final boxName in _baseHiveBoxes) {
+    await hiveInitializer.openEncryptedBox<dynamic>(boxName);
+  }
 }
