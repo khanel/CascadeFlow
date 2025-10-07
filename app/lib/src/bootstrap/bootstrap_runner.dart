@@ -8,6 +8,7 @@ const String _hiveEncryptionKey = 'cascadeflow.hive_encryption_key';
 const List<String> _baseHiveBoxes = <String>[
   'app.preferences',
   'app.navigation_state',
+  'app.adapter_registry',
 ];
 
 /// Executes startup tasks required before rendering the app shell.
