@@ -54,6 +54,7 @@ Development cadence: every task runs through TDD—write the failing test, add t
 ### Domain (`features/ingest/domain`)
 - [x] Define `CaptureItem` entity with validation and context metadata.
 - [ ] Implement use cases: `CaptureQuickEntry`, `ArchiveCaptureItem`.
+  - [x] `CaptureQuickEntry`
 
 ### Data (`features/ingest/data`)
 - [ ] Register Hive adapters for capture items and open encrypted inbox box.
