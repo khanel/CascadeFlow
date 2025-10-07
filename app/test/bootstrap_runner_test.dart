@@ -42,20 +42,6 @@ class _RecordingHiveInitializer extends InMemoryHiveInitializer {
   }
 }
 
-class _RecordingHiveAdapterRegistrar implements HiveAdapterRegistrar {
-  _RecordingHiveAdapterRegistrar({void Function()? onRegister})
-      : _onRegister = onRegister;
-
-  bool registerCalled = false;
-  final void Function()? _onRegister;
-
-  @override
-  Future<void> registerAdapters() async {
-    registerCalled = true;
-    _onRegister?.call();
-  }
-}
-
 class _RecordingNotificationScheduler implements NotificationScheduler {
   bool clearAllCalled = false;
 
@@ -106,9 +92,11 @@ void main() {
     () async {
       final order = <String>[];
 
-      final registrar = _RecordingHiveAdapterRegistrar(
-        onRegister: () => order.add('register'),
-      );
+      var registerCalled = false;
+      Future<void> registrar() async {
+        registerCalled = true;
+        order.add('register');
+      }
       final secureStorage = _RecordingSecureStorage();
       final hiveInitializer = _RecordingHiveInitializer(
         onBoxOpened: (name) => order.add('open:$name'),
@@ -124,7 +112,7 @@ void main() {
 
       await runCascadeBootstrap(container);
 
-      expect(registrar.registerCalled, isTrue);
+      expect(registerCalled, isTrue);
       expect(order, isNotEmpty);
       expect(order.first, 'register');
 

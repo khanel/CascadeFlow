@@ -26,11 +26,12 @@ Future<void> runCascadeBootstrap(ProviderContainer container) async {
 
   await encryptionKeyFuture;
   await hiveInitializationFuture;
-  await hiveAdapterRegistrar.registerAdapters();
+  await hiveAdapterRegistrar();
 
-  await Future.wait(
+  await Future.wait<void>(
     _baseHiveBoxes.map(
-      (boxName) => hiveInitializer.openEncryptedBox<dynamic>(boxName),
+      (boxName) async =>
+          hiveInitializer.openEncryptedBox<dynamic>(boxName),
     ),
   );
 
