@@ -1,5 +1,6 @@
 import 'package:cascade_flow_infrastructure/logging.dart';
 import 'package:cascade_flow_infrastructure/src/notifications/noop_notification_scheduler.dart';
+import 'package:cascade_flow_infrastructure/src/notifications/notification_bootstrapper.dart';
 import 'package:cascade_flow_infrastructure/src/notifications/notification_facade.dart';
 import 'package:cascade_flow_infrastructure/storage.dart';
 import 'package:riverpod/riverpod.dart';
@@ -47,4 +48,9 @@ final scheduleNotificationFacadeProvider = Provider<NotificationFacade>(
 /// Schedules habit cadence nudges and streak reinforcement notifications.
 final habitNotificationFacadeProvider = Provider<NotificationFacade>(
   _buildNotificationFacade,
+);
+
+/// Prepares notification channels and permissions before UI launch.
+final notificationBootstrapperProvider = Provider<NotificationBootstrapper>(
+  (ref) => noopNotificationBootstrapper,
 );
