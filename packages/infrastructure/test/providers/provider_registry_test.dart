@@ -91,5 +91,16 @@ void main() {
       expect(facade, isA<NotificationFacade>());
       expect(identical(facade, facadeAgain), isTrue);
     });
+
+    test('notificationBootstrapperProvider exposes bootstrap function', () {
+      // Arrange
+      final read = container.read;
+
+      // Act
+      final bootstrapper = read(notificationBootstrapperProvider);
+
+      // Assert
+      expect(bootstrapper, isA<Future<void> Function()>());
+    });
   });
 }
