@@ -15,6 +15,7 @@ const List<String> _baseHiveBoxes = <String>[
 Future<void> runCascadeBootstrap(ProviderContainer container) async {
   final secureStorage = container.read(secureStorageProvider);
   final hiveInitializer = container.read(hiveInitializerProvider);
+  final hiveAdapterRegistrar = container.read(hiveAdapterRegistrarProvider);
   final focusNotifications = container.read(focusNotificationFacadeProvider);
   final scheduleNotifications =
       container.read(scheduleNotificationFacadeProvider);
@@ -25,6 +26,7 @@ Future<void> runCascadeBootstrap(ProviderContainer container) async {
 
   await encryptionKeyFuture;
   await hiveInitializationFuture;
+  await hiveAdapterRegistrar.registerAdapters();
 
   await Future.wait(
     _baseHiveBoxes.map(

@@ -2,6 +2,7 @@ import 'package:cascade_flow_infrastructure/logging.dart';
 import 'package:cascade_flow_infrastructure/src/notifications/noop_notification_scheduler.dart';
 import 'package:cascade_flow_infrastructure/src/notifications/notification_facade.dart';
 import 'package:cascade_flow_infrastructure/storage.dart';
+import 'package:cascade_flow_infrastructure/src/storage/hive_adapter_registrar.dart';
 
 import 'package:riverpod/riverpod.dart';
 
@@ -13,6 +14,11 @@ final loggerProvider = Provider<PrintLogger>(
 /// Provides the in-memory Hive initializer stub for early development.
 final hiveInitializerProvider = Provider<InMemoryHiveInitializer>(
   (ref) => InMemoryHiveInitializer(),
+);
+
+/// Provides the registrar responsible for wiring Hive adapters.
+final hiveAdapterRegistrarProvider = Provider<HiveAdapterRegistrar>(
+  (ref) => const NoopHiveAdapterRegistrar(),
 );
 
 /// Provides a disposable secure storage stub backed by an in-memory map.
