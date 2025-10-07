@@ -14,4 +14,7 @@ Future<void> runCascadeBootstrap(ProviderContainer container) async {
 
   await encryptionKeyFuture;
   await hiveInitializationFuture;
+
+  await hiveInitializer.openEncryptedBox<dynamic>('app.preferences');
+  await hiveInitializer.openEncryptedBox<dynamic>('app.navigation_state');
 }
