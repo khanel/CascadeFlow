@@ -45,6 +45,7 @@ Development cadence: every task runs through TDD—write the failing test, add t
     - [x] Open app shell base boxes (`app.preferences`, `app.navigation_state`).
     - [ ] Wire Hive adapter registration.
   - [ ] Initialise the notification facade (permissions, channels, background handlers) prior to UI launch.
+    - [x] Clear pending notifications across focus, schedule, and habit facades during bootstrap.
 - [ ] Add placeholder routes/screens for each branch to unblock feature integration.
 
 ## Milestone 5 – Feature: Ingest
