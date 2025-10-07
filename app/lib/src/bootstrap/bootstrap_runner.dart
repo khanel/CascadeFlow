@@ -16,11 +16,13 @@ Future<void> runCascadeBootstrap(ProviderContainer container) async {
   final secureStorage = container.read(secureStorageProvider);
   final hiveInitializer = container.read(hiveInitializerProvider);
   final hiveAdapterRegistrar = container.read(hiveAdapterRegistrarProvider);
-  final notificationBootstrapper =
-      container.read(notificationBootstrapperProvider);
+  final notificationBootstrapper = container.read(
+    notificationBootstrapperProvider,
+  );
   final focusNotifications = container.read(focusNotificationFacadeProvider);
-  final scheduleNotifications =
-      container.read(scheduleNotificationFacadeProvider);
+  final scheduleNotifications = container.read(
+    scheduleNotificationFacadeProvider,
+  );
   final habitNotifications = container.read(habitNotificationFacadeProvider);
 
   final encryptionKeyFuture = secureStorage.read(key: _hiveEncryptionKey);
@@ -32,8 +34,7 @@ Future<void> runCascadeBootstrap(ProviderContainer container) async {
 
   await Future.wait<void>(
     _baseHiveBoxes.map(
-      (boxName) async =>
-          hiveInitializer.openEncryptedBox<dynamic>(boxName),
+      (boxName) => hiveInitializer.openEncryptedBox<dynamic>(boxName),
     ),
   );
 

@@ -24,7 +24,7 @@ class _RecordingSecureStorage extends InMemorySecureStorage {
 
 class _RecordingHiveInitializer extends InMemoryHiveInitializer {
   _RecordingHiveInitializer({void Function(String name)? onBoxOpened})
-      : _onBoxOpened = onBoxOpened;
+    : _onBoxOpened = onBoxOpened;
 
   bool initializeCalled = false;
   final List<String> openedBoxes = <String>[];
@@ -111,7 +111,7 @@ void main() {
     },
   );
 
-  // Guards that notification setup runs prior to facade clearing.
+  // Guards that notification setup runs before the facade clear phase.
   test(
     'bootstrap runner initialises notifications before clearing facades',
     () async {
@@ -138,7 +138,8 @@ void main() {
     },
   );
 
-  // Verifies adapter registration precedes any box warm-up to avoid type errors.
+  // Verifies adapter registration happens before box warm-up to prevent
+  // type mismatches.
   test(
     'bootstrap runner registers Hive adapters before opening base boxes',
     () async {
@@ -149,6 +150,7 @@ void main() {
         registerCalled = true;
         order.add('register');
       }
+
       final secureStorage = _RecordingSecureStorage();
       final hiveInitializer = _RecordingHiveInitializer(
         onBoxOpened: (name) => order.add('open:$name'),
@@ -174,9 +176,11 @@ void main() {
     },
   );
 
-  // Confirms notification bootstrapper runs prior to clearing individual facades.
+  // Confirms notification bootstrapper runs before clearing individual facades.
   test(
-    'bootstrap runner initialises notification bootstrapper before facade clear',
+    '''
+bootstrap runner initialises notification
+bootstrapper before facade clear''',
     () async {
       // ARRANGE
       final secureStorage = _RecordingSecureStorage();
@@ -185,6 +189,7 @@ void main() {
       Future<void> bootstrapper() async {
         bootstrapperCalls.add('bootstrap');
       }
+
       final focusScheduler = _RecordingNotificationScheduler();
       final scheduleScheduler = _RecordingNotificationScheduler();
       final habitScheduler = _RecordingNotificationScheduler();
@@ -218,7 +223,7 @@ void main() {
     },
   );
 
-  // Maintains legacy expectation that facades clear their queues after bootstrap.
+  // Maintains the expectation that facades clear their queues after bootstrap.
   test(
     'bootstrap runner clears pending notifications across facades',
     () async {
