@@ -59,6 +59,7 @@ Development cadence: every task runs through TDD—write the failing test, add t
 
 ### Data (`features/ingest/data`)
 - [ ] Register Hive adapters for capture items and open encrypted inbox box.
+  - [x] Define Hive persistence model and warm-up data source scaffold.
 - [ ] Build `CaptureLocalDataSource` and repository implementation with tests using temp boxes.
 
 ### Presentation (`features/ingest/presentation`)

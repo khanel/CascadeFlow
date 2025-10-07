@@ -3,6 +3,7 @@ import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
 
 /// Hive persistence model for `CaptureItem`.
 class CaptureItemHiveModel {
+  /// Creates a Hive model that mirrors the domain entity.
   CaptureItemHiveModel({
     required this.id,
     required this.content,
@@ -13,15 +14,6 @@ class CaptureItemHiveModel {
     required this.status,
     required this.metadata,
   });
-
-  final String id;
-  final String content;
-  final String source;
-  final String channel;
-  final int createdAtMicros;
-  final int updatedAtMicros;
-  final String status;
-  final Map<String, String> metadata;
 
   /// Builds a persistence model from the given domain entity.
   factory CaptureItemHiveModel.fromDomain(CaptureItem item) {
@@ -36,6 +28,30 @@ class CaptureItemHiveModel {
       metadata: Map<String, String>.from(item.metadata),
     );
   }
+
+  /// Identifier persisted with the Hive record.
+  final String id;
+
+  /// Primary content string captured by the user.
+  final String content;
+
+  /// Source enum value serialized as a string.
+  final String source;
+
+  /// Channel identifier stored alongside the capture.
+  final String channel;
+
+  /// UTC microseconds when the item was created.
+  final int createdAtMicros;
+
+  /// UTC microseconds when the item was last updated.
+  final int updatedAtMicros;
+
+  /// Serialized capture status.
+  final String status;
+
+  /// Arbitrary metadata stored with the capture item.
+  final Map<String, String> metadata;
 
   /// Converts this Hive model back into a domain entity.
   CaptureItem toDomain() {
@@ -64,7 +80,7 @@ class CaptureItemHiveModel {
       createdAt: createdAt,
       updatedAt: updatedAt,
       status: resolvedStatus,
-      metadata: metadata,
+      metadata: Map<String, String>.from(metadata),
     );
   }
 }

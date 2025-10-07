@@ -22,8 +22,8 @@ class ArchiveCaptureItem {
   ArchiveCaptureItem({
     required ArchiveCaptureItemClock nowProvider,
     required ArchiveCaptureItemEventPublisher publishEvent,
-  })  : _nowProvider = nowProvider,
-        _publishEvent = publishEvent;
+  }) : _nowProvider = nowProvider,
+       _publishEvent = publishEvent;
 
   final ArchiveCaptureItemClock _nowProvider;
   final ArchiveCaptureItemEventPublisher _publishEvent;

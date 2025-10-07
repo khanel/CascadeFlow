@@ -12,6 +12,8 @@ resolution: workspace
 dependencies:
   cascade_flow_core:
     path: ../../packages/core
+  cascade_flow_infrastructure:
+    path: ../../packages/infrastructure
   collection: ^1.18.0
   flutter:
     sdk: flutter

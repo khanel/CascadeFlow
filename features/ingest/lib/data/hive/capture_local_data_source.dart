@@ -6,8 +6,9 @@ const String captureItemsBoxName = 'capture_items';
 
 /// Local data source responsible for interacting with the capture inbox box.
 class CaptureLocalDataSource {
+  /// Creates a data source backed by the provided [initializer].
   CaptureLocalDataSource({required InMemoryHiveInitializer initializer})
-      : _initializer = initializer;
+    : _initializer = initializer;
 
   final InMemoryHiveInitializer _initializer;
 
