@@ -44,7 +44,7 @@ Development cadence: every task runs through TDD—write the failing test, add t
   - [ ] Register required Hive adapters and open base boxes used by the app shell.
     - [x] Open app shell base boxes (`app.preferences`, `app.navigation_state`).
     - [x] Add bootstrap adapter registry box warmup (`app.adapter_registry`).
-    - [ ] Wire Hive adapter registration.
+    - [x] Wire Hive adapter registration.
   - [ ] Initialise the notification facade (permissions, channels, background handlers) prior to UI launch.
     - [x] Clear pending notifications across focus, schedule, and habit facades during bootstrap.
 - [ ] Add placeholder routes/screens for each branch to unblock feature integration.
