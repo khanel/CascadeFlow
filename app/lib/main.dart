@@ -1,6 +1,7 @@
 import 'package:cascade_flow_app/src/bootstrap/cascade_app_theme.dart';
 import 'package:cascade_flow_app/src/bootstrap/cascade_layout_scope.dart';
 import 'package:cascade_flow_infrastructure/cascade_flow_infrastructure.dart';
+import 'package:cascade_flow_presentation/cascade_flow_presentation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -26,6 +27,9 @@ class CascadeBootstrap extends StatelessWidget {
 }
 
 /// Top-level router configuration for the app.
+const PresentationScaffoldFactory _scaffoldFactory =
+    PresentationScaffoldFactory();
+
 final GoRouter _router = GoRouter(
   initialLocation: _Paths.capture,
   routes: <RouteBase>[
@@ -117,22 +121,6 @@ class _AppShellState extends State<_AppShell> {
   }
 }
 
-class _PlaceholderView extends StatelessWidget {
-  const _PlaceholderView(this.title);
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: Center(
-        child: Text('$title placeholder'),
-      ),
-    );
-  }
-}
-
 /// Route path constants for primary navigation branches.
 abstract final class _Paths {
   static const String capture = '/capture';
@@ -197,17 +185,24 @@ class _NavigationBranchDefinition {
   final IconData icon;
   final IconData selectedIcon;
 
-  String get _detailTitle => '$label details';
+  String get _branchId =>
+      path.startsWith('/') ? path.substring(1) : path;
 
   GoRoute get route => GoRoute(
         path: path,
         builder: (BuildContext context, GoRouterState state) =>
-            _PlaceholderView(label),
+            _scaffoldFactory.buildRoot(
+              branchId: _branchId,
+              branchLabel: label,
+            ),
         routes: <RouteBase>[
           GoRoute(
             path: _Paths.detailSegment,
             builder: (BuildContext context, GoRouterState state) =>
-                _PlaceholderView(_detailTitle),
+                _scaffoldFactory.buildDetail(
+                  branchId: _branchId,
+                  branchLabel: label,
+                ),
           ),
         ],
       );
