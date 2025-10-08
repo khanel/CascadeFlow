@@ -31,16 +31,18 @@ void main() {
     });
 
     test(
-        'hiveInitializerProvider returns in-memory initializer by default', () {
-      // Arrange
-      final read = container.read;
+      'hiveInitializerProvider returns in-memory initializer by default',
+      () {
+        // Arrange
+        final read = container.read;
 
-      // Act
-      final initializer = read(hiveInitializerProvider);
+        // Act
+        final initializer = read(hiveInitializerProvider);
 
-      // Assert
-      expect(initializer, isA<InMemoryHiveInitializer>());
-    });
+        // Assert
+        expect(initializer, isA<InMemoryHiveInitializer>());
+      },
+    );
 
     test('notificationSchedulerProvider exposes NotificationScheduler', () {
       // Arrange

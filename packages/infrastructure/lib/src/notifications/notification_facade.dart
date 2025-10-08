@@ -1,11 +1,12 @@
-import 'package:collection/collection.dart' show MapEquality, UnmodifiableMapView;
+import 'package:collection/collection.dart'
+    show MapEquality, UnmodifiableMapView;
 import 'package:meta/meta.dart';
 
 /// High-level facade wrapping notification scheduling operations.
 class NotificationFacade {
   /// Creates a facade that delegates notification operations to [scheduler].
   NotificationFacade({required NotificationScheduler scheduler})
-      : _scheduler = scheduler;
+    : _scheduler = scheduler;
 
   final NotificationScheduler _scheduler;
 
@@ -42,9 +43,8 @@ class NotificationRequest {
     required this.channel,
     required Map<String, Object?> payload,
     required DateTime triggerAt,
-  })  : payload =
-            UnmodifiableMapView(Map<String, Object?>.from(payload)),
-        triggerAt = triggerAt.toUtc();
+  }) : payload = UnmodifiableMapView(Map<String, Object?>.from(payload)),
+       triggerAt = triggerAt.toUtc();
 
   /// Unique identifier for the notification.
   final String id;
@@ -73,11 +73,11 @@ class NotificationRequest {
 
   @override
   int get hashCode => Object.hash(
-        id,
-        channel,
-        triggerAt,
-        _payloadEquality.hash(payload),
-      );
+    id,
+    channel,
+    triggerAt,
+    _payloadEquality.hash(payload),
+  );
 
   @override
   String toString() =>

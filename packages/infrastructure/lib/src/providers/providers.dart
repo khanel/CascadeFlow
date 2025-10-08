@@ -32,8 +32,8 @@ final notificationSchedulerProvider = Provider<NotificationScheduler>(
 );
 
 NotificationFacade _buildNotificationFacade(Ref ref) => NotificationFacade(
-      scheduler: ref.watch(notificationSchedulerProvider),
-    );
+  scheduler: ref.watch(notificationSchedulerProvider),
+);
 
 /// Schedules focus-related notifications (Pomodoro timers, breaks, etc.).
 final focusNotificationFacadeProvider = Provider<NotificationFacade>(
@@ -53,26 +53,28 @@ final habitNotificationFacadeProvider = Provider<NotificationFacade>(
 /// Prepares notification channels and permissions before UI launch.
 final notificationPermissionInitializerProvider =
     Provider<NotificationPermissionInitializer>(
-  (ref) => noopNotificationInitializer,
-);
+      (ref) => noopNotificationInitializer,
+    );
 
 /// Configures notification channels before scheduling begins.
 final notificationChannelInitializerProvider =
     Provider<NotificationChannelInitializer>(
-  (ref) => noopNotificationInitializer,
-);
+      (ref) => noopNotificationInitializer,
+    );
 
 /// Registers background handlers supporting notification flows.
 final notificationBackgroundInitializerProvider =
     Provider<NotificationBackgroundInitializer>(
-  (ref) => noopNotificationInitializer,
-);
+      (ref) => noopNotificationInitializer,
+    );
 
+/// Executes notification bootstrapping prior to UI rendering.
 final notificationBootstrapperProvider = Provider<NotificationBootstrapper>(
   (ref) => createNotificationBootstrapper(
     requestPermissions: ref.watch(notificationPermissionInitializerProvider),
     configureChannels: ref.watch(notificationChannelInitializerProvider),
-    configureBackgroundHandlers:
-        ref.watch(notificationBackgroundInitializerProvider),
+    configureBackgroundHandlers: ref.watch(
+      notificationBackgroundInitializerProvider,
+    ),
   ),
 );

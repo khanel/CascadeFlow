@@ -1,14 +1,17 @@
 /// Coordinates notification setup before UI renders.
 typedef NotificationBootstrapper = Future<void> Function();
 
+/// Generic notification initializer signature.
+typedef NotificationInitializer = Future<void> Function();
+
 /// Requests notification permissions from the operating system.
-typedef NotificationPermissionInitializer = Future<void> Function();
+typedef NotificationPermissionInitializer = NotificationInitializer;
 
 /// Configures notification channels/categories on supported platforms.
-typedef NotificationChannelInitializer = Future<void> Function();
+typedef NotificationChannelInitializer = NotificationInitializer;
 
 /// Registers background handlers required for notification processing.
-typedef NotificationBackgroundInitializer = Future<void> Function();
+typedef NotificationBackgroundInitializer = NotificationInitializer;
 
 /// Builds a bootstrapper that executes the supplied initializers in order.
 NotificationBootstrapper createNotificationBootstrapper({
@@ -17,10 +20,20 @@ NotificationBootstrapper createNotificationBootstrapper({
   required NotificationBackgroundInitializer configureBackgroundHandlers,
 }) {
   return () async {
-    await requestPermissions();
-    await configureChannels();
-    await configureBackgroundHandlers();
+    await _runSequentially(<NotificationInitializer>[
+      requestPermissions,
+      configureChannels,
+      configureBackgroundHandlers,
+    ]);
   };
+}
+
+Future<void> _runSequentially(
+  Iterable<NotificationInitializer> initializers,
+) async {
+  for (final initializer in initializers) {
+    await initializer();
+  }
 }
 
 /// Placeholder initializer used while platform integrations are in-flight.

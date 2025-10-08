@@ -18,25 +18,26 @@ void main() {
     });
 
     test(
-        'delegates schedule requests to provided scheduler abstraction',
-        () async {
-      // Arrange
-      final scheduler = RecordingNotificationScheduler();
-      final facade = NotificationFacade(scheduler: scheduler);
-      final request = NotificationRequest(
-        id: 'focus_break',
-        channel: NotificationChannel.focus,
-        payload: const {'duration': '25m'},
-        triggerAt: DateTime.utc(2025, 10, 1, 12),
-      );
+      'delegates schedule requests to provided scheduler abstraction',
+      () async {
+        // Arrange
+        final scheduler = RecordingNotificationScheduler();
+        final facade = NotificationFacade(scheduler: scheduler);
+        final request = NotificationRequest(
+          id: 'focus_break',
+          channel: NotificationChannel.focus,
+          payload: const {'duration': '25m'},
+          triggerAt: DateTime.utc(2025, 10, 1, 12),
+        );
 
-      // Act
-      await facade.schedule(request);
+        // Act
+        await facade.schedule(request);
 
-      // Assert
-      expect(scheduler.recordedRequests, hasLength(1));
-      expect(scheduler.recordedRequests.single.id, 'focus_break');
-    });
+        // Assert
+        expect(scheduler.recordedRequests, hasLength(1));
+        expect(scheduler.recordedRequests.single.id, 'focus_break');
+      },
+    );
 
     test('supports cancel and clear operations through scheduler', () async {
       // Arrange

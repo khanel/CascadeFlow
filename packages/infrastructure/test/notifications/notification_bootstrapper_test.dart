@@ -1,11 +1,11 @@
 import 'package:cascade_flow_infrastructure/cascade_flow_infrastructure.dart';
-import 'package:cascade_flow_infrastructure/notifications.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
 
 void main() {
   test(
-    'notification bootstrapper requests permissions, registers channels, and configures background handlers in order',
+    'notification bootstrapper requests permissions, registers channels, '
+    'and configures background handlers in order',
     () async {
       // ARRANGE
       final callOrder = <String>[];
@@ -15,12 +15,13 @@ void main() {
 
       final container = ProviderContainer(
         overrides: [
-          notificationPermissionInitializerProvider
-              .overrideWithValue(permissions),
-          notificationChannelInitializerProvider
-              .overrideWithValue(channels),
-          notificationBackgroundInitializerProvider
-              .overrideWithValue(background),
+          notificationPermissionInitializerProvider.overrideWithValue(
+            permissions,
+          ),
+          notificationChannelInitializerProvider.overrideWithValue(channels),
+          notificationBackgroundInitializerProvider.overrideWithValue(
+            background,
+          ),
         ],
       );
 
