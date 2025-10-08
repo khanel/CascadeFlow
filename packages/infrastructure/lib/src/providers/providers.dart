@@ -51,6 +51,28 @@ final habitNotificationFacadeProvider = Provider<NotificationFacade>(
 );
 
 /// Prepares notification channels and permissions before UI launch.
+final notificationPermissionInitializerProvider =
+    Provider<NotificationPermissionInitializer>(
+  (ref) => noopNotificationInitializer,
+);
+
+/// Configures notification channels before scheduling begins.
+final notificationChannelInitializerProvider =
+    Provider<NotificationChannelInitializer>(
+  (ref) => noopNotificationInitializer,
+);
+
+/// Registers background handlers supporting notification flows.
+final notificationBackgroundInitializerProvider =
+    Provider<NotificationBackgroundInitializer>(
+  (ref) => noopNotificationInitializer,
+);
+
 final notificationBootstrapperProvider = Provider<NotificationBootstrapper>(
-  (ref) => noopNotificationBootstrapper,
+  (ref) => createNotificationBootstrapper(
+    requestPermissions: ref.watch(notificationPermissionInitializerProvider),
+    configureChannels: ref.watch(notificationChannelInitializerProvider),
+    configureBackgroundHandlers:
+        ref.watch(notificationBackgroundInitializerProvider),
+  ),
 );
