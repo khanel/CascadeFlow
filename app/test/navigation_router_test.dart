@@ -1,4 +1,5 @@
 import 'package:cascade_flow_app/main.dart';
+import 'package:cascade_flow_presentation/cascade_flow_presentation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -41,14 +42,18 @@ void main() {
       final captureTab = find.text('Capture');
       final planTab = find.text('Plan');
       final captureRootFinder = find.byKey(
-        const ValueKey('branch-capture-root'),
+        PresentationScaffoldKeys.root('capture'),
       );
       final captureDetailsFinder = find.byKey(
-        const ValueKey('branch-capture-detail'),
+        PresentationScaffoldKeys.detail('capture'),
       );
-      final planRootFinder = find.byKey(const ValueKey('branch-plan-root'));
-      final captureWorkspaceText = find.text('Capture workspace coming soon');
-      final planWorkspaceText = find.text('Plan workspace coming soon');
+      final planRootFinder = find.byKey(PresentationScaffoldKeys.root('plan'));
+      final captureWorkspaceText = find.text(
+        PresentationScaffoldMessages.workspace('Capture'),
+      );
+      final planWorkspaceText = find.text(
+        PresentationScaffoldMessages.workspace('Plan'),
+      );
 
       // ARRANGE: load app and ensure capture branch root is visible
       await tester.pumpWidget(const CascadeFlowApp());
@@ -81,7 +86,7 @@ void main() {
       // ASSERT: capture details restored when returning to branch
       expect(captureDetailsFinder, findsOneWidget);
       expect(
-        find.text('Capture details coming soon'),
+        find.text(PresentationScaffoldMessages.detail('Capture')),
         findsOneWidget,
       );
 
@@ -172,10 +177,14 @@ Future<void> _verifyBranchDetailRoute(
 ) async {
   final label = destination.label;
   final branchId = _branchIdFromPath(branchRoute.path);
-  final rootFinder = find.byKey(ValueKey('branch-$branchId-root'));
-  final rootTextFinder = find.text('$label workspace coming soon');
-  final detailFinder = find.byKey(ValueKey('branch-$branchId-detail'));
-  final detailTextFinder = find.text('$label details coming soon');
+  final rootFinder = find.byKey(PresentationScaffoldKeys.root(branchId));
+  final rootTextFinder = find.text(
+    PresentationScaffoldMessages.workspace(label),
+  );
+  final detailFinder = find.byKey(PresentationScaffoldKeys.detail(branchId));
+  final detailTextFinder = find.text(
+    PresentationScaffoldMessages.detail(label),
+  );
 
   router.go(branchRoute.path);
   await tester.pumpAndSettle();
