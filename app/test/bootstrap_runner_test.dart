@@ -260,4 +260,36 @@ bootstrapper before facade clear''',
       container.dispose();
     },
   );
+
+  // Ensures adapter registration populates the registry box for diagnostics.
+  test(
+    'bootstrap runner records adapter registration metadata in registry box',
+    () async {
+      // ARRANGE
+      final secureStorage = _RecordingSecureStorage();
+      final hiveInitializer = _RecordingHiveInitializer();
+      final container = ProviderContainer(
+        overrides: [
+          secureStorageProvider.overrideWithValue(secureStorage),
+          hiveInitializerProvider.overrideWithValue(hiveInitializer),
+        ],
+      );
+
+      // ACT
+      await runCascadeBootstrap(container);
+
+      // ASSERT
+      final registryBox = await hiveInitializer
+          .openEncryptedBox<dynamic>('app.adapter_registry');
+      final registryValues = await registryBox.values();
+      expect(
+        registryValues,
+        isNotEmpty,
+        reason:
+            'expected bootstrap to populate adapter registry for diagnostics',
+      );
+
+      container.dispose();
+    },
+  );
 }
