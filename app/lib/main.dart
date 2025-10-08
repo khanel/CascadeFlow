@@ -36,104 +36,13 @@ final GoRouter _router = GoRouter(
             GoRouterState state,
             StatefulNavigationShell navigationShell,
           ) => _AppShell(navigationShell: navigationShell),
-      branches: <StatefulShellBranch>[
-        StatefulShellBranch(
-          routes: <RouteBase>[
-            GoRoute(
-              path: _Paths.capture,
-              builder: (BuildContext context, GoRouterState state) =>
-                  const _CapturePage(),
-              routes: <RouteBase>[
-                GoRoute(
-                  path: 'details',
-                  builder: (BuildContext context, GoRouterState state) =>
-                      const _CaptureDetailsPage(),
-                ),
-              ],
+      branches: _navigationBranches
+          .map(
+            (_NavigationBranchDefinition branch) => StatefulShellBranch(
+              routes: <RouteBase>[branch.route],
             ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: <RouteBase>[
-            GoRoute(
-              path: _Paths.plan,
-              builder: (BuildContext context, GoRouterState state) =>
-                  const _PlanPage(),
-              routes: <RouteBase>[
-                GoRoute(
-                  path: 'details',
-                  builder: (BuildContext context, GoRouterState state) =>
-                      const _PlanDetailsPage(),
-                ),
-              ],
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: <RouteBase>[
-            GoRoute(
-              path: _Paths.execute,
-              builder: (BuildContext context, GoRouterState state) =>
-                  const _ExecutePage(),
-              routes: <RouteBase>[
-                GoRoute(
-                  path: 'details',
-                  builder: (BuildContext context, GoRouterState state) =>
-                      const _ExecuteDetailsPage(),
-                ),
-              ],
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: <RouteBase>[
-            GoRoute(
-              path: _Paths.review,
-              builder: (BuildContext context, GoRouterState state) =>
-                  const _ReviewPage(),
-              routes: <RouteBase>[
-                GoRoute(
-                  path: 'details',
-                  builder: (BuildContext context, GoRouterState state) =>
-                      const _ReviewDetailsPage(),
-                ),
-              ],
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: <RouteBase>[
-            GoRoute(
-              path: _Paths.insights,
-              builder: (BuildContext context, GoRouterState state) =>
-                  const _InsightsPage(),
-              routes: <RouteBase>[
-                GoRoute(
-                  path: 'details',
-                  builder: (BuildContext context, GoRouterState state) =>
-                      const _InsightsDetailsPage(),
-                ),
-              ],
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: <RouteBase>[
-            GoRoute(
-              path: _Paths.settings,
-              builder: (BuildContext context, GoRouterState state) =>
-                  const _SettingsPage(),
-              routes: <RouteBase>[
-                GoRoute(
-                  path: 'details',
-                  builder: (BuildContext context, GoRouterState state) =>
-                      const _SettingsDetailsPage(),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ],
+          )
+          .toList(),
     ),
   ],
 );
@@ -200,131 +109,12 @@ class _AppShellState extends State<_AppShell> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: widget.navigationShell.currentIndex,
         onDestinationSelected: _onDestinationSelected,
-        destinations: const <NavigationDestination>[
-          NavigationDestination(
-            icon: Icon(Icons.inbox_outlined),
-            selectedIcon: Icon(Icons.inbox),
-            label: 'Capture',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.event_note_outlined),
-            selectedIcon: Icon(Icons.event_note),
-            label: 'Plan',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.play_circle_outline),
-            selectedIcon: Icon(Icons.play_circle),
-            label: 'Execute',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.rate_review_outlined),
-            selectedIcon: Icon(Icons.rate_review),
-            label: 'Review',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.insights_outlined),
-            selectedIcon: Icon(Icons.insights),
-            label: 'Insights',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
+        destinations: _navigationBranches
+            .map((branch) => branch.destination)
+            .toList(growable: false),
       ),
     );
   }
-}
-
-class _CapturePage extends StatelessWidget {
-  const _CapturePage();
-
-  @override
-  Widget build(BuildContext context) => const _PlaceholderView('Capture');
-}
-
-class _CaptureDetailsPage extends StatelessWidget {
-  const _CaptureDetailsPage();
-
-  @override
-  Widget build(BuildContext context) =>
-      const _PlaceholderView('Capture details');
-}
-
-class _PlanPage extends StatelessWidget {
-  const _PlanPage();
-
-  @override
-  Widget build(BuildContext context) => const _PlaceholderView('Plan');
-}
-
-class _PlanDetailsPage extends StatelessWidget {
-  const _PlanDetailsPage();
-
-  @override
-  Widget build(BuildContext context) =>
-      const _PlaceholderView('Plan details');
-}
-
-class _ExecutePage extends StatelessWidget {
-  const _ExecutePage();
-
-  @override
-  Widget build(BuildContext context) => const _PlaceholderView('Execute');
-}
-
-class _ExecuteDetailsPage extends StatelessWidget {
-  const _ExecuteDetailsPage();
-
-  @override
-  Widget build(BuildContext context) =>
-      const _PlaceholderView('Execute details');
-}
-
-class _ReviewPage extends StatelessWidget {
-  const _ReviewPage();
-
-  @override
-  Widget build(BuildContext context) => const _PlaceholderView('Review');
-}
-
-class _ReviewDetailsPage extends StatelessWidget {
-  const _ReviewDetailsPage();
-
-  @override
-  Widget build(BuildContext context) =>
-      const _PlaceholderView('Review details');
-}
-
-class _InsightsPage extends StatelessWidget {
-  const _InsightsPage();
-
-  @override
-  Widget build(BuildContext context) => const _PlaceholderView('Insights');
-}
-
-class _InsightsDetailsPage extends StatelessWidget {
-  const _InsightsDetailsPage();
-
-  @override
-  Widget build(BuildContext context) =>
-      const _PlaceholderView('Insights details');
-}
-
-class _SettingsPage extends StatelessWidget {
-  const _SettingsPage();
-
-  @override
-  Widget build(BuildContext context) => const _PlaceholderView('Settings');
-}
-
-class _SettingsDetailsPage extends StatelessWidget {
-  const _SettingsDetailsPage();
-
-  @override
-  Widget build(BuildContext context) =>
-      const _PlaceholderView('Settings details');
 }
 
 class _PlaceholderView extends StatelessWidget {
@@ -351,4 +141,81 @@ abstract final class _Paths {
   static const String review = '/review';
   static const String insights = '/insights';
   static const String settings = '/settings';
+  static const String detailSegment = 'details';
+}
+
+const List<_NavigationBranchDefinition> _navigationBranches =
+    <_NavigationBranchDefinition>[
+  _NavigationBranchDefinition(
+    path: _Paths.capture,
+    label: 'Capture',
+    icon: Icons.inbox_outlined,
+    selectedIcon: Icons.inbox,
+  ),
+  _NavigationBranchDefinition(
+    path: _Paths.plan,
+    label: 'Plan',
+    icon: Icons.event_note_outlined,
+    selectedIcon: Icons.event_note,
+  ),
+  _NavigationBranchDefinition(
+    path: _Paths.execute,
+    label: 'Execute',
+    icon: Icons.play_circle_outline,
+    selectedIcon: Icons.play_circle,
+  ),
+  _NavigationBranchDefinition(
+    path: _Paths.review,
+    label: 'Review',
+    icon: Icons.rate_review_outlined,
+    selectedIcon: Icons.rate_review,
+  ),
+  _NavigationBranchDefinition(
+    path: _Paths.insights,
+    label: 'Insights',
+    icon: Icons.insights_outlined,
+    selectedIcon: Icons.insights,
+  ),
+  _NavigationBranchDefinition(
+    path: _Paths.settings,
+    label: 'Settings',
+    icon: Icons.settings_outlined,
+    selectedIcon: Icons.settings,
+  ),
+];
+
+class _NavigationBranchDefinition {
+  const _NavigationBranchDefinition({
+    required this.path,
+    required this.label,
+    required this.icon,
+    required this.selectedIcon,
+  });
+
+  final String path;
+  final String label;
+  final IconData icon;
+  final IconData selectedIcon;
+
+  String get _detailTitle => '$label details';
+
+  GoRoute get route => GoRoute(
+        path: path,
+        builder: (BuildContext context, GoRouterState state) =>
+            _PlaceholderView(label),
+        routes: <RouteBase>[
+          GoRoute(
+            path: _Paths.detailSegment,
+            builder: (BuildContext context, GoRouterState state) =>
+                _PlaceholderView(_detailTitle),
+          ),
+        ],
+      );
+
+  NavigationDestination get destination => NavigationDestination(
+        icon: Icon(icon),
+        selectedIcon: Icon(selectedIcon),
+        label: label,
+      );
+
 }

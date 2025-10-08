@@ -5,51 +5,6 @@ import 'package:go_router/go_router.dart';
 
 const String _captureDetailsRoutePath = '/capture/details';
 
-const List<_BranchNavigation> _branchNavigations = <_BranchNavigation>[
-  _BranchNavigation(
-    tabLabel: 'Capture',
-    rootText: 'Capture placeholder',
-    rootRoutePath: '/capture',
-    detailRoutePath: '/capture/details',
-    detailText: 'Capture details placeholder',
-  ),
-  _BranchNavigation(
-    tabLabel: 'Plan',
-    rootText: 'Plan placeholder',
-    rootRoutePath: '/plan',
-    detailRoutePath: '/plan/details',
-    detailText: 'Plan details placeholder',
-  ),
-  _BranchNavigation(
-    tabLabel: 'Execute',
-    rootText: 'Execute placeholder',
-    rootRoutePath: '/execute',
-    detailRoutePath: '/execute/details',
-    detailText: 'Execute details placeholder',
-  ),
-  _BranchNavigation(
-    tabLabel: 'Review',
-    rootText: 'Review placeholder',
-    rootRoutePath: '/review',
-    detailRoutePath: '/review/details',
-    detailText: 'Review details placeholder',
-  ),
-  _BranchNavigation(
-    tabLabel: 'Insights',
-    rootText: 'Insights placeholder',
-    rootRoutePath: '/insights',
-    detailRoutePath: '/insights/details',
-    detailText: 'Insights details placeholder',
-  ),
-  _BranchNavigation(
-    tabLabel: 'Settings',
-    rootText: 'Settings placeholder',
-    rootRoutePath: '/settings',
-    detailRoutePath: '/settings/details',
-    detailText: 'Settings details placeholder',
-  ),
-];
-
 void main() {
   testWidgets('MyApp uses StatefulShellRoute with six navigation branches',
       (tester) async {
@@ -144,8 +99,40 @@ void main() {
         return;
       }
 
-      for (final navigation in _branchNavigations) {
-        await _verifyBranchDetailRoute(tester, routerConfig, navigation);
+      final routes = routerConfig.configuration.routes;
+      expect(routes, hasLength(1));
+
+      final rootRoute = routes.single;
+      expect(rootRoute, isA<StatefulShellRoute>());
+      if (rootRoute is! StatefulShellRoute) {
+        return;
+      }
+
+      final navigationBarFinder = find.byType(NavigationBar);
+      final navigationBar = tester.widget<NavigationBar>(navigationBarFinder);
+      final destinations =
+          navigationBar.destinations.cast<NavigationDestination>();
+
+      expect(destinations, hasLength(rootRoute.branches.length));
+
+      for (var index = 0; index < rootRoute.branches.length; index++) {
+        final branch = rootRoute.branches[index];
+        final destination = destinations[index];
+        final branchRoutes = branch.routes.whereType<GoRoute>().toList();
+
+        expect(branchRoutes, hasLength(1));
+        final branchRoute = branchRoutes.single;
+
+        final detailRoutes = branchRoute.routes.whereType<GoRoute>().toList();
+        expect(detailRoutes, hasLength(1));
+
+        await _verifyBranchDetailRoute(
+          tester,
+          routerConfig,
+          destination,
+          branchRoute,
+          detailRoutes.single,
+        );
       }
     },
   );
@@ -167,36 +154,24 @@ Future<void> _pumpUntilVisible(WidgetTester tester, Finder finder) async {
 Future<void> _verifyBranchDetailRoute(
   WidgetTester tester,
   GoRouter router,
-  _BranchNavigation navigation,
+  NavigationDestination destination,
+  GoRoute branchRoute,
+  GoRoute detailRoute,
 ) async {
-  final rootFinder = find.text(navigation.rootText);
-  final detailFinder = find.text(navigation.detailText);
+  final label = destination.label;
+  final rootFinder = find.text('$label placeholder');
+  final detailFinder = find.text('$label details placeholder');
 
-  router.go(navigation.rootRoutePath);
+  router.go(branchRoute.path);
   await tester.pumpAndSettle();
   expect(rootFinder, findsOneWidget);
 
-  router.go(navigation.detailRoutePath);
+  final detailPath = '${branchRoute.path}/${detailRoute.path}';
+  router.go(detailPath);
   await tester.pumpAndSettle();
   expect(detailFinder, findsOneWidget);
 
-  router.go(navigation.rootRoutePath);
+  router.go(branchRoute.path);
   await tester.pumpAndSettle();
   expect(rootFinder, findsOneWidget);
-}
-
-class _BranchNavigation {
-  const _BranchNavigation({
-    required this.tabLabel,
-    required this.rootText,
-    required this.rootRoutePath,
-    required this.detailRoutePath,
-    required this.detailText,
-  });
-
-  final String tabLabel;
-  final String rootText;
-  final String rootRoutePath;
-  final String detailRoutePath;
-  final String detailText;
 }
