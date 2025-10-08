@@ -37,6 +37,15 @@ Future<void> runCascadeBootstrap(ProviderContainer container) async {
       (boxName) => hiveInitializer.openEncryptedBox<dynamic>(boxName),
     ),
   );
+  final adapterRegistryBox =
+      await hiveInitializer.openEncryptedBox<dynamic>('app.adapter_registry');
+  await adapterRegistryBox.put(
+    'bootstrap',
+    <String, Object?>{
+      'status': 'registered',
+      'timestamp': DateTime.now().toUtc().toIso8601String(),
+    },
+  );
 
   await notificationBootstrapper();
 
