@@ -9,7 +9,6 @@ Development cadence: every task runs through TDD—write the failing test, add t
 ## Status Snapshot (2025-09-30)
 - Current focus: kick off CaptureItem domain modelling and notification facade design now that the feature-based restructure is in place.
 - Next actions:
-  - Add placeholder routes/screens for each navigation branch to unblock feature integration work.
   - Flesh out presentation scaffolds so slice packages can begin wiring real UI flows.
 - Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief, CONTRIBUTING workflow guide, initial infrastructure stubs (PrintLogger, in-memory Hive + secure storage), logging helper with global error hook, provider registry documentation, `Result.guard`/`guardAsync` helper utilities. Updated workspace test script to skip empty packages, seeded placeholder test scaffolds across unwired packages, established `CaptureItem` domain entity with validation/context metadata. Ensured tab re-selection resets each branch to its root while preserving cross-branch navigation stacks using go_router's `StatefulNavigationShell`.
 
@@ -47,7 +46,7 @@ Development cadence: every task runs through TDD—write the failing test, add t
   - [x] Initialise the notification facade (permissions, channels, background handlers) prior to UI launch.
     - [x] Clear pending notifications across focus, schedule, and habit facades during bootstrap.
     - [x] Invoke notification bootstrapper prior to facade clearing.
-- [ ] Add placeholder routes/screens for each branch to unblock feature integration.
+- [x] Add placeholder routes/screens for each branch to unblock feature integration.
 
 ## Milestone 5 – Feature: Ingest
 ### Domain (`features/ingest/domain`)
