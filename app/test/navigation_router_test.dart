@@ -6,8 +6,9 @@ import 'package:go_router/go_router.dart';
 const String _captureDetailsRoutePath = '/capture/details';
 
 void main() {
-  testWidgets('MyApp uses StatefulShellRoute with six navigation branches',
-      (tester) async {
+  testWidgets('MyApp uses StatefulShellRoute with six navigation branches', (
+    tester,
+  ) async {
     await tester.pumpWidget(const CascadeFlowApp());
 
     final materialAppFinder = find.byType(MaterialApp);
@@ -39,19 +40,24 @@ void main() {
     (tester) async {
       final captureTab = find.text('Capture');
       final planTab = find.text('Plan');
-      final capturePlaceholderFinder = find.text('Capture placeholder');
-      final captureDetailsFinder = find.text('Capture details placeholder');
-      final planPlaceholderFinder = find.text('Plan placeholder');
+      final captureRootFinder = find.byKey(
+        const ValueKey('branch-capture-root'),
+      );
+      final captureDetailsFinder = find.byKey(
+        const ValueKey('branch-capture-detail'),
+      );
+      final planRootFinder = find.byKey(const ValueKey('branch-plan-root'));
+      final captureWorkspaceText = find.text('Capture workspace coming soon');
+      final planWorkspaceText = find.text('Plan workspace coming soon');
 
       // ARRANGE: load app and ensure capture branch root is visible
       await tester.pumpWidget(const CascadeFlowApp());
       await _pumpUntilVisible(
         tester,
-        capturePlaceholderFinder,
+        captureRootFinder,
       );
 
-      final BuildContext captureContext =
-          tester.element(capturePlaceholderFinder);
+      final BuildContext captureContext = tester.element(captureRootFinder);
 
       // ACT: navigate into capture details via router and switch tabs
       GoRouter.of(captureContext).go(_captureDetailsRoutePath);
@@ -64,7 +70,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // ASSERT: plan branch is visible and capture details hidden
-      expect(planPlaceholderFinder, findsOneWidget);
+      expect(planRootFinder, findsOneWidget);
+      expect(planWorkspaceText, findsOneWidget);
       expect(captureDetailsFinder, findsNothing);
 
       // ACT: switch back to capture tab (should preserve stack)
@@ -73,13 +80,18 @@ void main() {
 
       // ASSERT: capture details restored when returning to branch
       expect(captureDetailsFinder, findsOneWidget);
+      expect(
+        find.text('Capture details coming soon'),
+        findsOneWidget,
+      );
 
       // ACT: reselect capture tab to trigger stack reset
       await tester.tap(captureTab);
       await tester.pumpAndSettle();
 
       // ASSERT: reselecting capture resets stack to root screen
-      expect(capturePlaceholderFinder, findsOneWidget);
+      expect(captureRootFinder, findsOneWidget);
+      expect(captureWorkspaceText, findsOneWidget);
       expect(captureDetailsFinder, findsNothing);
     },
   );
@@ -110,8 +122,8 @@ void main() {
 
       final navigationBarFinder = find.byType(NavigationBar);
       final navigationBar = tester.widget<NavigationBar>(navigationBarFinder);
-      final destinations =
-          navigationBar.destinations.cast<NavigationDestination>();
+      final destinations = navigationBar.destinations
+          .cast<NavigationDestination>();
 
       expect(destinations, hasLength(rootRoute.branches.length));
 
@@ -159,19 +171,28 @@ Future<void> _verifyBranchDetailRoute(
   GoRoute detailRoute,
 ) async {
   final label = destination.label;
-  final rootFinder = find.text('$label placeholder');
-  final detailFinder = find.text('$label details placeholder');
+  final branchId = _branchIdFromPath(branchRoute.path);
+  final rootFinder = find.byKey(ValueKey('branch-$branchId-root'));
+  final rootTextFinder = find.text('$label workspace coming soon');
+  final detailFinder = find.byKey(ValueKey('branch-$branchId-detail'));
+  final detailTextFinder = find.text('$label details coming soon');
 
   router.go(branchRoute.path);
   await tester.pumpAndSettle();
   expect(rootFinder, findsOneWidget);
+  expect(rootTextFinder, findsOneWidget);
 
   final detailPath = '${branchRoute.path}/${detailRoute.path}';
   router.go(detailPath);
   await tester.pumpAndSettle();
   expect(detailFinder, findsOneWidget);
+  expect(detailTextFinder, findsOneWidget);
 
   router.go(branchRoute.path);
   await tester.pumpAndSettle();
   expect(rootFinder, findsOneWidget);
+  expect(rootTextFinder, findsOneWidget);
 }
+
+String _branchIdFromPath(String path) =>
+    path.startsWith('/') ? path.substring(1) : path;
