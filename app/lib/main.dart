@@ -59,6 +59,13 @@ final GoRouter _router = GoRouter(
               path: _Paths.plan,
               builder: (BuildContext context, GoRouterState state) =>
                   const _PlanPage(),
+              routes: <RouteBase>[
+                GoRoute(
+                  path: 'details',
+                  builder: (BuildContext context, GoRouterState state) =>
+                      const _PlanDetailsPage(),
+                ),
+              ],
             ),
           ],
         ),
@@ -68,6 +75,13 @@ final GoRouter _router = GoRouter(
               path: _Paths.execute,
               builder: (BuildContext context, GoRouterState state) =>
                   const _ExecutePage(),
+              routes: <RouteBase>[
+                GoRoute(
+                  path: 'details',
+                  builder: (BuildContext context, GoRouterState state) =>
+                      const _ExecuteDetailsPage(),
+                ),
+              ],
             ),
           ],
         ),
@@ -77,6 +91,13 @@ final GoRouter _router = GoRouter(
               path: _Paths.review,
               builder: (BuildContext context, GoRouterState state) =>
                   const _ReviewPage(),
+              routes: <RouteBase>[
+                GoRoute(
+                  path: 'details',
+                  builder: (BuildContext context, GoRouterState state) =>
+                      const _ReviewDetailsPage(),
+                ),
+              ],
             ),
           ],
         ),
@@ -86,6 +107,13 @@ final GoRouter _router = GoRouter(
               path: _Paths.insights,
               builder: (BuildContext context, GoRouterState state) =>
                   const _InsightsPage(),
+              routes: <RouteBase>[
+                GoRoute(
+                  path: 'details',
+                  builder: (BuildContext context, GoRouterState state) =>
+                      const _InsightsDetailsPage(),
+                ),
+              ],
             ),
           ],
         ),
@@ -95,6 +123,13 @@ final GoRouter _router = GoRouter(
               path: _Paths.settings,
               builder: (BuildContext context, GoRouterState state) =>
                   const _SettingsPage(),
+              routes: <RouteBase>[
+                GoRoute(
+                  path: 'details',
+                  builder: (BuildContext context, GoRouterState state) =>
+                      const _SettingsDetailsPage(),
+                ),
+              ],
             ),
           ],
         ),
@@ -224,11 +259,27 @@ class _PlanPage extends StatelessWidget {
   Widget build(BuildContext context) => const _PlaceholderView('Plan');
 }
 
+class _PlanDetailsPage extends StatelessWidget {
+  const _PlanDetailsPage();
+
+  @override
+  Widget build(BuildContext context) =>
+      const _PlaceholderView('Plan details');
+}
+
 class _ExecutePage extends StatelessWidget {
   const _ExecutePage();
 
   @override
   Widget build(BuildContext context) => const _PlaceholderView('Execute');
+}
+
+class _ExecuteDetailsPage extends StatelessWidget {
+  const _ExecuteDetailsPage();
+
+  @override
+  Widget build(BuildContext context) =>
+      const _PlaceholderView('Execute details');
 }
 
 class _ReviewPage extends StatelessWidget {
@@ -238,6 +289,14 @@ class _ReviewPage extends StatelessWidget {
   Widget build(BuildContext context) => const _PlaceholderView('Review');
 }
 
+class _ReviewDetailsPage extends StatelessWidget {
+  const _ReviewDetailsPage();
+
+  @override
+  Widget build(BuildContext context) =>
+      const _PlaceholderView('Review details');
+}
+
 class _InsightsPage extends StatelessWidget {
   const _InsightsPage();
 
@@ -245,11 +304,27 @@ class _InsightsPage extends StatelessWidget {
   Widget build(BuildContext context) => const _PlaceholderView('Insights');
 }
 
+class _InsightsDetailsPage extends StatelessWidget {
+  const _InsightsDetailsPage();
+
+  @override
+  Widget build(BuildContext context) =>
+      const _PlaceholderView('Insights details');
+}
+
 class _SettingsPage extends StatelessWidget {
   const _SettingsPage();
 
   @override
   Widget build(BuildContext context) => const _PlaceholderView('Settings');
+}
+
+class _SettingsDetailsPage extends StatelessWidget {
+  const _SettingsDetailsPage();
+
+  @override
+  Widget build(BuildContext context) =>
+      const _PlaceholderView('Settings details');
 }
 
 class _PlaceholderView extends StatelessWidget {
