@@ -1,11 +1,9 @@
+import 'package:cascade_flow_app/src/bootstrap/hive_adapter_registration.dart';
 import 'package:cascade_flow_infrastructure/cascade_flow_infrastructure.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Storage key used to retrieve the Hive encryption secret.
 const String _hiveEncryptionKey = 'cascadeflow.hive_encryption_key';
-
-/// Hive box seeded with adapter registration records.
-const String _adapterRegistryBoxName = 'app.adapter_registry';
 
 /// Registry key storing bootstrap metadata.
 const String _adapterRegistryBootstrapKey = 'bootstrap';
@@ -44,7 +42,7 @@ Future<void> runCascadeBootstrap(ProviderContainer container) async {
   );
   final adapterRegistryBox =
       await hiveInitializer.openEncryptedBox<Map<String, Object?>>(
-        _adapterRegistryBoxName,
+        adapterRegistryBoxName,
       );
   await adapterRegistryBox.put(
     _adapterRegistryBootstrapKey,

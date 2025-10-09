@@ -1,5 +1,6 @@
 import 'package:cascade_flow_app/src/bootstrap/cascade_app_theme.dart';
 import 'package:cascade_flow_app/src/bootstrap/cascade_layout_scope.dart';
+import 'package:cascade_flow_app/src/bootstrap/hive_adapter_registration.dart';
 import 'package:cascade_flow_infrastructure/cascade_flow_infrastructure.dart';
 import 'package:cascade_flow_presentation/cascade_flow_presentation.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class CascadeBootstrap extends StatelessWidget {
     return ProviderScope(
       overrides: [
         loggerProvider.overrideWithValue(const PrintLogger()),
+        hiveAdapterRegistrarProvider.overrideWith(appHiveAdapterRegistrar),
       ],
       child: const CascadeFlowApp(),
     );

@@ -18,6 +18,8 @@ dependencies:
     path: ../packages/infrastructure
   cascade_flow_presentation:
     path: ../packages/presentation
+  cascade_flow_ingest:
+    path: ../features/ingest
   cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter
