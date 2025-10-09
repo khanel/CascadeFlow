@@ -16,10 +16,10 @@ dependencies:
     path: ../packages/data
   cascade_flow_infrastructure:
     path: ../packages/infrastructure
-  cascade_flow_presentation:
-    path: ../packages/presentation
   cascade_flow_ingest:
     path: ../features/ingest
+  cascade_flow_presentation:
+    path: ../packages/presentation
   cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter

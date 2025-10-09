@@ -46,10 +46,7 @@ Future<void> runCascadeBootstrap(ProviderContainer container) async {
       );
   await adapterRegistryBox.put(
     _adapterRegistryBootstrapKey,
-    <String, Object?>{
-      'status': 'registered',
-      'timestamp': DateTime.now().toUtc().toIso8601String(),
-    },
+    createAdapterRegistrationMetadata(),
   );
 
   await notificationBootstrapper();
