@@ -10,7 +10,7 @@ Development cadence: every task runs through TDD—write the failing test, add t
 - Current focus: kick off CaptureItem domain modelling and notification facade design now that the feature-based restructure is in place.
 - Next actions:
   - Wire capture presentation providers and quick-add UI once data layer warm-up completes.
-- Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief, CONTRIBUTING workflow guide, initial infrastructure stubs (PrintLogger, in-memory Hive + secure storage), logging helper with global error hook, provider registry documentation, `Result.guard`/`guardAsync` helper utilities. Updated workspace test script to skip empty packages, seeded placeholder test scaffolds across unwired packages, established `CaptureItem` domain entity with validation/context metadata. Ensured tab re-selection resets each branch to its root while preserving cross-branch navigation stacks using go_router's `StatefulNavigationShell`. Added shared presentation scaffolds and messaging for all navigation branches to unblock slice UI wiring.
+- Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief, CONTRIBUTING workflow guide, initial infrastructure stubs (PrintLogger, in-memory Hive + secure storage), logging helper with global error hook, provider registry documentation, `Result.guard`/`guardAsync` helper utilities. Updated workspace test script to skip empty packages, seeded placeholder test scaffolds across unwired packages, established `CaptureItem` domain entity with validation/context metadata. Ensured tab re-selection resets each branch to its root while preserving cross-branch navigation stacks using go_router's `StatefulNavigationShell`. Added shared presentation scaffolds and messaging for all navigation branches to unblock slice UI wiring. Seeded adapter registry metadata during bootstrap for diagnostics parity.
 
 ## Milestone 1 – Workspace Restructure & Tooling
 - [x] Adopt feature-based directory layout (`/app`, `/core`, `/infrastructure`, `/features/<pillar>`).
@@ -35,14 +35,15 @@ Development cadence: every task runs through TDD—write the failing test, add t
 ## Milestone 4 – App Composition & Navigation
 - [x] Configure `StatefulShellRoute` branches aligned with pillars (Capture, Plan, Execute, Review, Insights, Settings).
 - [x] Ensure each branch preserves its navigation stack when switching tabs.
-- [ ] Complete bootstrap initialisation:
+ - [x] Complete bootstrap initialisation:
   - [x] Apply the shared light/dark themes and adaptive layout breakpoints to the root `MaterialApp`.
   - [x] Wrap the entry widget with `ProviderScope` and register global overrides/providers.
   - [x] Introduce an async bootstrap runner that requests the secure storage key and configures Hive before `runApp`.
-  - [ ] Register required Hive adapters and open base boxes used by the app shell.
+  - [x] Register required Hive adapters and open base boxes used by the app shell.
     - [x] Open app shell base boxes (`app.preferences`, `app.navigation_state`).
     - [x] Add bootstrap adapter registry box warmup (`app.adapter_registry`).
     - [x] Wire Hive adapter registration.
+    - [x] Seed adapter registry with bootstrap metadata for diagnostics.
   - [x] Initialise the notification facade (permissions, channels, background handlers) prior to UI launch.
     - [x] Clear pending notifications across focus, schedule, and habit facades during bootstrap.
     - [x] Invoke notification bootstrapper prior to facade clearing.
