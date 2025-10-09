@@ -4,11 +4,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Storage key used to retrieve the Hive encryption secret.
 const String _hiveEncryptionKey = 'cascadeflow.hive_encryption_key';
 
+/// Hive box seeded with adapter registration records.
+const String _adapterRegistryBoxName = 'app.adapter_registry';
+
+/// Registry key storing bootstrap metadata.
+const String _adapterRegistryBootstrapKey = 'bootstrap';
+
 /// Boxes the app shell expects to be ready before UI launch.
 const List<String> _baseHiveBoxes = <String>[
   'app.preferences',
   'app.navigation_state',
-  'app.adapter_registry',
 ];
 
 /// Executes startup tasks required before rendering the app shell.
@@ -38,9 +43,11 @@ Future<void> runCascadeBootstrap(ProviderContainer container) async {
     ),
   );
   final adapterRegistryBox =
-      await hiveInitializer.openEncryptedBox<dynamic>('app.adapter_registry');
+      await hiveInitializer.openEncryptedBox<Map<String, Object?>>(
+        _adapterRegistryBoxName,
+      );
   await adapterRegistryBox.put(
-    'bootstrap',
+    _adapterRegistryBootstrapKey,
     <String, Object?>{
       'status': 'registered',
       'timestamp': DateTime.now().toUtc().toIso8601String(),
