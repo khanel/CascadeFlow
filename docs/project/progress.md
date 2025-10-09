@@ -10,7 +10,7 @@ Development cadence: every task runs through TDD—write the failing test, add t
 - Current focus: kick off CaptureItem domain modelling and notification facade design now that the feature-based restructure is in place.
 - Next actions:
   - Wire capture presentation providers and quick-add UI once data layer warm-up completes.
-- Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief, CONTRIBUTING workflow guide, initial infrastructure stubs (PrintLogger, in-memory Hive + secure storage), logging helper with global error hook, provider registry documentation, `Result.guard`/`guardAsync` helper utilities. Updated workspace test script to skip empty packages, seeded placeholder test scaffolds across unwired packages, established `CaptureItem` domain entity with validation/context metadata. Ensured tab re-selection resets each branch to its root while preserving cross-branch navigation stacks using go_router's `StatefulNavigationShell`. Added shared presentation scaffolds and messaging for all navigation branches to unblock slice UI wiring. Seeded adapter registry metadata during bootstrap for diagnostics parity.
+- Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief, CONTRIBUTING workflow guide, initial infrastructure stubs (PrintLogger, in-memory Hive + secure storage), logging helper with global error hook, provider registry documentation, `Result.guard`/`guardAsync` helper utilities. Updated workspace test script to skip empty packages, seeded placeholder test scaffolds across unwired packages, established `CaptureItem` domain entity with validation/context metadata. Ensured tab re-selection resets each branch to its root while preserving cross-branch navigation stacks using go_router's `StatefulNavigationShell`. Added shared presentation scaffolds and messaging for all navigation branches to unblock slice UI wiring. Seeded adapter registry metadata during bootstrap for diagnostics parity and wired capture adapter registration to warm the inbox Hive box.
 
 ## Milestone 1 – Workspace Restructure & Tooling
 - [x] Adopt feature-based directory layout (`/app`, `/core`, `/infrastructure`, `/features/<pillar>`).
@@ -57,8 +57,9 @@ Development cadence: every task runs through TDD—write the failing test, add t
   - [x] `ArchiveCaptureItem`
 
 ### Data (`features/ingest/data`)
-- [ ] Register Hive adapters for capture items and open encrypted inbox box.
+- [x] Register Hive adapters for capture items and open encrypted inbox box.
   - [x] Define Hive persistence model and warm-up data source scaffold.
+  - [x] Seed adapter registry diagnostics via shared registrar and warm capture inbox during bootstrap.
 - [ ] Build `CaptureLocalDataSource` and repository implementation with tests using temp boxes.
   - [x] Add local data source warm-up to ensure capture inbox box is available.
 
