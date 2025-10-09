@@ -1,6 +1,8 @@
 import 'package:cascade_flow_app/src/bootstrap/bootstrap_runner.dart';
+import 'package:cascade_flow_app/src/bootstrap/hive_adapter_registration.dart';
 import 'package:cascade_flow_infrastructure/cascade_flow_infrastructure.dart';
 import 'package:cascade_flow_infrastructure/notifications.dart';
+import 'package:cascade_flow_ingest/data/hive/capture_local_data_source.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -90,6 +92,7 @@ void main() {
         overrides: [
           secureStorageProvider.overrideWithValue(secureStorage),
           hiveInitializerProvider.overrideWithValue(hiveInitializer),
+          hiveAdapterRegistrarProvider.overrideWith(appHiveAdapterRegistrar),
         ],
       );
 
@@ -124,6 +127,7 @@ void main() {
         overrides: [
           secureStorageProvider.overrideWithValue(secureStorage),
           hiveInitializerProvider.overrideWithValue(hiveInitializer),
+          hiveAdapterRegistrarProvider.overrideWith(appHiveAdapterRegistrar),
           notificationBootstrapperProvider.overrideWithValue(
             () async => bootstrapGuard.value = true,
           ),
@@ -197,6 +201,7 @@ bootstrapper before facade clear''',
         overrides: [
           secureStorageProvider.overrideWithValue(secureStorage),
           hiveInitializerProvider.overrideWithValue(hiveInitializer),
+          hiveAdapterRegistrarProvider.overrideWith(appHiveAdapterRegistrar),
           notificationBootstrapperProvider.overrideWithValue(bootstrapper),
           focusNotificationFacadeProvider.overrideWithValue(
             NotificationFacade(scheduler: focusScheduler),
@@ -237,6 +242,7 @@ bootstrapper before facade clear''',
         overrides: [
           secureStorageProvider.overrideWithValue(secureStorage),
           hiveInitializerProvider.overrideWithValue(hiveInitializer),
+          hiveAdapterRegistrarProvider.overrideWith(appHiveAdapterRegistrar),
           focusNotificationFacadeProvider.overrideWithValue(
             NotificationFacade(scheduler: focusScheduler),
           ),
@@ -272,6 +278,7 @@ bootstrapper before facade clear''',
         overrides: [
           secureStorageProvider.overrideWithValue(secureStorage),
           hiveInitializerProvider.overrideWithValue(hiveInitializer),
+          hiveAdapterRegistrarProvider.overrideWith(appHiveAdapterRegistrar),
         ],
       );
 
@@ -279,14 +286,24 @@ bootstrapper before facade clear''',
       await runCascadeBootstrap(container);
 
       // ASSERT
-      final registryBox = await hiveInitializer
-          .openEncryptedBox<dynamic>('app.adapter_registry');
-      final registryValues = await registryBox.values();
+      final registryBox =
+          await hiveInitializer.openEncryptedBox<Map<String, Object?>>(
+            adapterRegistryBoxName,
+          );
+      final bootstrapMetadata =
+          registryBox.require('bootstrap');
+      final captureMetadata =
+          registryBox.require(captureAdapterRegistryKey);
+
+      expect(bootstrapMetadata['status'], 'registered');
       expect(
-        registryValues,
-        isNotEmpty,
-        reason:
-            'expected bootstrap to populate adapter registry for diagnostics',
+        captureMetadata,
+        containsPair('box', captureItemsBoxName),
+      );
+      expect(captureMetadata['status'], 'registered');
+      expect(
+        hiveInitializer.openedBoxes,
+        contains(captureItemsBoxName),
       );
 
       container.dispose();
