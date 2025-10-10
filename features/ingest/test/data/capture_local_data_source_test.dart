@@ -91,4 +91,28 @@ void main() {
     expect(models.first.id, first.id);
     expect(models.last.id, second.id);
   });
+
+  test('delete removes stored capture model and ignores unknown ids', () async {
+    // ARRANGE
+    final initializer = InMemoryHiveInitializer();
+    final dataSource = CaptureLocalDataSource(initializer: initializer);
+    await dataSource.warmUp();
+    final model = CaptureItemHiveModel.fromDomain(
+      buildTestCaptureItem(
+        id: 'to-delete',
+        createdMicros: 5,
+        updatedMicros: 5,
+      ),
+    );
+    await dataSource.save(model);
+
+    // ACT
+    await dataSource.delete(model.id);
+    await dataSource.delete('missing-id');
+
+    // ASSERT
+    expect(await dataSource.read(model.id), isNull);
+    final remaining = await dataSource.readAll();
+    expect(remaining, isEmpty);
+  });
 }

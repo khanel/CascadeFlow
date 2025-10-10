@@ -86,4 +86,28 @@ void main() {
     final inboxItems = await repository.loadInbox();
     expect(inboxItems, isEmpty);
   });
+
+  test('delete removes capture from persistence and repository view', () async {
+    // ARRANGE
+    final first = buildTestCaptureItem(
+      id: 'capture-first',
+      createdMicros: 1,
+      updatedMicros: 1,
+    );
+    final second = buildTestCaptureItem(
+      id: 'capture-second',
+      createdMicros: 2,
+      updatedMicros: 2,
+    );
+    await repository.save(first);
+    await repository.save(second);
+
+    // ACT
+    await repository.delete(first.id);
+
+    // ASSERT
+    expect(await dataSource.read(first.id.value), isNull);
+    final inboxItems = await repository.loadInbox();
+    expect(inboxItems, equals(<CaptureItem>[second]));
+  });
 }
