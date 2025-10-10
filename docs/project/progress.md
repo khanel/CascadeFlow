@@ -9,8 +9,8 @@ Development cadence: every task runs through TDD—write the failing test, add t
 ## Status Snapshot (2025-09-30)
 - Current focus: kick off CaptureItem domain modelling and notification facade design now that the feature-based restructure is in place.
 - Next actions:
-  - Wire capture presentation providers and quick-add UI now that the data layer is ready.
-- Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief, CONTRIBUTING workflow guide, initial infrastructure stubs (PrintLogger, in-memory Hive + secure storage), logging helper with global error hook, provider registry documentation, `Result.guard`/`guardAsync` helper utilities. Updated workspace test script to skip empty packages, seeded placeholder test scaffolds across unwired packages, established `CaptureItem` domain entity with validation/context metadata. Ensured tab re-selection resets each branch to its root while preserving cross-branch navigation stacks using go_router's `StatefulNavigationShell`. Added shared presentation scaffolds and messaging for all navigation branches to unblock slice UI wiring. Seeded adapter registry metadata during bootstrap for diagnostics parity and wired capture adapter registration to warm the inbox Hive box. Implemented CaptureLocalDataSource CRUD (including delete support) with repository wiring and tests to satisfy the data-layer milestone for Ingest.
+  - Start Goals slice domain scaffolding (Goal entity + SMART metadata).
+- Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief, CONTRIBUTING workflow guide, initial infrastructure stubs (PrintLogger, in-memory Hive + secure storage), logging helper with global error hook, provider registry documentation, `Result.guard`/`guardAsync` helper utilities. Updated workspace test script to skip empty packages, seeded placeholder test scaffolds across unwired packages, established `CaptureItem` domain entity with validation/context metadata. Ensured tab re-selection resets each branch to its root while preserving cross-branch navigation stacks using go_router's `StatefulNavigationShell`. Added shared presentation scaffolds and messaging for all navigation branches to unblock slice UI wiring. Seeded adapter registry metadata during bootstrap for diagnostics parity and wired capture adapter registration to warm the inbox Hive box. Implemented CaptureLocalDataSource CRUD (including delete support) with repository wiring and tests to satisfy the data-layer milestone for Ingest. Delivered the quick-add widget and inbox list UIs with Riverpod-driven tests to complete the presentation slice for capture.
 
 ## Milestone 1 – Workspace Restructure & Tooling
 - [x] Adopt feature-based directory layout (`/app`, `/core`, `/infrastructure`, `/features/<pillar>`).
@@ -65,7 +65,7 @@ Development cadence: every task runs through TDD—write the failing test, add t
 
 ### Presentation (`features/ingest/presentation`)
 - [x] Add Riverpod providers for capture workflows and inbox state.
-- [ ] Ship quick-add UI (text/voice) and inbox list with widget tests.
+- [x] Ship quick-add UI (text/voice) and inbox list with widget tests.
 
 ## Milestone 6 – Feature: Goals
 ### Domain (`features/goals/domain`)
