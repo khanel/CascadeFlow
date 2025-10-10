@@ -56,19 +56,20 @@ class _CaptureInboxListView extends StatelessWidget {
       separatorBuilder: (context, index) => const Divider(height: 0),
       itemBuilder: (context, index) {
         final item = items[index];
-        final createdAt = item.createdAt.value.toLocal();
-        final subtitle =
-            '${item.context.channel} · '
-            '${TimeOfDay.fromDateTime(createdAt).format(context)}';
-
         return ListTile(
           key: CaptureInboxListKeys.itemTile(item.id.value),
           title: Text(item.content),
-          subtitle: Text(subtitle),
+          subtitle: Text(_subtitleFor(context, item)),
           leading: const Icon(Icons.inbox),
         );
       },
     );
+  }
+
+  String _subtitleFor(BuildContext context, CaptureItem item) {
+    final createdAt = item.createdAt.value.toLocal();
+    final formattedTime = TimeOfDay.fromDateTime(createdAt).format(context);
+    return '${item.context.channel} · $formattedTime';
   }
 }
 

@@ -10,8 +10,9 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../test_utils/capture_test_data.dart';
 
 void main() {
-  testWidgets('renders capture items returned by the repository',
-      (WidgetTester tester) async {
+  testWidgets('renders capture items returned by the repository', (
+    WidgetTester tester,
+  ) async {
     // ARRANGE
     final repository = _RecordingCaptureRepository()
       ..inboxItems = <CaptureItem>[
@@ -54,8 +55,9 @@ void main() {
     expect(find.text('Plan weekly review'), findsOneWidget);
   });
 
-  testWidgets('shows empty placeholder when inbox is clear',
-      (WidgetTester tester) async {
+  testWidgets('shows empty placeholder when inbox is clear', (
+    WidgetTester tester,
+  ) async {
     // ARRANGE
     final repository = _RecordingCaptureRepository();
 
@@ -76,8 +78,10 @@ void main() {
     // ASSERT
     expect(find.byKey(CaptureInboxListKeys.listView), findsNothing);
     expect(find.byKey(CaptureInboxListKeys.emptyState), findsOneWidget);
-    expect(find.textContaining('inbox is clear', findRichText: true),
-        findsOneWidget);
+    expect(
+      find.textContaining('inbox is clear', findRichText: true),
+      findsOneWidget,
+    );
   });
 }
 

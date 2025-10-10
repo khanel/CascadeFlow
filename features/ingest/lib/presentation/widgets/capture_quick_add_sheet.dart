@@ -46,6 +46,7 @@ class _CaptureQuickAddSheetState extends ConsumerState<CaptureQuickAddSheet> {
             if (focusScope.hasPrimaryFocus) {
               focusScope.unfocus();
             }
+            return;
           case CaptureQuickEntryStatus.error:
             final failure = next.failure;
             if (failure != null) {
@@ -55,6 +56,7 @@ class _CaptureQuickAddSheetState extends ConsumerState<CaptureQuickAddSheet> {
                   SnackBar(content: Text(failure.message)),
                 );
             }
+            return;
           case CaptureQuickEntryStatus.idle:
           case CaptureQuickEntryStatus.submitting:
             break;
