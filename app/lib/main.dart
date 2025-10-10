@@ -2,6 +2,7 @@ import 'package:cascade_flow_app/src/bootstrap/cascade_app_theme.dart';
 import 'package:cascade_flow_app/src/bootstrap/cascade_layout_scope.dart';
 import 'package:cascade_flow_app/src/bootstrap/hive_adapter_registration.dart';
 import 'package:cascade_flow_infrastructure/cascade_flow_infrastructure.dart';
+import 'package:cascade_flow_ingest/presentation/pages/capture_home_page.dart';
 import 'package:cascade_flow_presentation/cascade_flow_presentation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -134,39 +135,40 @@ abstract final class _Paths {
   static const String detailSegment = 'details';
 }
 
-const List<_NavigationBranchDefinition> _navigationBranches =
+final List<_NavigationBranchDefinition> _navigationBranches =
     <_NavigationBranchDefinition>[
   _NavigationBranchDefinition(
     path: _Paths.capture,
     label: 'Capture',
     icon: Icons.inbox_outlined,
     selectedIcon: Icons.inbox,
+    rootBuilder: (context) => const CaptureHomePage(),
   ),
-  _NavigationBranchDefinition(
+  const _NavigationBranchDefinition(
     path: _Paths.plan,
     label: 'Plan',
     icon: Icons.event_note_outlined,
     selectedIcon: Icons.event_note,
   ),
-  _NavigationBranchDefinition(
+  const _NavigationBranchDefinition(
     path: _Paths.execute,
     label: 'Execute',
     icon: Icons.play_circle_outline,
     selectedIcon: Icons.play_circle,
   ),
-  _NavigationBranchDefinition(
+  const _NavigationBranchDefinition(
     path: _Paths.review,
     label: 'Review',
     icon: Icons.rate_review_outlined,
     selectedIcon: Icons.rate_review,
   ),
-  _NavigationBranchDefinition(
+  const _NavigationBranchDefinition(
     path: _Paths.insights,
     label: 'Insights',
     icon: Icons.insights_outlined,
     selectedIcon: Icons.insights,
   ),
-  _NavigationBranchDefinition(
+  const _NavigationBranchDefinition(
     path: _Paths.settings,
     label: 'Settings',
     icon: Icons.settings_outlined,
@@ -180,23 +182,30 @@ class _NavigationBranchDefinition {
     required this.label,
     required this.icon,
     required this.selectedIcon,
+    this.rootBuilder,
   });
 
   final String path;
   final String label;
   final IconData icon;
   final IconData selectedIcon;
+  final WidgetBuilder? rootBuilder;
 
   String get _branchId =>
       path.startsWith('/') ? path.substring(1) : path;
 
   GoRoute get route => GoRoute(
         path: path,
-        builder: (BuildContext context, GoRouterState state) =>
-            _scaffoldFactory.buildRoot(
-              branchId: _branchId,
-              branchLabel: label,
-            ),
+        builder: (BuildContext context, GoRouterState state) {
+          final builder = rootBuilder;
+          if (builder != null) {
+            return builder(context);
+          }
+          return _scaffoldFactory.buildRoot(
+            branchId: _branchId,
+            branchLabel: label,
+          );
+        },
         routes: <RouteBase>[
           GoRoute(
             path: _Paths.detailSegment,
