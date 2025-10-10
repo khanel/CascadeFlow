@@ -64,7 +64,7 @@ Development cadence: every task runs through TDD—write the failing test, add t
   - [x] Add local data source warm-up to ensure capture inbox box is available.
 
 ### Presentation (`features/ingest/presentation`)
-- [ ] Add Riverpod providers for capture workflows and inbox state.
+- [x] Add Riverpod providers for capture workflows and inbox state.
 - [ ] Ship quick-add UI (text/voice) and inbox list with widget tests.
 
 ## Milestone 6 – Feature: Goals
