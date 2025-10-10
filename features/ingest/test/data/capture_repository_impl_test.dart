@@ -1,36 +1,9 @@
-import 'package:cascade_flow_core/cascade_flow_core.dart';
 import 'package:cascade_flow_infrastructure/storage.dart';
 import 'package:cascade_flow_ingest/data/hive/capture_local_data_source.dart';
 import 'package:cascade_flow_ingest/data/repositories/capture_repository_impl.dart';
 import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-CaptureItem _buildCaptureItem({
-  required String id,
-  CaptureStatus status = CaptureStatus.inbox,
-  String content = 'Capture content',
-  String channel = 'quick_sheet',
-  int createdMicros = 0,
-  int updatedMicros = 0,
-}) {
-  return CaptureItem.create(
-    id: EntityId(id),
-    content: content,
-    context: CaptureContext(
-      source: CaptureSource.quickCapture,
-      channel: channel,
-    ),
-    status: status,
-    createdAt: Timestamp(DateTime.fromMicrosecondsSinceEpoch(
-      createdMicros,
-      isUtc: true,
-    )),
-    updatedAt: Timestamp(DateTime.fromMicrosecondsSinceEpoch(
-      updatedMicros,
-      isUtc: true,
-    )),
-  );
-}
+import '../test_utils/capture_test_data.dart';
 
 void main() {
   late InMemoryHiveInitializer initializer;
@@ -46,7 +19,7 @@ void main() {
 
   test('save persists capture item to local data source', () async {
     // ARRANGE
-    final item = _buildCaptureItem(
+    final item = buildTestCaptureItem(
       id: 'capture-1',
       createdMicros: 100,
       updatedMicros: 100,
@@ -62,18 +35,18 @@ void main() {
 
   test('loadInbox returns inbox items ordered by creation time', () async {
     // ARRANGE
-    final older = _buildCaptureItem(
+    final older = buildTestCaptureItem(
       id: 'capture-old',
       createdMicros: 10,
       updatedMicros: 10,
     );
-    final archived = _buildCaptureItem(
+    final archived = buildTestCaptureItem(
       id: 'capture-archived',
       status: CaptureStatus.archived,
       createdMicros: 20,
       updatedMicros: 20,
     );
-    final newer = _buildCaptureItem(
+    final newer = buildTestCaptureItem(
       id: 'capture-new',
       createdMicros: 30,
       updatedMicros: 30,
@@ -87,24 +60,22 @@ void main() {
     final inboxItems = await repository.loadInbox();
 
     // ASSERT
-    expect(inboxItems, equals(<CaptureItem>[older, newer]));
+    expect(
+      inboxItems,
+      equals(<CaptureItem>[older, newer]),
+    );
   });
 
-  test('save overwrites existing item preserving latest domain state', () async {
+  test('save overwrites existing item '
+      'preserving latest domain state', () async {
     // ARRANGE
-    final seed = _buildCaptureItem(
+    final seed = buildTestCaptureItem(
       id: 'capture-update',
       createdMicros: 1,
       updatedMicros: 1,
     );
     await repository.save(seed);
-    final archived = seed.copyWith(
-      status: CaptureStatus.archived,
-      updatedAt: Timestamp(DateTime.fromMicrosecondsSinceEpoch(
-        5,
-        isUtc: true,
-      )),
-    );
+    final archived = seed.copyWith(status: CaptureStatus.archived);
 
     // ACT
     await repository.save(archived);

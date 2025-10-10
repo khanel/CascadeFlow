@@ -19,13 +19,15 @@ class CaptureRepositoryImpl {
   /// Loads all inbox capture items ordered by creation time.
   Future<List<CaptureItem>> loadInbox() async {
     final models = await _localDataSource.readAll();
-    final inboxItems = models
-        .map((model) => model.toDomain())
-        .where((item) => item.status == CaptureStatus.inbox)
-        .toList();
-    inboxItems.sort(
-      (CaptureItem a, CaptureItem b) => a.createdAt.compareTo(b.createdAt),
+    final mapped = models.map((model) => model.toDomain());
+    final inboxItems = mapped.where(
+      (item) => item.status == CaptureStatus.inbox,
     );
-    return inboxItems;
+    final sorted = inboxItems.toList()
+      ..sort(
+        (CaptureItem a, CaptureItem b) =>
+            a.createdAt.compareTo(b.createdAt),
+      );
+    return sorted;
   }
 }

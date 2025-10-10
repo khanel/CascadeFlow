@@ -11,8 +11,7 @@ class CaptureLocalDataSource {
     : _initializer = initializer;
 
   final InMemoryHiveInitializer _initializer;
-  Future<InMemoryHiveBox<CaptureItemHiveModel>>?
-      _captureBoxFuture;
+  Future<InMemoryHiveBox<CaptureItemHiveModel>>? _captureBoxFuture;
 
   /// Ensures the capture inbox box is opened before use.
   Future<void> warmUp() async {
