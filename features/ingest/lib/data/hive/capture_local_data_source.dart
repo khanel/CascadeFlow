@@ -16,35 +16,30 @@ class CaptureLocalDataSource {
   /// Ensures the capture inbox box is opened before use.
   Future<void> warmUp() async {
     await _initializer.initialize();
-    _captureBoxFuture ??=
-        _initializer.openEncryptedBox<CaptureItemHiveModel>(
-          captureItemsBoxName,
-        );
+    _captureBoxFuture ??= _initializer.openEncryptedBox<CaptureItemHiveModel>(
+      captureItemsBoxName,
+    );
     await _captureBoxFuture;
   }
 
   /// Persists the provided capture [model] to the inbox box.
   Future<void> save(CaptureItemHiveModel model) async {
-    final box = await _ensureBox();
-    await box.put(model.id, model);
+    await _useBox((box) => box.put(model.id, model));
   }
 
   /// Reads a capture model for the given [id], returning null when missing.
   Future<CaptureItemHiveModel?> read(String id) async {
-    final box = await _ensureBox();
-    return box.get(id);
+    return _useBox((box) => box.get(id));
   }
 
   /// Deletes the capture model identified by [id], ignoring missing entries.
   Future<void> delete(String id) async {
-    final box = await _ensureBox();
-    await box.delete(id);
+    await _useBox((box) => box.delete(id));
   }
 
   /// Returns a snapshot of every stored capture model.
   Future<List<CaptureItemHiveModel>> readAll() async {
-    final box = await _ensureBox();
-    return box.values();
+    return _useBox((box) => box.values());
   }
 
   Future<InMemoryHiveBox<CaptureItemHiveModel>> _ensureBox() async {
@@ -54,5 +49,12 @@ class CaptureLocalDataSource {
     }
     await warmUp();
     return _captureBoxFuture!;
+  }
+
+  Future<T> _useBox<T>(
+    Future<T> Function(InMemoryHiveBox<CaptureItemHiveModel> box) action,
+  ) async {
+    final box = await _ensureBox();
+    return action(box);
   }
 }

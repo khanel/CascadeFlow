@@ -1,7 +1,7 @@
+import 'package:cascade_flow_core/cascade_flow_core.dart';
 import 'package:cascade_flow_ingest/data/hive/capture_item_hive_model.dart';
 import 'package:cascade_flow_ingest/data/hive/capture_local_data_source.dart';
 import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
-import 'package:cascade_flow_core/cascade_flow_core.dart';
 
 /// Repository implementation that persists capture items via Hive.
 class CaptureRepositoryImpl {
@@ -26,8 +26,7 @@ class CaptureRepositoryImpl {
     );
     final sorted = inboxItems.toList()
       ..sort(
-        (CaptureItem a, CaptureItem b) =>
-            a.createdAt.compareTo(b.createdAt),
+        (CaptureItem a, CaptureItem b) => a.createdAt.compareTo(b.createdAt),
       );
     return sorted;
   }
