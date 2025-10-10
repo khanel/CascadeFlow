@@ -31,11 +31,13 @@ Goal: Compose the application shell before wiring feature slices.
 - Ensure each branch preserves its navigation stack while switching tabs.
 - Bootstrap ProviderScope, theming, Hive initialisation, secure storage, and notifications in `app/main.dart`.
 - Provide placeholder routes/screens for each branch to unblock feature slices.
+- **Integration Tests**: Add integration tests verifying tab navigation flows (stack preservation/reset), bootstrap initialization (notification facade lifecycle, adapter registry diagnostics), and cross-branch navigation behavior.
 
 ## Milestone 5 – Feature Slice: Ingest
 - **Domain**: Define `CaptureItem` entity, validation rules, and use cases (`CaptureQuickEntry`, `ArchiveCaptureItem`).
 - **Data**: Model DTO/adapter for capture items, open encrypted inbox box, implement local data source and repository with tests.
 - **Presentation**: Riverpod providers for capture workflows, quick-add UI (text/voice), and inbox list with widget tests.
+- **Post-MVP Enhancements**: Hook archive/delete interactions into the UI, replace placeholder detail routes with real capture views, add voice capture onboarding, surface refresh affordances, tighten error messaging, wire downstream consumers of capture events, and expand integration/widget tests covering multi-step flows.
 
 ## Milestone 6 – Feature Slice: Goals
 - **Domain**: Goal entity with SMART metadata, sub-goal relationships, and use cases (`CreateGoal`, `UpdateGoalProgress`).

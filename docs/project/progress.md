@@ -7,10 +7,14 @@ Dependency policy: add packages only as needed, step-by-step with development. S
 Development cadence: every task runs through TDD—write the failing test, add the minimal implementation, then refactor with the suite green.
 
 ## Status Snapshot (2025-09-30)
-- Current focus: kick off CaptureItem domain modelling and notification facade design now that the feature-based restructure is in place.
+- Current focus: finish the remaining App Composition & Navigation work from Milestone 4 so the shell is production-ready.
 - Next actions:
-  - Start Goals slice domain scaffolding (Goal entity + SMART metadata).
-- Recently completed: repo init, Flutter skeleton, README, LICENSE, .gitignore, strict linting, dependency policy/log, packages directory scaffolds, Melos workspace config with path dependencies, core primitives and shared event contracts, Ingest slice planning brief, CONTRIBUTING workflow guide, initial infrastructure stubs (PrintLogger, in-memory Hive + secure storage), logging helper with global error hook, provider registry documentation, `Result.guard`/`guardAsync` helper utilities. Updated workspace test script to skip empty packages, seeded placeholder test scaffolds across unwired packages, established `CaptureItem` domain entity with validation/context metadata. Ensured tab re-selection resets each branch to its root while preserving cross-branch navigation stacks using go_router's `StatefulNavigationShell`. Added shared presentation scaffolds and messaging for all navigation branches to unblock slice UI wiring. Seeded adapter registry metadata during bootstrap for diagnostics parity and wired capture adapter registration to warm the inbox Hive box. Implemented CaptureLocalDataSource CRUD (including delete support) with repository wiring and tests to satisfy the data-layer milestone for Ingest. Delivered the quick-add widget and inbox list UIs with Riverpod-driven tests to complete the presentation slice for capture.
+  - Exercise the tab navigation flows to confirm stack preservation/reset behaviour in all branches.
+  - Finalise bootstrap verification (notification facade lifecycle, adapter registry diagnostics) before moving to capture presentation follow-ups.
+- Recently completed:
+  - Milestone 1 – Workspace restructure and Melos tooling across the repo.
+  - Milestone 2 – Core primitives and shared event contracts with tests.
+  - Milestone 3 – Infrastructure services for Hive, secure storage, logging, and notification bootstrap.
 
 ## Milestone 1 – Workspace Restructure & Tooling
 - [x] Adopt feature-based directory layout (`/app`, `/core`, `/infrastructure`, `/features/<pillar>`).
@@ -48,6 +52,9 @@ Development cadence: every task runs through TDD—write the failing test, add t
     - [x] Clear pending notifications across focus, schedule, and habit facades during bootstrap.
     - [x] Invoke notification bootstrapper prior to facade clearing.
 - [x] Add placeholder routes/screens for each branch to unblock feature integration.
+- [ ] Add integration tests verifying tab navigation flows (stack preservation/reset behavior).
+- [ ] Add integration tests verifying bootstrap initialization (notification facade lifecycle, adapter registry diagnostics).
+- [ ] Add integration tests verifying cross-branch navigation and state isolation.
 
 ## Milestone 5 – Feature: Ingest
 ### Domain (`features/ingest/domain`)
@@ -66,6 +73,14 @@ Development cadence: every task runs through TDD—write the failing test, add t
 ### Presentation (`features/ingest/presentation`)
 - [x] Add Riverpod providers for capture workflows and inbox state.
 - [x] Ship quick-add UI (text/voice) and inbox list with widget tests.
+- [ ] Wire archive/delete gestures into the inbox list so captures can be cleared.
+- [ ] Replace placeholder capture detail routes with contextual views/actions.
+- [ ] Add voice capture hand-off and channel selection to the quick-add sheet.
+- [ ] Provide manual refresh affordance and reactive updates when captures change externally.
+- [ ] Improve error surfacing (retry, logging) for failed inbox loads and submissions.
+- [ ] Layer accessibility/keyboard shortcuts for rapid capture entry.
+- [ ] Publish `CaptureItemFiled` events to downstream slices (Goals/Prioritize) and consume their feedback.
+- [ ] Extend integration/widget tests to cover multi-step capture flows, deletions, and error states.
 
 ## Milestone 6 – Feature: Goals
 ### Domain (`features/goals/domain`)
