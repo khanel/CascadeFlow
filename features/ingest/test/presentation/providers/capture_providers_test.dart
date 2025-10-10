@@ -63,7 +63,7 @@ void main() {
           ],
         );
         addTearDown(container.dispose);
-        final controller = container.read(
+        final controller = container.read<CaptureQuickEntryController>(
           captureQuickEntryControllerProvider.notifier,
         );
 
@@ -79,7 +79,9 @@ void main() {
         expect(repository.savedItems.single.content, 'Log meeting notes');
         expect(publishedEvents, isNotEmpty);
 
-        final state = container.read(captureQuickEntryControllerProvider);
+        final state = container.read<CaptureQuickEntryState>(
+          captureQuickEntryControllerProvider,
+        );
         expect(state.status, CaptureQuickEntryStatus.success);
         expect(state.item?.id, generatedId);
         expect(state.failure, isNull);
@@ -104,7 +106,7 @@ void main() {
           ],
         );
         addTearDown(container.dispose);
-        final controller = container.read(
+        final controller = container.read<CaptureQuickEntryController>(
           captureQuickEntryControllerProvider.notifier,
         );
 
@@ -115,7 +117,9 @@ void main() {
 
         // ASSERT
         expect(repository.savedItems, isEmpty);
-        final state = container.read(captureQuickEntryControllerProvider);
+        final state = container.read<CaptureQuickEntryState>(
+          captureQuickEntryControllerProvider,
+        );
         expect(state.status, CaptureQuickEntryStatus.error);
         expect(state.failure, isA<Failure>());
         expect(state.item, isNull);
