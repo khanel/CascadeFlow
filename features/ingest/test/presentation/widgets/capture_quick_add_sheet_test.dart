@@ -5,8 +5,8 @@ import 'package:cascade_flow_ingest/domain/use_cases/capture_quick_entry.dart';
 import 'package:cascade_flow_ingest/presentation/providers/capture_providers.dart';
 import 'package:cascade_flow_ingest/presentation/widgets/capture_quick_add_sheet.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   testWidgets(
