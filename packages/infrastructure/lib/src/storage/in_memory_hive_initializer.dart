@@ -63,6 +63,12 @@ class InMemoryHiveBox<T> {
     return Future<List<T>>.value(List.unmodifiable(_items.values));
   }
 
+  /// Deletes the value stored under [key], doing nothing when it is absent.
+  Future<void> delete(String key) {
+    _items.remove(key);
+    return Future<void>.value();
+  }
+
   /// Removes every stored value.
   Future<void> clear() {
     _items.clear();

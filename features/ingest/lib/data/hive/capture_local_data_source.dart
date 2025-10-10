@@ -35,6 +35,12 @@ class CaptureLocalDataSource {
     return box.get(id);
   }
 
+  /// Deletes the capture model identified by [id], ignoring missing entries.
+  Future<void> delete(String id) async {
+    final box = await _ensureBox();
+    await box.delete(id);
+  }
+
   /// Returns a snapshot of every stored capture model.
   Future<List<CaptureItemHiveModel>> readAll() async {
     final box = await _ensureBox();
