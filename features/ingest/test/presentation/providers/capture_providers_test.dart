@@ -67,6 +67,38 @@ void main() {
     );
   });
 
+  group('captureInboxPageProvider', () {
+    test(
+      'loads items after provided cursor using custom limit',
+      () async {
+        // ARRANGE
+        final newest = buildTestCaptureItem(id: 'capture-newest');
+        final middle = buildTestCaptureItem(id: 'capture-middle');
+        final oldest = buildTestCaptureItem(id: 'capture-oldest');
+        final repository = _RecordingCaptureRepository()
+          ..inboxItems = <CaptureItem>[newest, middle, oldest];
+        final container = ProviderContainer(
+          overrides: [
+            captureRepositoryProvider.overrideWithValue(repository),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        // ACT
+        final page = await container.read(
+          captureInboxPageProvider(
+            (limit: 2, startAfter: newest.id),
+          ).future,
+        );
+
+        // ASSERT
+        expect(repository.lastLimit, equals(2));
+        expect(repository.lastStartAfterId, equals(newest.id));
+        expect(page, equals(<CaptureItem>[middle, oldest]));
+      },
+    );
+  });
+
   group('captureQuickEntryControllerProvider', () {
     test(
       'persists capture and exposes success state when request is valid',
@@ -175,9 +207,16 @@ class _RecordingCaptureRepository implements CaptureRepository {
     loadInboxInvocations++;
     lastLimit = limit;
     lastStartAfterId = startAfter;
-    final items = limit == null
-        ? List<CaptureItem>.from(inboxItems)
-        : inboxItems.take(limit).toList();
+    final startIndex = startAfter == null
+        ? -1
+        : inboxItems.indexWhere((item) => item.id == startAfter);
+    final sliced = startIndex >= 0 && startIndex + 1 < inboxItems.length
+        ? inboxItems.sublist(startIndex + 1)
+        : startIndex >= 0
+            ? <CaptureItem>[]
+            : List<CaptureItem>.from(inboxItems);
+    final items =
+        limit == null ? sliced : sliced.take(limit).toList();
     return List.unmodifiable(items);
   }
 

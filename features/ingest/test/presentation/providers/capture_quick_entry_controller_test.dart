@@ -29,7 +29,15 @@ class _RecordingCaptureRepository implements CaptureRepository {
     final inbox = _items
         .where((item) => item.status == CaptureStatus.inbox)
         .toList(growable: false);
-    final limited = limit == null ? inbox : inbox.take(limit).toList();
+    final startIndex = startAfter == null
+        ? -1
+        : inbox.indexWhere((item) => item.id == startAfter);
+    final sliced = startIndex >= 0 && startIndex + 1 < inbox.length
+        ? inbox.sublist(startIndex + 1)
+        : startIndex >= 0
+            ? <CaptureItem>[]
+            : inbox;
+    final limited = limit == null ? sliced : sliced.take(limit).toList();
     return List.unmodifiable(limited);
   }
 

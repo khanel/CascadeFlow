@@ -35,10 +35,20 @@ class _RecordingCaptureRepository implements CaptureRepository {
     int? limit,
     EntityId? startAfter,
   }) async {
-    final items = limit == null
-        ? List<CaptureItem>.from(savedItems)
-        : savedItems.take(limit).toList();
-    return List.unmodifiable(items);
+    final base =
+        limit == null ? List<CaptureItem>.from(savedItems) : savedItems.take(limit).toList();
+    if (startAfter == null) {
+      return List.unmodifiable(base);
+    }
+    final index = base.indexWhere((item) => item.id == startAfter);
+    if (index < 0) {
+      return List.unmodifiable(base);
+    }
+    if (index + 1 >= base.length) {
+      return const <CaptureItem>[];
+    }
+    final sliced = base.sublist(index + 1);
+    return List.unmodifiable(sliced);
   }
 
   @override
