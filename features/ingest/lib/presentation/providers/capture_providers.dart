@@ -56,10 +56,24 @@ final Provider<ArchiveCaptureItem> archiveCaptureItemUseCaseProvider =
     });
 
 /// Loads capture inbox items for presentation.
+typedef CaptureInboxPageArgs = ({int? limit, EntityId? startAfter});
+
 final FutureProvider<List<CaptureItem>> captureInboxItemsProvider =
     FutureProvider.autoDispose<List<CaptureItem>>((ref) async {
       final repository = ref.watch(captureRepositoryProvider);
       return repository.loadInbox(limit: captureInboxDefaultBatchSize);
+    });
+
+/// Loads a paginated slice of the inbox after an optional cursor.
+final captureInboxPageProvider =
+    FutureProvider.autoDispose
+        .family<List<CaptureItem>, CaptureInboxPageArgs>((ref, args) async {
+      final repository = ref.watch(captureRepositoryProvider);
+      final limit = args.limit ?? captureInboxDefaultBatchSize;
+      return repository.loadInbox(
+        limit: limit,
+        startAfter: args.startAfter,
+      );
     });
 
 /// Describes the submission lifecycle for the quick-entry controller.
