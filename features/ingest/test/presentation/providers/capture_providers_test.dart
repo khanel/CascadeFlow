@@ -61,7 +61,7 @@ void main() {
         final items = await container.read(captureInboxItemsProvider.future);
 
         // ASSERT
-        expect(repository.lastLimit, equals(50));
+        expect(repository.lastLimit, equals(captureInboxDefaultBatchSize));
         expect(items, equals(repository.inboxItems));
       },
     );

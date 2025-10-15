@@ -10,7 +10,7 @@ import 'package:meta/meta.dart';
 import 'package:riverpod/riverpod.dart';
 
 /// Default number of capture items fetched per inbox request.
-const int _captureInboxDefaultBatchSize = 50;
+const int captureInboxDefaultBatchSize = 50;
 
 /// Provides the Hive-backed data source for capture inbox operations.
 final Provider<CaptureLocalDataSource> captureLocalDataSourceProvider =
@@ -59,7 +59,7 @@ final Provider<ArchiveCaptureItem> archiveCaptureItemUseCaseProvider =
 final FutureProvider<List<CaptureItem>> captureInboxItemsProvider =
     FutureProvider.autoDispose<List<CaptureItem>>((ref) async {
       final repository = ref.watch(captureRepositoryProvider);
-      return repository.loadInbox(limit: _captureInboxDefaultBatchSize);
+      return repository.loadInbox(limit: captureInboxDefaultBatchSize);
     });
 
 /// Describes the submission lifecycle for the quick-entry controller.
