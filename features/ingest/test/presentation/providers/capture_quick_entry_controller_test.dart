@@ -21,7 +21,10 @@ class _RecordingCaptureRepository implements CaptureRepository {
   }
 
   @override
-  Future<List<CaptureItem>> loadInbox({int? limit}) async {
+  Future<List<CaptureItem>> loadInbox({
+    int? limit,
+    EntityId? startAfter,
+  }) async {
     loadInboxCallCount++;
     final inbox = _items
         .where((item) => item.status == CaptureStatus.inbox)

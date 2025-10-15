@@ -160,6 +160,7 @@ class _RecordingCaptureRepository implements CaptureRepository {
   final List<EntityId> deletedIds = <EntityId>[];
   int loadInboxInvocations = 0;
   int? lastLimit;
+  EntityId? lastStartAfterId;
 
   @override
   Future<void> save(CaptureItem item) async {
@@ -167,9 +168,13 @@ class _RecordingCaptureRepository implements CaptureRepository {
   }
 
   @override
-  Future<List<CaptureItem>> loadInbox({int? limit}) async {
+  Future<List<CaptureItem>> loadInbox({
+    int? limit,
+    EntityId? startAfter,
+  }) async {
     loadInboxInvocations++;
     lastLimit = limit;
+    lastStartAfterId = startAfter;
     final items = limit == null
         ? List<CaptureItem>.from(inboxItems)
         : inboxItems.take(limit).toList();

@@ -707,10 +707,12 @@ class _RecordingCaptureRepository implements CaptureRepository {
   }
 
   @override
-  Future<List<CaptureItem>> loadInbox({int? limit}) async {
-    final inbox = inboxItems
-        .where((i) => i.status == CaptureStatus.inbox)
-        .toList();
+  Future<List<CaptureItem>> loadInbox({
+    int? limit,
+    EntityId? startAfter,
+  }) async {
+    final inbox =
+        inboxItems.where((i) => i.status == CaptureStatus.inbox).toList();
     final limited = limit == null ? inbox : inbox.take(limit).toList();
     return List.unmodifiable(limited);
   }

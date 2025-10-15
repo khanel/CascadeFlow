@@ -85,6 +85,40 @@ void main() {
     expect(inboxItems, equals(<CaptureItem>[second]));
   });
 
+  test('loadInbox applies startAfter cursor when provided', () async {
+    // ARRANGE
+    final oldest = buildTestCaptureItem(
+      id: 'capture-oldest',
+      createdMicros: 10,
+      updatedMicros: 10,
+    );
+    final middle = buildTestCaptureItem(
+      id: 'capture-middle',
+      createdMicros: 20,
+      updatedMicros: 20,
+    );
+    final newest = buildTestCaptureItem(
+      id: 'capture-newest',
+      createdMicros: 30,
+      updatedMicros: 30,
+    );
+
+    await repository.save(newest);
+    await repository.save(middle);
+    await repository.save(oldest);
+
+    // ACT
+    final pageOne = await repository.loadInbox(limit: 2);
+    final pageTwo = await repository.loadInbox(
+      limit: 2,
+      startAfter: middle.id,
+    );
+
+    // ASSERT
+    expect(pageOne, equals(<CaptureItem>[newest, middle]));
+    expect(pageTwo, equals(<CaptureItem>[oldest]));
+  });
+
   test('save overwrites existing item '
       'preserving latest domain state', () async {
     // ARRANGE
