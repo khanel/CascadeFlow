@@ -47,6 +47,7 @@
 - Repository results wrapped in `List.unmodifiable` to guard against accidental mutation by consumers
 - `CaptureRepository.loadInbox` accepts an optional `limit` enabling batched fetches for large inboxes
 - `captureInboxItemsProvider` now requests 50-item batches by default to keep UI updates snappy
+- `CaptureRepository.loadInbox` also respects `startAfter` cursors so pagination resumes after the last item returned
 ## Active Decisions
 
 ### State Management Pattern

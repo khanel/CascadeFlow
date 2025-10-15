@@ -42,6 +42,7 @@
 - ✅ Repository returns unmodifiable inbox lists to prevent downstream mutation bugs
 - ✅ Inbox repository supports optional limit parameter for batched loading
 - ✅ Inbox provider fetches 50-item batches by default to reduce unnecessary loads
+- ✅ Inbox repository honors `startAfter` cursor to resume pagination seamlessly
 
 ### Testing
 - ✅ Provider tests cover `CaptureQuickEntryController` success and failure flows
