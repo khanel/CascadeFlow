@@ -132,8 +132,9 @@ void main() {
       addTearDown(stateSub.close);
       states.add(container.read(captureQuickEntryControllerProvider).status);
 
-      final controller =
-          container.read(captureQuickEntryControllerProvider.notifier);
+      final controller = container.read(
+        captureQuickEntryControllerProvider.notifier,
+      );
 
       await controller.submit(
         request: const CaptureQuickEntryRequest(rawContent: ''),
@@ -148,30 +149,33 @@ void main() {
       expect(latestState.failure, isA<ValidationFailure>());
     });
 
-    test('submit updates state to error when content is only whitespace',
-        () async {
-      final states = <CaptureQuickEntryStatus>[];
-      final stateSub = container.listen(
-        captureQuickEntryControllerProvider,
-        (previous, next) => states.add(next.status),
-      );
-      addTearDown(stateSub.close);
-      states.add(container.read(captureQuickEntryControllerProvider).status);
+    test(
+      'submit updates state to error when content is only whitespace',
+      () async {
+        final states = <CaptureQuickEntryStatus>[];
+        final stateSub = container.listen(
+          captureQuickEntryControllerProvider,
+          (previous, next) => states.add(next.status),
+        );
+        addTearDown(stateSub.close);
+        states.add(container.read(captureQuickEntryControllerProvider).status);
 
-      final controller =
-          container.read(captureQuickEntryControllerProvider.notifier);
+        final controller = container.read(
+          captureQuickEntryControllerProvider.notifier,
+        );
 
-      await controller.submit(
-        request: const CaptureQuickEntryRequest(rawContent: '   '),
-      );
+        await controller.submit(
+          request: const CaptureQuickEntryRequest(rawContent: '   '),
+        );
 
-      expect(states, [
-        CaptureQuickEntryStatus.idle,
-        CaptureQuickEntryStatus.error,
-      ]);
-      expect(repository.saveCallCount, isZero);
-      final latestState = container.read(captureQuickEntryControllerProvider);
-      expect(latestState.failure, isA<ValidationFailure>());
-    });
+        expect(states, [
+          CaptureQuickEntryStatus.idle,
+          CaptureQuickEntryStatus.error,
+        ]);
+        expect(repository.saveCallCount, isZero);
+        final latestState = container.read(captureQuickEntryControllerProvider);
+        expect(latestState.failure, isA<ValidationFailure>());
+      },
+    );
   });
 }

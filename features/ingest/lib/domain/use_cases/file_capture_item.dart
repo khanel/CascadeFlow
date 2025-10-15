@@ -22,8 +22,8 @@ class FileCaptureItem {
   FileCaptureItem({
     required FileCaptureItemClock nowProvider,
     required FileCaptureItemEventPublisher publishEvent,
-  })  : _nowProvider = nowProvider,
-        _publishEvent = publishEvent;
+  }) : _nowProvider = nowProvider,
+       _publishEvent = publishEvent;
 
   final FileCaptureItemClock _nowProvider;
   final FileCaptureItemEventPublisher _publishEvent;
@@ -35,7 +35,7 @@ class FileCaptureItem {
     return Result.guard<CaptureItem, Failure>(
       body: () {
         final item = request.item;
-        if (item.status == CaptureStatus.filed) {
+        if (item.isFiled) {
           throw const DomainFailure(
             message: 'Capture item already filed',
           );

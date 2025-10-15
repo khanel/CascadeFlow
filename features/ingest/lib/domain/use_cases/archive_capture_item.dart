@@ -35,7 +35,7 @@ class ArchiveCaptureItem {
     return Result.guard<CaptureItem, Failure>(
       body: () {
         final item = request.item;
-        if (item.status == CaptureStatus.archived) {
+        if (item.isArchived) {
           throw const DomainFailure(
             message: 'Capture item already archived',
           );

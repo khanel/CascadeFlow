@@ -156,6 +156,15 @@ class CaptureItem {
       metadata: metadata ?? this.metadata,
     );
   }
+
+  /// Returns `true` when the item remains in the inbox.
+  bool get isInbox => status == CaptureStatus.inbox;
+
+  /// Returns `true` when the item has been filed.
+  bool get isFiled => status == CaptureStatus.filed;
+
+  /// Returns `true` when the item has been archived.
+  bool get isArchived => status == CaptureStatus.archived;
 }
 
 /// Contextual information describing how a capture was created.
