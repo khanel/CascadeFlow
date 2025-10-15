@@ -1,99 +1,124 @@
-import 'package:cascade_flow_core/cascade_flow_core.dart';
+import 'dart:async';
+
 import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
-import 'package:cascade_flow_ingest/domain/repositories/capture_repository.dart';
 import 'package:cascade_flow_ingest/presentation/providers/capture_providers.dart';
 import 'package:cascade_flow_ingest/presentation/widgets/capture_inbox_list.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../test_utils/capture_test_data.dart';
 
 void main() {
-  testWidgets('renders capture items returned by the repository', (
-    WidgetTester tester,
-  ) async {
-    // ARRANGE
-    final repository = _RecordingCaptureRepository()
-      ..inboxItems = <CaptureItem>[
+  group('CaptureInboxList', () {
+    testWidgets('shows loading indicator while inbox loads', (tester) async {
+      final Completer<List<CaptureItem>> completer =
+          Completer<List<CaptureItem>>();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            captureInboxItemsProvider.overrideWith(
+              (ref) => completer.future,
+            ),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: CaptureInboxList(),
+            ),
+          ),
+        ),
+      );
+
+      expect(
+        find.byKey(CaptureInboxListKeys.loadingIndicator),
+        findsOneWidget,
+      );
+
+      completer.complete(<CaptureItem>[]);
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('renders empty state when there are no inbox items',
+        (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            captureInboxItemsProvider.overrideWith(
+              (ref) async => <CaptureItem>[],
+            ),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: CaptureInboxList(),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(CaptureInboxListKeys.emptyState), findsOneWidget);
+    });
+
+    testWidgets('renders inbox items using the provided data', (tester) async {
+      final List<CaptureItem> items = <CaptureItem>[
         buildTestCaptureItem(
           id: 'capture-1',
-          content: 'Draft project outline',
-          createdMicros: 1,
-          updatedMicros: 1,
+          content: 'Draft meeting notes',
+          channel: 'keyboard',
+          createdMicros: 100,
+          updatedMicros: 150,
         ),
         buildTestCaptureItem(
           id: 'capture-2',
-          content: 'Plan weekly review',
-          createdMicros: 2,
-          updatedMicros: 2,
+          content: 'Sync project roadmap',
+          channel: 'integration',
+          createdMicros: 200,
+          updatedMicros: 250,
         ),
       ];
 
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          captureRepositoryProvider.overrideWithValue(repository),
-        ],
-        child: const MaterialApp(
-          home: Scaffold(body: CaptureInboxList()),
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            captureInboxItemsProvider.overrideWith(
+              (ref) async => items,
+            ),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: CaptureInboxList(),
+            ),
+          ),
         ),
-      ),
-    );
+      );
+      await tester.pumpAndSettle();
 
-    // Loading state
-    expect(find.byKey(CaptureInboxListKeys.loadingIndicator), findsOneWidget);
+      expect(find.byKey(CaptureInboxListKeys.listView), findsOneWidget);
+      expect(find.text('Draft meeting notes'), findsOneWidget);
+      expect(find.text('Sync project roadmap'), findsOneWidget);
+    });
 
-    // ACT
-    await tester.pump();
-
-    // ASSERT
-    expect(find.byKey(CaptureInboxListKeys.loadingIndicator), findsNothing);
-    expect(find.byKey(CaptureInboxListKeys.emptyState), findsNothing);
-    expect(find.byKey(CaptureInboxListKeys.listView), findsOneWidget);
-    expect(find.text('Draft project outline'), findsOneWidget);
-    expect(find.text('Plan weekly review'), findsOneWidget);
-  });
-
-  testWidgets('shows empty placeholder when inbox is clear', (
-    WidgetTester tester,
-  ) async {
-    // ARRANGE
-    final repository = _RecordingCaptureRepository();
-
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          captureRepositoryProvider.overrideWithValue(repository),
-        ],
-        child: const MaterialApp(
-          home: Scaffold(body: CaptureInboxList()),
+    testWidgets('renders error state when provider throws', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            captureInboxItemsProvider.overrideWith(
+              (ref) => Future<List<CaptureItem>>.error(
+                Exception('boom'),
+              ),
+            ),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: CaptureInboxList(),
+            ),
+          ),
         ),
-      ),
-    );
+      );
+      await tester.pumpAndSettle();
 
-    // ACT
-    await tester.pump();
-
-    // ASSERT
-    expect(find.byKey(CaptureInboxListKeys.listView), findsNothing);
-    expect(find.byKey(CaptureInboxListKeys.emptyState), findsOneWidget);
-    expect(
-      find.textContaining('inbox is clear', findRichText: true),
-      findsOneWidget,
-    );
+      expect(find.textContaining('Failed to load inbox'), findsOneWidget);
+    });
   });
-}
-
-class _RecordingCaptureRepository implements CaptureRepository {
-  List<CaptureItem> inboxItems = <CaptureItem>[];
-
-  @override
-  Future<void> save(CaptureItem item) async {}
-
-  @override
-  Future<List<CaptureItem>> loadInbox() async => inboxItems;
-
-  @override
-  Future<void> delete(EntityId id) async {}
 }

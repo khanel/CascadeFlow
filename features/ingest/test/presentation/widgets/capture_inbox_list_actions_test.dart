@@ -654,15 +654,6 @@ void main() {
 
 // Test doubles
 
-/// Provider for the archive use case.
-final Provider<ArchiveCaptureItem> archiveCaptureItemUseCaseProvider =
-    Provider<ArchiveCaptureItem>((ref) {
-      return ArchiveCaptureItem(
-        nowProvider: () => Timestamp(DateTime.now().toUtc()),
-        publishEvent: (_) {},
-      );
-    });
-
 /// Recording repository implementation for testing.
 class _RecordingCaptureRepository implements CaptureRepository {
   List<CaptureItem> inboxItems = <CaptureItem>[];
