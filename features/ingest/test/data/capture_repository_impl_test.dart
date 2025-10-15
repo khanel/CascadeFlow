@@ -33,7 +33,7 @@ void main() {
     expect(persisted?.toDomain(), equals(item));
   });
 
-  test('loadInbox returns inbox items ordered by creation time', () async {
+  test('loadInbox returns inbox items ordered by newest first', () async {
     // ARRANGE
     final older = buildTestCaptureItem(
       id: 'capture-old',
@@ -60,10 +60,7 @@ void main() {
     final inboxItems = await repository.loadInbox();
 
     // ASSERT
-    expect(
-      inboxItems,
-      equals(<CaptureItem>[older, newer]),
-    );
+    expect(inboxItems, equals(<CaptureItem>[newer, older]));
   });
 
   test('save overwrites existing item '
