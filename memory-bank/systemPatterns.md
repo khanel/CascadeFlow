@@ -155,11 +155,28 @@ ProviderScope (App)
 
 ## Testing Strategy
 
-#### Test-Driven Development (TDD)
-- **Red-Green-Refactor Cycle**: Write failing tests first, implement minimal code to pass, then refactor
-- **Domain-First Testing**: Start with domain logic tests before infrastructure or UI
-- **Incremental Development**: Small, testable increments with immediate feedback
-- **Regression Prevention**: Comprehensive test suite prevents breaking changes
+All development in this project **must** follow a strict Test-Driven Development (TDD) workflow. This is a non-negotiable pattern for ensuring code quality, correctness, and maintainability. The source of truth for this process is documented in `docs/development/TDD_GUIDELINE.md`.
+
+### Mandatory TDD Cycle: Red-Green-Refactor
+
+The TDD cycle is the primary development methodology. Each phase must be completed in order and result in a separate, atomic git commit.
+
+#### 1. RED Phase: Write a Failing Test
+- **Action**: Write a single, minimal test for a piece of functionality that does not yet exist.
+- **Goal**: The test must fail, proving that it is correctly testing the desired behavior.
+- **Commit**: Commit the failing test with a message like `test(scope): add failing test for [behavior]`.
+
+#### 2. GREEN Phase: Make the Test Pass
+- **Action**: Write the simplest, most direct code possible to make the failing test pass. Do not add extra functionality or refactor.
+- **Goal**: Get to a passing state quickly. All tests must pass.
+- **Commit**: Commit the implementation code with a message like `feat(scope): implement [behavior] to pass test`.
+
+#### 3. REFACTOR Phase (Blue): Improve the Code
+- **Action**: Refactor the implementation code to meet the quality standards outlined in the TDD guideline (e.g., remove duplication, improve names, ensure single responsibility). Do not change functionality.
+- **Goal**: Clean up the code while keeping all tests passing.
+- **Commit**: Commit the refactored code with a message like `refactor(scope): improve implementation of [behavior]`.
+
+This cycle is repeated for every piece of new functionality. Adherence to this pattern is critical for the project's health.
 
 ### Unit Tests
 - **Domain Logic**: Pure function testing with TDD approach

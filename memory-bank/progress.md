@@ -52,6 +52,7 @@
 - ✅ Widget tests cover `CaptureInboxList` loading, empty, data, and error states
 - ✅ Gesture tests exercise capture inbox archive/delete flows and undo interactions
 - ✅ Added tests for inbox pagination controller behavior and scroll-triggered page loading
+- ✅ Added controller-level validation tests for quick entry (empty and whitespace submissions)
 
 ## What's Left to Build
 

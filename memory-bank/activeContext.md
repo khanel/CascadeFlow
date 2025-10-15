@@ -5,8 +5,8 @@
 ### Primary Feature: Ingest
 - **Status**: Active development
 - **Scope**: Capture item management with inbox functionality
-- **Current Work**: Presentation coverage, swipe gestures, and controller state validation for quick capture flows
-- **Open Files**: `capture_providers.dart`, `capture_inbox_list.dart`, `capture_quick_add_sheet.dart`, archive/delete gesture tests
+- **Current Work**: Presentation coverage and swipe gestures for inbox management
+- **Open Files**: `capture_inbox_list.dart`, archive/delete gesture tests
 
 ### Architecture Implementation
 - **Feature-Sliced Design**: Modular packages with clear boundaries
@@ -14,6 +14,11 @@
 - **Infrastructure Stubs**: In-memory implementations for early development
 
 ## Recent Changes
+
+### Quick Entry Controller Validation
+- Moved quick entry validation from the widget to the controller layer
+- Controller now returns a `ValidationFailure` for empty or whitespace-only input
+- Added dedicated controller tests to cover validation scenarios
 
 ### Provider Registry
 - Infrastructure providers established for storage and logging
@@ -76,11 +81,11 @@
 - **Type Safety**: Strong typing throughout with generated code
 
 ### Testing Approach
-- **Test-Driven Development**: Red-green-refactor cycle for all new features
-- **Unit Tests**: Domain logic and providers with TDD
-- **Widget Tests**: UI component integration with behavior-driven tests
-- **Integration Tests**: Feature workflow validation
-- **Stubs**: In-memory implementations for isolated testing
+- **Strict Test-Driven Development**: All development **must** follow the Red-Green-Refactor TDD cycle. Each phase (Red, Green, Refactor) is an atomic, separate commit. This is a mandatory workflow for all new features and bug fixes.
+- **Unit Tests**: Domain logic and providers are built using the TDD cycle.
+- **Widget Tests**: UI component integration is developed with behavior-driven tests, also following the TDD cycle.
+- **Integration Tests**: Feature workflows are validated with end-to-end tests.
+- **Stubs**: In-memory implementations are used for isolated testing.
 
 ### Error Handling
 - **Domain Layer**: `TaskEither<Failure, Result>` pattern

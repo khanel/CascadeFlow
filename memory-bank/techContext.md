@@ -98,10 +98,10 @@
 - Part files for provider and adapter generation
 
 ### Testing Strategy
-- Unit tests for business logic
-- Widget tests for UI components
-- Integration tests for feature workflows
-- In-memory stubs for infrastructure dependencies
+This project mandates a strict Test-Driven Development (TDD) process for all code changes. All development must follow the **Red-Green-Refactor** cycle, with each phase committed separately. This is a core requirement for maintaining code quality and stability.
+
+Refer to `systemPatterns.md` for a detailed breakdown of this mandatory workflow.
+
 
 ### Code Quality
 - `flutter analyze` for static analysis
