@@ -32,7 +32,10 @@ class _RecordingCaptureRepository implements CaptureRepository {
 
   @override
   Future<List<CaptureItem>> loadInbox({int? limit}) async {
-    return limit == null ? List<CaptureItem>.from(savedItems) : savedItems.take(limit).toList();
+    final items = limit == null
+        ? List<CaptureItem>.from(savedItems)
+        : savedItems.take(limit).toList();
+    return List.unmodifiable(items);
   }
 
   @override

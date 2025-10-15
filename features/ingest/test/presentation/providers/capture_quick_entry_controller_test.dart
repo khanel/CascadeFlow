@@ -26,7 +26,8 @@ class _RecordingCaptureRepository implements CaptureRepository {
     final inbox = _items
         .where((item) => item.status == CaptureStatus.inbox)
         .toList(growable: false);
-    return limit == null ? inbox : inbox.take(limit).toList();
+    final limited = limit == null ? inbox : inbox.take(limit).toList();
+    return List.unmodifiable(limited);
   }
 
   @override
