@@ -19,7 +19,7 @@ class CaptureRepositoryImpl implements CaptureRepository {
     await _localDataSource.save(model);
   }
 
-  /// Loads all inbox capture items ordered by creation time.
+  /// Loads all inbox capture items ordered by newest creation time first.
   @override
   Future<List<CaptureItem>> loadInbox() async {
     final models = await _localDataSource.readAll();
@@ -29,9 +29,9 @@ class CaptureRepositoryImpl implements CaptureRepository {
     );
     final sorted = inboxItems.toList()
       ..sort(
-        (CaptureItem a, CaptureItem b) => a.createdAt.compareTo(b.createdAt),
+        (CaptureItem a, CaptureItem b) => b.createdAt.compareTo(a.createdAt),
       );
-    return sorted;
+    return List.unmodifiable(sorted);
   }
 
   /// Deletes the capture item identified by [id] from persistence.
