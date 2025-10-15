@@ -2,7 +2,7 @@ import 'package:cascade_flow_core/src/domain_event.dart';
 import 'package:cascade_flow_core/src/value_objects/entity_id.dart';
 import 'package:cascade_flow_core/src/value_objects/timestamp.dart';
 
-/// Event emitted when a capture item is filed into the inbox.
+/// Domain event indicating a capture item has been filed.
 class CaptureItemFiled extends DomainEvent {
   /// Builds an event describing a newly filed capture item.
   factory CaptureItemFiled({

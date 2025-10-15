@@ -227,6 +227,9 @@ enum CaptureStatus {
   /// Capture remains in the inbox awaiting processing.
   inbox,
 
+  /// Capture has been processed and filed into a specific context.
+  filed,
+
   /// Capture has been archived or processed.
   archived,
 }
