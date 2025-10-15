@@ -4,16 +4,15 @@ import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
 import 'package:cascade_flow_ingest/presentation/providers/capture_providers.dart';
 import 'package:cascade_flow_ingest/presentation/widgets/capture_inbox_list.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 import '../../test_utils/capture_test_data.dart';
 
 void main() {
   group('CaptureInboxList', () {
     testWidgets('shows loading indicator while inbox loads', (tester) async {
-      final Completer<List<CaptureItem>> completer =
-          Completer<List<CaptureItem>>();
+      final completer = Completer<List<CaptureItem>>();
 
       await tester.pumpWidget(
         ProviderScope(
@@ -39,8 +38,9 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('renders empty state when there are no inbox items',
-        (tester) async {
+    testWidgets('renders empty state when there are no inbox items', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -61,7 +61,7 @@ void main() {
     });
 
     testWidgets('renders inbox items using the provided data', (tester) async {
-      final List<CaptureItem> items = <CaptureItem>[
+      final items = <CaptureItem>[
         buildTestCaptureItem(
           id: 'capture-1',
           content: 'Draft meeting notes',

@@ -7,8 +7,8 @@ import 'package:cascade_flow_ingest/domain/use_cases/capture_quick_entry.dart';
 import 'package:cascade_flow_ingest/presentation/providers/capture_providers.dart';
 import 'package:cascade_flow_ingest/presentation/widgets/capture_quick_add_sheet.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 class _RecordingCaptureRepository implements CaptureRepository {
   _RecordingCaptureRepository({Completer<void>? saveCompleter})
@@ -61,15 +61,16 @@ class _FailureCaptureQuickEntry extends CaptureQuickEntry {
 
 void main() {
   group('CaptureQuickAddSheet', () {
-    testWidgets(
-        'disables submit during save and clears field after success',
-        (tester) async {
-      final Completer<void> saveCompleter = Completer<void>();
-      final _RecordingCaptureRepository repository =
-          _RecordingCaptureRepository(saveCompleter: saveCompleter);
-      final EntityId captureId = EntityId('capture-ui');
-      final Timestamp now = Timestamp(DateTime.utc(2025, 1, 1));
-      final CaptureQuickEntry useCase = CaptureQuickEntry(
+    testWidgets('disables submit during save and clears field after success', (
+      tester,
+    ) async {
+      final saveCompleter = Completer<void>();
+      final repository = _RecordingCaptureRepository(
+        saveCompleter: saveCompleter,
+      );
+      final captureId = EntityId('capture-ui');
+      final now = Timestamp(DateTime.utc(2025));
+      final useCase = CaptureQuickEntry(
         idGenerator: () => captureId,
         nowProvider: () => now,
         publishEvent: (_) {},
@@ -89,13 +90,11 @@ void main() {
         ),
       );
 
-      final Finder fieldFinder =
-          find.byKey(CaptureQuickAddSheetKeys.contentField);
-      final Finder buttonFinder =
-          find.byKey(CaptureQuickAddSheetKeys.submitButton);
+      final fieldFinder = find.byKey(CaptureQuickAddSheetKeys.contentField);
+      final buttonFinder = find.byKey(CaptureQuickAddSheetKeys.submitButton);
 
       expect(
-        (tester.widget<FilledButton>(buttonFinder).onPressed),
+        tester.widget<FilledButton>(buttonFinder).onPressed,
         isNull,
       );
 
@@ -103,7 +102,7 @@ void main() {
       await tester.pump();
 
       expect(
-        (tester.widget<FilledButton>(buttonFinder).onPressed),
+        tester.widget<FilledButton>(buttonFinder).onPressed,
         isNotNull,
       );
 
@@ -111,7 +110,7 @@ void main() {
       await tester.pump();
 
       expect(
-        (tester.widget<FilledButton>(buttonFinder).onPressed),
+        tester.widget<FilledButton>(buttonFinder).onPressed,
         isNull,
       );
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -123,17 +122,16 @@ void main() {
       expect(repository.saveCallCount, equals(1));
       expect(repository.savedItems.single.id, equals(captureId));
       expect(
-        (tester.widget<FilledButton>(buttonFinder).onPressed),
+        tester.widget<FilledButton>(buttonFinder).onPressed,
         isNull,
       );
       expect(find.byType(CircularProgressIndicator), findsNothing);
-      final TextField field = tester.widget<TextField>(fieldFinder);
+      final field = tester.widget<TextField>(fieldFinder);
       expect(field.controller?.text ?? '', isEmpty);
     });
 
     testWidgets('shows snackbar when submission fails', (tester) async {
-      final _RecordingCaptureRepository repository =
-          _RecordingCaptureRepository();
+      final repository = _RecordingCaptureRepository();
 
       await tester.pumpWidget(
         ProviderScope(
@@ -151,10 +149,8 @@ void main() {
         ),
       );
 
-      final Finder fieldFinder =
-          find.byKey(CaptureQuickAddSheetKeys.contentField);
-      final Finder buttonFinder =
-          find.byKey(CaptureQuickAddSheetKeys.submitButton);
+      final fieldFinder = find.byKey(CaptureQuickAddSheetKeys.contentField);
+      final buttonFinder = find.byKey(CaptureQuickAddSheetKeys.submitButton);
 
       await tester.enterText(fieldFinder, 'Attempt failure path');
       await tester.pump();
@@ -165,7 +161,7 @@ void main() {
       expect(repository.saveCallCount, equals(0));
       expect(find.text('Capture failed'), findsOneWidget);
       expect(
-        (tester.widget<FilledButton>(buttonFinder).onPressed),
+        tester.widget<FilledButton>(buttonFinder).onPressed,
         isNotNull,
       );
     });

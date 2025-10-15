@@ -48,7 +48,7 @@ void main() {
     setUp(() {
       repository = _RecordingCaptureRepository();
       captureId = EntityId('capture-test');
-      now = Timestamp(DateTime.utc(2025, 1, 1));
+      now = Timestamp(DateTime.utc(2025));
       useCase = CaptureQuickEntry(
         idGenerator: () => captureId,
         nowProvider: () => now,
@@ -68,39 +68,34 @@ void main() {
     });
 
     test('submit persists capture and transitions to success state', () async {
-      final List<CaptureQuickEntryStatus> states =
-          <CaptureQuickEntryStatus>[];
+      final states = <CaptureQuickEntryStatus>[];
 
-      final ProviderSubscription<CaptureQuickEntryState> stateSub =
-          container.listen(
+      final stateSub = container.listen(
         captureQuickEntryControllerProvider,
         (CaptureQuickEntryState? previous, CaptureQuickEntryState next) {
           states.add(next.status);
         },
-        fireImmediately: true,
       );
       addTearDown(stateSub.close);
 
-      final ProviderSubscription<AsyncValue<List<CaptureItem>>> inboxSub =
-          container.listen(
-        captureInboxItemsProvider,
-        (_, __) {},
-        fireImmediately: true,
+      states.add(
+        container.read(captureQuickEntryControllerProvider).status,
       );
-      addTearDown(inboxSub.close);
 
       expect(await container.read(captureInboxItemsProvider.future), isEmpty);
       expect(repository.loadInboxCallCount, equals(1));
 
-      final controller =
-          container.read(captureQuickEntryControllerProvider.notifier);
-
-      await controller.submit(
-        request: const CaptureQuickEntryRequest(rawContent: 'Draft meeting notes'),
+      final controller = container.read(
+        captureQuickEntryControllerProvider.notifier,
       );
 
-      final List<CaptureItem> refreshed =
-          await container.read(captureInboxItemsProvider.future);
+      await controller.submit(
+        request: const CaptureQuickEntryRequest(
+          rawContent: 'Draft meeting notes',
+        ),
+      );
+
+      final refreshed = await container.read(captureInboxItemsProvider.future);
 
       expect(states, <CaptureQuickEntryStatus>[
         CaptureQuickEntryStatus.idle,
@@ -116,24 +111,26 @@ void main() {
     });
 
     test('submit updates state to error when use case fails', () async {
-      final List<CaptureQuickEntryStatus> states =
-          <CaptureQuickEntryStatus>[];
+      final states = <CaptureQuickEntryStatus>[];
 
-      final ProviderSubscription<CaptureQuickEntryState> stateSub =
-          container.listen(
+      final stateSub = container.listen(
         captureQuickEntryControllerProvider,
         (CaptureQuickEntryState? previous, CaptureQuickEntryState next) {
           states.add(next.status);
         },
-        fireImmediately: true,
       );
       addTearDown(stateSub.close);
+
+      states.add(
+        container.read(captureQuickEntryControllerProvider).status,
+      );
 
       expect(await container.read(captureInboxItemsProvider.future), isEmpty);
       expect(repository.loadInboxCallCount, equals(1));
 
-      final controller =
-          container.read(captureQuickEntryControllerProvider.notifier);
+      final controller = container.read(
+        captureQuickEntryControllerProvider.notifier,
+      );
 
       await controller.submit(
         request: const CaptureQuickEntryRequest(rawContent: '   '),
@@ -146,8 +143,7 @@ void main() {
       ]);
       expect(repository.saveCallCount, equals(0));
       expect(repository.loadInboxCallCount, equals(1));
-      final CaptureQuickEntryState latestState =
-          container.read(captureQuickEntryControllerProvider);
+      final latestState = container.read(captureQuickEntryControllerProvider);
       expect(latestState.failure, isA<ValidationFailure>());
     });
   });

@@ -11,7 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../test_utils/capture_test_data.dart';
 
 /// Comprehensive tests for archive and delete gestures in capture inbox list.
-/// 
+///
 /// These tests verify Dismissible swipe gestures work correctly.
 void main() {
   group('CaptureInboxList Archive Gestures', () {
@@ -74,8 +74,9 @@ void main() {
           ProviderScope(
             overrides: [
               captureRepositoryProvider.overrideWithValue(repository),
-              archiveCaptureItemUseCaseProvider
-                  .overrideWithValue(archiveUseCase),
+              archiveCaptureItemUseCaseProvider.overrideWithValue(
+                archiveUseCase,
+              ),
             ],
             child: const MaterialApp(
               home: Scaffold(body: CaptureInboxList()),
@@ -119,8 +120,9 @@ void main() {
           ProviderScope(
             overrides: [
               captureRepositoryProvider.overrideWithValue(repository),
-              archiveCaptureItemUseCaseProvider
-                  .overrideWithValue(archiveUseCase),
+              archiveCaptureItemUseCaseProvider.overrideWithValue(
+                archiveUseCase,
+              ),
             ],
             child: const MaterialApp(
               home: Scaffold(body: CaptureInboxList()),
@@ -138,8 +140,10 @@ void main() {
 
         // ASSERT
         expect(find.byType(SnackBar), findsOneWidget);
-        expect(find.textContaining('archived', findRichText: true), 
-            findsOneWidget);
+        expect(
+          find.textContaining('archived', findRichText: true),
+          findsOneWidget,
+        );
         expect(find.widgetWithText(SnackBarAction, 'Undo'), findsOneWidget);
       },
     );
@@ -164,8 +168,9 @@ void main() {
           ProviderScope(
             overrides: [
               captureRepositoryProvider.overrideWithValue(repository),
-              archiveCaptureItemUseCaseProvider
-                  .overrideWithValue(archiveUseCase),
+              archiveCaptureItemUseCaseProvider.overrideWithValue(
+                archiveUseCase,
+              ),
             ],
             child: const MaterialApp(
               home: Scaffold(body: CaptureInboxList()),
@@ -213,8 +218,9 @@ void main() {
           ProviderScope(
             overrides: [
               captureRepositoryProvider.overrideWithValue(repository),
-              archiveCaptureItemUseCaseProvider
-                  .overrideWithValue(archiveUseCase),
+              archiveCaptureItemUseCaseProvider.overrideWithValue(
+                archiveUseCase,
+              ),
             ],
             child: const MaterialApp(
               home: Scaffold(body: CaptureInboxList()),
@@ -232,8 +238,10 @@ void main() {
 
         // ASSERT
         expect(find.byType(SnackBar), findsOneWidget);
-        expect(find.textContaining('failed', findRichText: true), 
-            findsOneWidget);
+        expect(
+          find.textContaining('failed', findRichText: true),
+          findsOneWidget,
+        );
       },
     );
 
@@ -244,20 +252,23 @@ void main() {
         final repository = _RecordingCaptureRepository()
           ..inboxItems = <CaptureItem>[
             buildTestCaptureItem(
-                id: 'capture-1', 
-                content: 'First', 
-                createdMicros: 1, 
-                updatedMicros: 1),
+              id: 'capture-1',
+              content: 'First',
+              createdMicros: 1,
+              updatedMicros: 1,
+            ),
             buildTestCaptureItem(
-                id: 'capture-2', 
-                content: 'Second', 
-                createdMicros: 2, 
-                updatedMicros: 2),
+              id: 'capture-2',
+              content: 'Second',
+              createdMicros: 2,
+              updatedMicros: 2,
+            ),
             buildTestCaptureItem(
-                id: 'capture-3', 
-                content: 'Third', 
-                createdMicros: 3, 
-                updatedMicros: 3),
+              id: 'capture-3',
+              content: 'Third',
+              createdMicros: 3,
+              updatedMicros: 3,
+            ),
           ];
 
         final archiveUseCase = _RecordingArchiveCaptureItem();
@@ -266,27 +277,29 @@ void main() {
           ProviderScope(
             overrides: [
               captureRepositoryProvider.overrideWithValue(repository),
-              archiveCaptureItemUseCaseProvider
-                  .overrideWithValue(archiveUseCase),
+              archiveCaptureItemUseCaseProvider.overrideWithValue(
+                archiveUseCase,
+              ),
             ],
-            child: const MaterialApp(
-                home: Scaffold(body: CaptureInboxList())),
+            child: const MaterialApp(home: Scaffold(body: CaptureInboxList())),
           ),
         );
         await tester.pump();
 
         // ACT - Archive first item
         await tester.drag(
-            find.byKey(CaptureInboxListKeys.itemTile('capture-1')), 
-            const Offset(500, 0));
+          find.byKey(CaptureInboxListKeys.itemTile('capture-1')),
+          const Offset(500, 0),
+        );
         await tester.pumpAndSettle();
         repository.inboxItems.removeAt(0);
         await tester.pump();
 
         // Archive second item
         await tester.drag(
-            find.byKey(CaptureInboxListKeys.itemTile('capture-2')), 
-            const Offset(500, 0));
+          find.byKey(CaptureInboxListKeys.itemTile('capture-2')),
+          const Offset(500, 0),
+        );
         await tester.pumpAndSettle();
         repository.inboxItems.removeAt(0);
         await tester.pump();
@@ -306,18 +319,19 @@ void main() {
         final repository = _RecordingCaptureRepository()
           ..inboxItems = <CaptureItem>[
             buildTestCaptureItem(
-                id: 'capture-1', 
-                content: 'Delete me', 
-                createdMicros: 1, 
-                updatedMicros: 1),
+              id: 'capture-1',
+              content: 'Delete me',
+              createdMicros: 1,
+              updatedMicros: 1,
+            ),
           ];
 
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-                captureRepositoryProvider.overrideWithValue(repository)],
-            child: const MaterialApp(
-                home: Scaffold(body: CaptureInboxList())),
+              captureRepositoryProvider.overrideWithValue(repository),
+            ],
+            child: const MaterialApp(home: Scaffold(body: CaptureInboxList())),
           ),
         );
         await tester.pump();
@@ -342,18 +356,19 @@ void main() {
         final repository = _RecordingCaptureRepository()
           ..inboxItems = <CaptureItem>[
             buildTestCaptureItem(
-                id: 'capture-1', 
-                content: 'Delete me', 
-                createdMicros: 1, 
-                updatedMicros: 1),
+              id: 'capture-1',
+              content: 'Delete me',
+              createdMicros: 1,
+              updatedMicros: 1,
+            ),
           ];
 
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-                captureRepositoryProvider.overrideWithValue(repository)],
-            child: const MaterialApp(
-                home: Scaffold(body: CaptureInboxList())),
+              captureRepositoryProvider.overrideWithValue(repository),
+            ],
+            child: const MaterialApp(home: Scaffold(body: CaptureInboxList())),
           ),
         );
         await tester.pump();
@@ -368,8 +383,10 @@ void main() {
         // ASSERT
         expect(find.byType(AlertDialog), findsOneWidget);
         expect(find.text('Delete capture?'), findsOneWidget);
-        expect(find.textContaining('cannot be undone', findRichText: true), 
-            findsOneWidget);
+        expect(
+          find.textContaining('cannot be undone', findRichText: true),
+          findsOneWidget,
+        );
         expect(find.widgetWithText(TextButton, 'Cancel'), findsOneWidget);
         expect(find.widgetWithText(TextButton, 'Delete'), findsOneWidget);
       },
@@ -382,18 +399,19 @@ void main() {
         final repository = _RecordingCaptureRepository()
           ..inboxItems = <CaptureItem>[
             buildTestCaptureItem(
-                id: 'capture-1', 
-                content: 'Delete me', 
-                createdMicros: 1, 
-                updatedMicros: 1),
+              id: 'capture-1',
+              content: 'Delete me',
+              createdMicros: 1,
+              updatedMicros: 1,
+            ),
           ];
 
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-                captureRepositoryProvider.overrideWithValue(repository)],
-            child: const MaterialApp(
-                home: Scaffold(body: CaptureInboxList())),
+              captureRepositoryProvider.overrideWithValue(repository),
+            ],
+            child: const MaterialApp(home: Scaffold(body: CaptureInboxList())),
           ),
         );
         await tester.pump();
@@ -421,23 +439,25 @@ void main() {
         final repository = _RecordingCaptureRepository()
           ..inboxItems = <CaptureItem>[
             buildTestCaptureItem(
-                id: 'capture-1', 
-                content: 'Delete me', 
-                createdMicros: 1, 
-                updatedMicros: 1),
+              id: 'capture-1',
+              content: 'Delete me',
+              createdMicros: 1,
+              updatedMicros: 1,
+            ),
             buildTestCaptureItem(
-                id: 'capture-2', 
-                content: 'Keep me', 
-                createdMicros: 2, 
-                updatedMicros: 2),
+              id: 'capture-2',
+              content: 'Keep me',
+              createdMicros: 2,
+              updatedMicros: 2,
+            ),
           ];
 
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-                captureRepositoryProvider.overrideWithValue(repository)],
-            child: const MaterialApp(
-                home: Scaffold(body: CaptureInboxList())),
+              captureRepositoryProvider.overrideWithValue(repository),
+            ],
+            child: const MaterialApp(home: Scaffold(body: CaptureInboxList())),
           ),
         );
         await tester.pump();
@@ -450,8 +470,7 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(find.widgetWithText(TextButton, 'Delete'));
         await tester.pumpAndSettle();
-        repository.inboxItems
-            .removeWhere((i) => i.id.value == 'capture-1');
+        repository.inboxItems.removeWhere((i) => i.id.value == 'capture-1');
         await tester.pump();
 
         // ASSERT
@@ -467,10 +486,11 @@ void main() {
         final repository = _RecordingCaptureRepository()
           ..inboxItems = <CaptureItem>[
             buildTestCaptureItem(
-                id: 'capture-1', 
-                content: 'Delete me', 
-                createdMicros: 1, 
-                updatedMicros: 1),
+              id: 'capture-1',
+              content: 'Delete me',
+              createdMicros: 1,
+              updatedMicros: 1,
+            ),
           ]
           ..shouldFailDelete = true
           ..deleteError = Exception('Delete failed');
@@ -478,9 +498,9 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-                captureRepositoryProvider.overrideWithValue(repository)],
-            child: const MaterialApp(
-                home: Scaffold(body: CaptureInboxList())),
+              captureRepositoryProvider.overrideWithValue(repository),
+            ],
+            child: const MaterialApp(home: Scaffold(body: CaptureInboxList())),
           ),
         );
         await tester.pump();
@@ -496,8 +516,10 @@ void main() {
 
         // ASSERT
         expect(find.byType(SnackBar), findsOneWidget);
-        expect(find.textContaining('failed', findRichText: true), 
-            findsOneWidget);
+        expect(
+          find.textContaining('failed', findRichText: true),
+          findsOneWidget,
+        );
         expect(find.text('Delete me'), findsOneWidget);
       },
     );
@@ -509,36 +531,40 @@ void main() {
         final repository = _RecordingCaptureRepository()
           ..inboxItems = <CaptureItem>[
             buildTestCaptureItem(
-                id: 'capture-1', 
-                content: 'First', 
-                createdMicros: 1, 
-                updatedMicros: 1),
+              id: 'capture-1',
+              content: 'First',
+              createdMicros: 1,
+              updatedMicros: 1,
+            ),
             buildTestCaptureItem(
-                id: 'capture-2', 
-                content: 'Second', 
-                createdMicros: 2, 
-                updatedMicros: 2),
+              id: 'capture-2',
+              content: 'Second',
+              createdMicros: 2,
+              updatedMicros: 2,
+            ),
             buildTestCaptureItem(
-                id: 'capture-3', 
-                content: 'Third', 
-                createdMicros: 3, 
-                updatedMicros: 3),
+              id: 'capture-3',
+              content: 'Third',
+              createdMicros: 3,
+              updatedMicros: 3,
+            ),
           ];
 
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-                captureRepositoryProvider.overrideWithValue(repository)],
-            child: const MaterialApp(
-                home: Scaffold(body: CaptureInboxList())),
+              captureRepositoryProvider.overrideWithValue(repository),
+            ],
+            child: const MaterialApp(home: Scaffold(body: CaptureInboxList())),
           ),
         );
         await tester.pump();
 
         // ACT - Delete first item
         await tester.drag(
-            find.byKey(CaptureInboxListKeys.itemTile('capture-1')), 
-            const Offset(-500, 0));
+          find.byKey(CaptureInboxListKeys.itemTile('capture-1')),
+          const Offset(-500, 0),
+        );
         await tester.pumpAndSettle();
         await tester.tap(find.widgetWithText(TextButton, 'Delete'));
         await tester.pumpAndSettle();
@@ -547,8 +573,9 @@ void main() {
 
         // Delete second item
         await tester.drag(
-            find.byKey(CaptureInboxListKeys.itemTile('capture-2')), 
-            const Offset(-500, 0));
+          find.byKey(CaptureInboxListKeys.itemTile('capture-2')),
+          const Offset(-500, 0),
+        );
         await tester.pumpAndSettle();
         await tester.tap(find.widgetWithText(TextButton, 'Delete'));
         await tester.pumpAndSettle();
@@ -570,25 +597,27 @@ void main() {
         final repository = _RecordingCaptureRepository()
           ..inboxItems = <CaptureItem>[
             buildTestCaptureItem(
-                id: 'capture-1', 
-                content: 'Tap me', 
-                createdMicros: 1, 
-                updatedMicros: 1),
+              id: 'capture-1',
+              content: 'Tap me',
+              createdMicros: 1,
+              updatedMicros: 1,
+            ),
           ];
 
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-                captureRepositoryProvider.overrideWithValue(repository)],
-            child: const MaterialApp(
-                home: Scaffold(body: CaptureInboxList())),
+              captureRepositoryProvider.overrideWithValue(repository),
+            ],
+            child: const MaterialApp(home: Scaffold(body: CaptureInboxList())),
           ),
         );
         await tester.pump();
 
         // ACT
         await tester.tap(
-            find.byKey(CaptureInboxListKeys.itemTile('capture-1')));
+          find.byKey(CaptureInboxListKeys.itemTile('capture-1')),
+        );
         await tester.pumpAndSettle();
 
         // ASSERT
@@ -605,15 +634,17 @@ void main() {
         final repository = _RecordingCaptureRepository()
           ..inboxItems = <CaptureItem>[
             buildTestCaptureItem(
-                id: 'capture-1', 
-                content: 'First', 
-                createdMicros: 1, 
-                updatedMicros: 1),
+              id: 'capture-1',
+              content: 'First',
+              createdMicros: 1,
+              updatedMicros: 1,
+            ),
             buildTestCaptureItem(
-                id: 'capture-2', 
-                content: 'Second', 
-                createdMicros: 2, 
-                updatedMicros: 2),
+              id: 'capture-2',
+              content: 'Second',
+              createdMicros: 2,
+              updatedMicros: 2,
+            ),
           ];
 
         final archiveUseCase = _RecordingArchiveCaptureItem();
@@ -622,27 +653,29 @@ void main() {
           ProviderScope(
             overrides: [
               captureRepositoryProvider.overrideWithValue(repository),
-              archiveCaptureItemUseCaseProvider
-                  .overrideWithValue(archiveUseCase),
+              archiveCaptureItemUseCaseProvider.overrideWithValue(
+                archiveUseCase,
+              ),
             ],
-            child: const MaterialApp(
-                home: Scaffold(body: CaptureInboxList())),
+            child: const MaterialApp(home: Scaffold(body: CaptureInboxList())),
           ),
         );
         await tester.pump();
 
         // Archive first item
         await tester.drag(
-            find.byKey(CaptureInboxListKeys.itemTile('capture-1')), 
-            const Offset(500, 0));
+          find.byKey(CaptureInboxListKeys.itemTile('capture-1')),
+          const Offset(500, 0),
+        );
         await tester.pumpAndSettle();
         repository.inboxItems.removeAt(0);
         await tester.pump();
 
         // ACT - Try to delete second item
         await tester.drag(
-            find.byKey(CaptureInboxListKeys.itemTile('capture-2')), 
-            const Offset(-100, 0));
+          find.byKey(CaptureInboxListKeys.itemTile('capture-2')),
+          const Offset(-100, 0),
+        );
         await tester.pump();
 
         // ASSERT - Delete gesture still works
@@ -703,11 +736,13 @@ class _RecordingArchiveCaptureItem implements ArchiveCaptureItem {
       return FailureResult(failure ?? const DomainFailure(message: 'Failed'));
     }
 
-    final archived = archivedItem ?? request.item.copyWith(
-      status: CaptureStatus.archived,
-      updatedAt: Timestamp(DateTime.now().toUtc()),
-    );
-    
+    final archived =
+        archivedItem ??
+        request.item.copyWith(
+          status: CaptureStatus.archived,
+          updatedAt: Timestamp(DateTime.now().toUtc()),
+        );
+
     archivedItems.add(request.item);
     return SuccessResult(archived);
   }
