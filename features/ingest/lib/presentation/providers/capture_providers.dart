@@ -78,6 +78,137 @@ captureInboxPageProvider = FutureProvider.autoDispose
       );
     });
 
+/// State snapshot produced by the inbox pagination controller.
+@immutable
+class CaptureInboxPaginationState {
+  /// Builds a pagination state with the provided [items] and metadata.
+  CaptureInboxPaginationState({
+    required List<CaptureItem> items,
+    required this.hasMore,
+    this.isLoadingMore = false,
+    this.loadMoreError,
+  }) : items = List.unmodifiable(items);
+
+  /// Inbox items currently loaded in memory.
+  final List<CaptureItem> items;
+
+  /// Indicates that additional items are available beyond the current page.
+  final bool hasMore;
+
+  /// Whether an additional page request is currently in flight.
+  final bool isLoadingMore;
+
+  /// Most recent load-more error, cleared on subsequent successful loads.
+  final AsyncError<Object>? loadMoreError;
+
+  /// Convenience flag to detect when the inbox has no content.
+  bool get isEmpty => items.isEmpty;
+
+  static const Object _sentinel = Object();
+
+  /// Returns an updated copy of the pagination state.
+  CaptureInboxPaginationState copyWith({
+    List<CaptureItem>? items,
+    bool? hasMore,
+    bool? isLoadingMore,
+    Object? loadMoreError = _sentinel,
+  }) {
+    return CaptureInboxPaginationState(
+      items: items ?? this.items,
+      hasMore: hasMore ?? this.hasMore,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      loadMoreError: identical(loadMoreError, _sentinel)
+          ? this.loadMoreError
+          : loadMoreError as AsyncError<Object>?,
+    );
+  }
+}
+
+/// Controller that orchestrates paginated inbox loading with Riverpod.
+class CaptureInboxPaginationController
+    extends Notifier<AsyncValue<CaptureInboxPaginationState>> {
+  /// Completes when the current initial load finishes.
+  Future<void> whenReady() => _initialLoad ?? Future.value();
+
+  Future<void>? _initialLoad;
+
+  @override
+  AsyncValue<CaptureInboxPaginationState> build() {
+    _initialLoad = _loadInitial();
+    return const AsyncValue.loading();
+  }
+
+  Future<void> _loadInitial() async {
+    try {
+      final items = await _loadPage();
+      final hasMore = items.length == captureInboxDefaultBatchSize;
+      state = AsyncValue.data(
+        CaptureInboxPaginationState(
+          items: items,
+          hasMore: hasMore,
+        ),
+      );
+    } on Object catch (error, stackTrace) {
+      state = AsyncValue.error(error, stackTrace);
+    }
+  }
+
+  /// Requests the next page of inbox items when available.
+  Future<void> loadNextPage() async {
+    final current = state.maybeWhen(
+      data: (value) => value,
+      orElse: () => null,
+    );
+
+    if (current == null || current.isLoadingMore || !current.hasMore) {
+      return;
+    }
+
+    final loadingMore = current.copyWith(
+      isLoadingMore: true,
+      loadMoreError: null,
+    );
+    state = AsyncValue.data(loadingMore);
+
+    final cursor = current.items.isEmpty ? null : current.items.last.id;
+
+    try {
+      final next = await _loadPage(startAfter: cursor);
+      final merged = <CaptureItem>[...current.items, ...next];
+      state = AsyncValue.data(
+        loadingMore.copyWith(
+          items: merged,
+          hasMore: next.length == captureInboxDefaultBatchSize,
+          isLoadingMore: false,
+          loadMoreError: null,
+        ),
+      );
+    } on Object catch (error, stackTrace) {
+      state = AsyncValue.data(
+        loadingMore.copyWith(
+          isLoadingMore: false,
+          loadMoreError: AsyncError<Object>(error, stackTrace),
+        ),
+      );
+    }
+  }
+
+  Future<List<CaptureItem>> _loadPage({EntityId? startAfter}) {
+    final repository = ref.read(captureRepositoryProvider);
+    return repository.loadInbox(
+      limit: captureInboxDefaultBatchSize,
+      startAfter: startAfter,
+    );
+  }
+}
+
+/// Provider exposing the paginated inbox controller to widgets.
+final captureInboxPaginationControllerProvider =
+    NotifierProvider.autoDispose<
+      CaptureInboxPaginationController,
+      AsyncValue<CaptureInboxPaginationState>
+    >(CaptureInboxPaginationController.new);
+
 /// Loads a page of inbox items using shared repository lookups.
 Future<List<CaptureItem>> _loadInboxPage(
   Ref ref, {
@@ -179,6 +310,7 @@ class CaptureQuickEntryController extends Notifier<CaptureQuickEntryState> {
         await repository.save(item);
         state = CaptureQuickEntryState.success(item);
         ref.invalidate(captureInboxItemsProvider);
+        ref.invalidate(captureInboxPaginationControllerProvider);
       case FailureResult<CaptureItem, Failure>(failure: final failure):
         state = CaptureQuickEntryState.error(failure);
     }

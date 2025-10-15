@@ -30,56 +30,78 @@ class CaptureInboxList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final inbox = ref.watch(captureInboxItemsProvider);
+    final pagination = ref.watch(captureInboxPaginationControllerProvider);
 
-    return inbox.when(
+    return pagination.when(
       loading: () => const Center(
         child: CircularProgressIndicator(
           key: CaptureInboxListKeys.loadingIndicator,
         ),
       ),
       error: (error, stackTrace) => _CaptureInboxError(error: error),
-      data: (items) => items.isEmpty
+      data: (state) => state.isEmpty
           ? const _CaptureInboxEmptyState()
-          : _CaptureInboxListView(items: items),
+          : _CaptureInboxListView(state: state),
     );
   }
 }
 
 class _CaptureInboxListView extends ConsumerWidget {
-  const _CaptureInboxListView({required this.items});
+  const _CaptureInboxListView({required this.state});
 
-  final List<CaptureItem> items;
+  final CaptureInboxPaginationState state;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ListView.separated(
-      key: CaptureInboxListKeys.listView,
-      shrinkWrap: true,
-      physics: const ClampingScrollPhysics(),
-      itemCount: items.length,
-      separatorBuilder: (context, index) => const Divider(height: 0),
-      itemBuilder: (context, index) {
-        final item = items[index];
-        return Dismissible(
-          key: Key('captureInbox_dismiss_${item.id.value}'),
-          background: const _ArchiveBackground(),
-          secondaryBackground: const _DeleteBackground(),
-          confirmDismiss: (direction) => _handleDismiss(
-            context,
-            ref,
-            direction,
-            item,
-          ),
-          child: ListTile(
-            key: CaptureInboxListKeys.itemTile(item.id.value),
-            title: Text(item.content),
-            subtitle: Text(_subtitleFor(context, item)),
-            leading: const Icon(Icons.inbox),
-          ),
-        );
-      },
+    final controller = ref.read(
+      captureInboxPaginationControllerProvider.notifier,
     );
+
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        if (_shouldRequestNext(notification)) {
+          controller.loadNextPage();
+        }
+        return false;
+      },
+      child: ListView.separated(
+        key: CaptureInboxListKeys.listView,
+        shrinkWrap: false,
+        physics: const ClampingScrollPhysics(),
+        itemCount: state.items.length + (state.isLoadingMore ? 1 : 0),
+        separatorBuilder: (context, index) => const Divider(height: 0),
+        itemBuilder: (context, index) {
+          if (index >= state.items.length) {
+            return const _CaptureInboxLoadingMore();
+          }
+          final item = state.items[index];
+          return Dismissible(
+            key: Key('captureInbox_dismiss_${item.id.value}'),
+            background: const _ArchiveBackground(),
+            secondaryBackground: const _DeleteBackground(),
+            confirmDismiss: (direction) => _handleDismiss(
+              context,
+              ref,
+              direction,
+              item,
+            ),
+            child: ListTile(
+              key: CaptureInboxListKeys.itemTile(item.id.value),
+              title: Text(item.content),
+              subtitle: Text(_subtitleFor(context, item)),
+              leading: const Icon(Icons.inbox),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  bool _shouldRequestNext(ScrollNotification notification) {
+    if (!state.hasMore || state.isLoadingMore) {
+      return false;
+    }
+    return notification.metrics.extentAfter < 200;
   }
 
   String _subtitleFor(BuildContext context, CaptureItem item) {
@@ -165,6 +187,20 @@ class _CaptureInboxError extends StatelessWidget {
           const SizedBox(height: 8),
           Text('Failed to load inbox: $error'),
         ],
+      ),
+    );
+  }
+}
+
+class _CaptureInboxLoadingMore extends StatelessWidget {
+  const _CaptureInboxLoadingMore();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 16),
+      child: Center(
+        child: CircularProgressIndicator.adaptive(),
       ),
     );
   }
@@ -283,6 +319,7 @@ class _CaptureInboxActions {
 
   void _refreshInbox() {
     _container.invalidate(captureInboxItemsProvider);
+    _container.invalidate(captureInboxPaginationControllerProvider);
   }
 
   Future<void> _undoArchive(CaptureItem item) async {
