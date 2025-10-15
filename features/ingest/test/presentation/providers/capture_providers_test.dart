@@ -99,6 +99,114 @@ void main() {
     );
   });
 
+  group('captureInboxPaginationControllerProvider', () {
+    test('loads initial page with hasMore flag', () async {
+      // ARRANGE
+      final repository = _RecordingCaptureRepository()
+        ..inboxItems = <CaptureItem>[
+          buildTestCaptureItem(id: 'capture-1'),
+          buildTestCaptureItem(id: 'capture-2'),
+        ];
+      final container = ProviderContainer(
+        overrides: [
+          captureRepositoryProvider.overrideWithValue(repository),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      // ACT
+      final controller = container.read(
+        captureInboxPaginationControllerProvider.notifier,
+      );
+      await controller.whenReady();
+      final state = container.read(captureInboxPaginationControllerProvider);
+
+      // ASSERT
+      expect(state, isA<AsyncData<CaptureInboxPaginationState>>());
+      expect(
+        state.requireValue.items,
+        equals(repository.inboxItems),
+      );
+      expect(state.requireValue.hasMore, isFalse);
+      expect(repository.loadInboxInvocations, equals(1));
+    });
+
+    test('appends next page when loadNextPage is invoked', () async {
+      // ARRANGE
+      final totalItems = captureInboxDefaultBatchSize + 5;
+      final repository = _RecordingCaptureRepository()
+        ..inboxItems = List<CaptureItem>.generate(
+          totalItems,
+          (index) => buildTestCaptureItem(
+            id: 'capture-${index + 1}',
+            createdMicros: 100 + index,
+            updatedMicros: 200 + index,
+          ),
+        );
+      final container = ProviderContainer(
+        overrides: [
+          captureRepositoryProvider.overrideWithValue(repository),
+        ],
+      );
+      addTearDown(container.dispose);
+      final controller = container.read(
+        captureInboxPaginationControllerProvider.notifier,
+      );
+
+      // ACT
+      await controller.whenReady();
+      final initial = container.read(captureInboxPaginationControllerProvider);
+      expect(
+        initial.requireValue.items.length,
+        captureInboxDefaultBatchSize,
+      );
+      expect(initial.requireValue.hasMore, isTrue);
+
+      await controller.loadNextPage();
+
+      final updated = container
+          .read(captureInboxPaginationControllerProvider)
+          .maybeWhen(
+            data: (value) => value,
+            orElse: () => null,
+          );
+
+      // ASSERT
+      expect(updated, isNotNull);
+      expect(updated!.items.length, equals(totalItems));
+      expect(updated.hasMore, isFalse);
+      expect(updated.isLoadingMore, isFalse);
+      expect(repository.loadInboxInvocations, equals(2));
+    });
+
+    test('ignores loadNextPage when no more items remain', () async {
+      // ARRANGE
+      final repository = _RecordingCaptureRepository()
+        ..inboxItems = <CaptureItem>[
+          buildTestCaptureItem(id: 'capture-1'),
+        ];
+      final container = ProviderContainer(
+        overrides: [
+          captureRepositoryProvider.overrideWithValue(repository),
+        ],
+      );
+      addTearDown(container.dispose);
+      final controller = container.read(
+        captureInboxPaginationControllerProvider.notifier,
+      );
+
+      // ACT
+      await controller.whenReady();
+      final state = container.read(captureInboxPaginationControllerProvider);
+      expect(state.requireValue.hasMore, isFalse);
+
+      await controller.loadNextPage();
+
+      // ASSERT
+      expect(repository.loadInboxInvocations, equals(1));
+    });
+  });
+
   group('captureQuickEntryControllerProvider', () {
     test(
       'persists capture and exposes success state when request is valid',

@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:cascade_flow_core/cascade_flow_core.dart';
 import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
+import 'package:cascade_flow_ingest/domain/repositories/capture_repository.dart';
 import 'package:cascade_flow_ingest/presentation/providers/capture_providers.dart';
 import 'package:cascade_flow_ingest/presentation/widgets/capture_inbox_list.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +19,10 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            captureInboxItemsProvider.overrideWith(
-              (ref) => completer.future,
+            captureRepositoryProvider.overrideWithValue(
+              _StubCaptureRepository(
+                onLoadInbox: ({limit, startAfter}) => completer.future,
+              ),
             ),
           ],
           child: const MaterialApp(
@@ -35,7 +39,8 @@ void main() {
       );
 
       completer.complete(<CaptureItem>[]);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump();
     });
 
     testWidgets('renders empty state when there are no inbox items', (
@@ -44,8 +49,10 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            captureInboxItemsProvider.overrideWith(
-              (ref) async => <CaptureItem>[],
+            captureRepositoryProvider.overrideWithValue(
+              _StubCaptureRepository(
+                onLoadInbox: ({limit, startAfter}) async => <CaptureItem>[],
+              ),
             ),
           ],
           child: const MaterialApp(
@@ -55,7 +62,8 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump();
 
       expect(find.byKey(CaptureInboxListKeys.emptyState), findsOneWidget);
     });
@@ -81,31 +89,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            captureInboxItemsProvider.overrideWith(
-              (ref) async => items,
-            ),
-          ],
-          child: const MaterialApp(
-            home: Scaffold(
-              body: CaptureInboxList(),
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.byKey(CaptureInboxListKeys.listView), findsOneWidget);
-      expect(find.text('Draft meeting notes'), findsOneWidget);
-      expect(find.text('Sync project roadmap'), findsOneWidget);
-    });
-
-    testWidgets('renders error state when provider throws', (tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            captureInboxItemsProvider.overrideWith(
-              (ref) => Future<List<CaptureItem>>.error(
-                Exception('boom'),
+            captureRepositoryProvider.overrideWithValue(
+              _StubCaptureRepository(
+                onLoadInbox: ({limit, startAfter}) async => items,
               ),
             ),
           ],
@@ -116,9 +102,125 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.byKey(CaptureInboxListKeys.listView), findsOneWidget);
+      expect(find.text('Draft meeting notes'), findsOneWidget);
+      expect(find.text('Sync project roadmap'), findsOneWidget);
+    });
+
+    testWidgets('renders error state when provider throws', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            captureRepositoryProvider.overrideWithValue(
+              _StubCaptureRepository(
+                onLoadInbox: ({limit, startAfter}) =>
+                    Future<List<CaptureItem>>.error(Exception('boom')),
+              ),
+            ),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: CaptureInboxList(),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump();
 
       expect(find.textContaining('Failed to load inbox'), findsOneWidget);
     });
+
+    testWidgets('loads next page when scrolled near the end', (
+      tester,
+    ) async {
+      final firstPage = List<CaptureItem>.generate(
+        captureInboxDefaultBatchSize,
+        (index) => buildTestCaptureItem(
+          id: 'capture-${index + 1}',
+          createdMicros: index,
+          updatedMicros: index,
+        ),
+      );
+      final remainingItems = List<CaptureItem>.generate(
+        5,
+        (index) => buildTestCaptureItem(
+          id: 'capture-${captureInboxDefaultBatchSize + index + 1}',
+          createdMicros: captureInboxDefaultBatchSize + index,
+          updatedMicros: captureInboxDefaultBatchSize + index,
+        ),
+      );
+      final loads = <({int? limit, EntityId? startAfter})>[];
+      final repository = _StubCaptureRepository(
+        onLoadInbox: ({limit, startAfter}) async {
+          loads.add((limit: limit, startAfter: startAfter));
+          if (startAfter == null) {
+            return firstPage;
+          }
+          return remainingItems;
+        },
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            captureRepositoryProvider.overrideWithValue(repository),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: CaptureInboxList(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+
+      final listFinder = find.byKey(CaptureInboxListKeys.listView);
+      expect(listFinder, findsOneWidget);
+      expect(loads.length, 1);
+
+      await tester.dragUntilVisible(
+        find.byKey(CaptureInboxListKeys.itemTile(firstPage.last.id.value)),
+        listFinder,
+        const Offset(0, -200),
+      );
+      await tester.pumpAndSettle();
+
+      expect(loads.length, greaterThanOrEqualTo(2));
+      final secondLoad = loads.last;
+      expect(secondLoad.limit, equals(captureInboxDefaultBatchSize));
+      expect(secondLoad.startAfter, equals(firstPage.last.id));
+    });
   });
+}
+
+class _StubCaptureRepository implements CaptureRepository {
+  _StubCaptureRepository({
+    required this.onLoadInbox,
+  });
+
+  final Future<List<CaptureItem>> Function({
+    int? limit,
+    EntityId? startAfter,
+  })
+  onLoadInbox;
+
+  @override
+  Future<void> save(CaptureItem item) async {}
+
+  @override
+  Future<List<CaptureItem>> loadInbox({
+    int? limit,
+    EntityId? startAfter,
+  }) {
+    return onLoadInbox(limit: limit, startAfter: startAfter);
+  }
+
+  @override
+  Future<void> delete(EntityId id) async {}
 }
