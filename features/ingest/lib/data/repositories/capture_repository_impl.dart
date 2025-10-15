@@ -23,15 +23,16 @@ class CaptureRepositoryImpl implements CaptureRepository {
   @override
   Future<List<CaptureItem>> loadInbox() async {
     final models = await _localDataSource.readAll();
-    final mapped = models.map((model) => model.toDomain());
-    final inboxItems = mapped.where(
-      (item) => item.status == CaptureStatus.inbox,
-    );
-    final sorted = inboxItems.toList()
-      ..sort(
-        (CaptureItem a, CaptureItem b) => b.createdAt.compareTo(a.createdAt),
-      );
-    return List.unmodifiable(sorted);
+    final inboxItems =
+        models
+            .map((model) => model.toDomain())
+            .where((item) => item.status == CaptureStatus.inbox)
+            .toList()
+          ..sort(
+            (CaptureItem a, CaptureItem b) =>
+                b.createdAt.compareTo(a.createdAt),
+          );
+    return List.unmodifiable(inboxItems);
   }
 
   /// Deletes the capture item identified by [id] from persistence.
