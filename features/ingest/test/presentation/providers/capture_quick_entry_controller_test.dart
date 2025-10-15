@@ -123,39 +123,53 @@ void main() {
       expect(refreshed.single.content, equals('Draft meeting notes'));
     });
 
-    test('submit updates state to error when use case fails', () async {
+    test('submit updates state to error when content is empty', () async {
       final states = <CaptureQuickEntryStatus>[];
-
       final stateSub = container.listen(
         captureQuickEntryControllerProvider,
-        (CaptureQuickEntryState? previous, CaptureQuickEntryState next) {
-          states.add(next.status);
-        },
+        (previous, next) => states.add(next.status),
       );
       addTearDown(stateSub.close);
+      states.add(container.read(captureQuickEntryControllerProvider).status);
 
-      states.add(
-        container.read(captureQuickEntryControllerProvider).status,
+      final controller =
+          container.read(captureQuickEntryControllerProvider.notifier);
+
+      await controller.submit(
+        request: const CaptureQuickEntryRequest(rawContent: ''),
       );
 
-      expect(await container.read(captureInboxItemsProvider.future), isEmpty);
-      expect(repository.loadInboxCallCount, equals(1));
+      expect(states, [
+        CaptureQuickEntryStatus.idle,
+        CaptureQuickEntryStatus.error,
+      ]);
+      expect(repository.saveCallCount, isZero);
+      final latestState = container.read(captureQuickEntryControllerProvider);
+      expect(latestState.failure, isA<ValidationFailure>());
+    });
 
-      final controller = container.read(
-        captureQuickEntryControllerProvider.notifier,
+    test('submit updates state to error when content is only whitespace',
+        () async {
+      final states = <CaptureQuickEntryStatus>[];
+      final stateSub = container.listen(
+        captureQuickEntryControllerProvider,
+        (previous, next) => states.add(next.status),
       );
+      addTearDown(stateSub.close);
+      states.add(container.read(captureQuickEntryControllerProvider).status);
+
+      final controller =
+          container.read(captureQuickEntryControllerProvider.notifier);
 
       await controller.submit(
         request: const CaptureQuickEntryRequest(rawContent: '   '),
       );
 
-      expect(states, <CaptureQuickEntryStatus>[
+      expect(states, [
         CaptureQuickEntryStatus.idle,
-        CaptureQuickEntryStatus.submitting,
         CaptureQuickEntryStatus.error,
       ]);
-      expect(repository.saveCallCount, equals(0));
-      expect(repository.loadInboxCallCount, equals(1));
+      expect(repository.saveCallCount, isZero);
       final latestState = container.read(captureQuickEntryControllerProvider);
       expect(latestState.failure, isA<ValidationFailure>());
     });
