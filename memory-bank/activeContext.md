@@ -56,6 +56,10 @@
 - `captureInboxItemsProvider` now requests 50-item batches by default to keep UI updates snappy
 - `captureInboxPageProvider` exposes paginated inbox loading with `limit`/`startAfter` arguments for incremental fetches
 - `CaptureRepository.loadInbox` also respects `startAfter` cursors so pagination resumes after the last item returned
+
+### Capture Domain Status Helpers
+- `CaptureItem` exposes `isInbox`, `isFiled`, and `isArchived` getters to reduce direct status comparisons throughout the domain layer
+- Filing workflow implemented via `FileCaptureItem` use case, transitioning items to the new `CaptureStatus.filed` state while emitting `CaptureItemFiled` events
 ## Active Decisions
 
 ### State Management Pattern
