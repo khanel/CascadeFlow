@@ -45,6 +45,7 @@
 - Gesture orchestration centralized in `_CaptureInboxActions` to capture dependencies eagerly and remove duplicated snackbar logic
 - Repository now delivers inbox items sorted by newest-first timestamps to prioritize fresh captures
 - Repository results wrapped in `List.unmodifiable` to guard against accidental mutation by consumers
+- `CaptureRepository.loadInbox` accepts an optional `limit` enabling batched fetches for large inboxes
 ## Active Decisions
 
 ### State Management Pattern
