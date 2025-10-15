@@ -313,6 +313,9 @@ class CaptureQuickEntryState {
 
 /// State notifier that orchestrates the quick-entry submission flow.
 class CaptureQuickEntryController extends Notifier<CaptureQuickEntryState> {
+  static const ValidationFailure _emptyCaptureContentFailure =
+      ValidationFailure(message: 'Capture content cannot be empty');
+
   @override
   CaptureQuickEntryState build() => const CaptureQuickEntryState.initial();
 
@@ -320,10 +323,9 @@ class CaptureQuickEntryController extends Notifier<CaptureQuickEntryState> {
   Future<void> submit({
     required CaptureQuickEntryRequest request,
   }) async {
-    if (request.rawContent.trim().isEmpty) {
-      state = const CaptureQuickEntryState.error(
-        ValidationFailure(message: 'Capture content cannot be empty'),
-      );
+    final validationFailure = _validateRequest(request);
+    if (validationFailure != null) {
+      state = CaptureQuickEntryState.error(validationFailure);
       return;
     }
     state = const CaptureQuickEntryState.submitting();
@@ -341,6 +343,13 @@ class CaptureQuickEntryController extends Notifier<CaptureQuickEntryState> {
       case FailureResult<CaptureItem, Failure>(failure: final failure):
         state = CaptureQuickEntryState.error(failure);
     }
+  }
+
+  ValidationFailure? _validateRequest(CaptureQuickEntryRequest request) {
+    if (request.rawContent.trim().isEmpty) {
+      return _emptyCaptureContentFailure;
+    }
+    return null;
   }
 }
 
