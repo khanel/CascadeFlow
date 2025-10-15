@@ -320,6 +320,12 @@ class CaptureQuickEntryController extends Notifier<CaptureQuickEntryState> {
   Future<void> submit({
     required CaptureQuickEntryRequest request,
   }) async {
+    if (request.rawContent.trim().isEmpty) {
+      state = const CaptureQuickEntryState.error(
+        ValidationFailure(message: 'Capture content cannot be empty'),
+      );
+      return;
+    }
     state = const CaptureQuickEntryState.submitting();
 
     final captureQuickEntry = ref.read(captureQuickEntryUseCaseProvider);
