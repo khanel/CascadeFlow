@@ -21,9 +21,9 @@ class CaptureRepositoryImpl implements CaptureRepository {
 
   /// Loads all inbox capture items ordered by newest creation time first.
   @override
-  Future<List<CaptureItem>> loadInbox() async {
+  Future<List<CaptureItem>> loadInbox({int? limit}) async {
     final models = await _localDataSource.readAll();
-    final inboxItems =
+    final sortedInbox =
         models
             .map((model) => model.toDomain())
             .where((item) => item.status == CaptureStatus.inbox)
@@ -32,7 +32,17 @@ class CaptureRepositoryImpl implements CaptureRepository {
             (CaptureItem a, CaptureItem b) =>
                 b.createdAt.compareTo(a.createdAt),
           );
-    return List.unmodifiable(inboxItems);
+    if (limit != null && limit < 0) {
+      throw ArgumentError.value(
+        limit,
+        'limit',
+        'Limit must be greater than or equal to zero',
+      );
+    }
+    final limited = limit == null
+        ? sortedInbox
+        : sortedInbox.take(limit).toList();
+    return List.unmodifiable(limited);
   }
 
   /// Deletes the capture item identified by [id] from persistence.
