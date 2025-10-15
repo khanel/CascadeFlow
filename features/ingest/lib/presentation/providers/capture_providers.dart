@@ -4,6 +4,7 @@ import 'package:cascade_flow_ingest/data/hive/capture_local_data_source.dart';
 import 'package:cascade_flow_ingest/data/repositories/capture_repository_impl.dart';
 import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
 import 'package:cascade_flow_ingest/domain/repositories/capture_repository.dart';
+import 'package:cascade_flow_ingest/domain/use_cases/archive_capture_item.dart';
 import 'package:cascade_flow_ingest/domain/use_cases/capture_quick_entry.dart';
 import 'package:meta/meta.dart';
 import 'package:riverpod/riverpod.dart';
@@ -27,6 +28,11 @@ final Provider<CaptureQuickEntryEventPublisher>
 captureQuickEntryEventPublisherProvider =
     Provider<CaptureQuickEntryEventPublisher>((ref) => (_) {});
 
+/// Publishes domain events emitted by the archive use case.
+final Provider<ArchiveCaptureItemEventPublisher>
+archiveCaptureItemEventPublisherProvider =
+    Provider<ArchiveCaptureItemEventPublisher>((ref) => (_) {});
+
 /// Builds the capture quick-entry use case used by the controller.
 final Provider<CaptureQuickEntry> captureQuickEntryUseCaseProvider =
     Provider<CaptureQuickEntry>((ref) {
@@ -34,6 +40,15 @@ final Provider<CaptureQuickEntry> captureQuickEntryUseCaseProvider =
         idGenerator: EntityId.generate,
         nowProvider: () => Timestamp(DateTime.now().toUtc()),
         publishEvent: ref.watch(captureQuickEntryEventPublisherProvider),
+      );
+    });
+
+/// Builds the archive capture item use case used by the inbox gestures.
+final Provider<ArchiveCaptureItem> archiveCaptureItemUseCaseProvider =
+    Provider<ArchiveCaptureItem>((ref) {
+      return ArchiveCaptureItem(
+        nowProvider: () => Timestamp(DateTime.now().toUtc()),
+        publishEvent: ref.watch(archiveCaptureItemEventPublisherProvider),
       );
     });
 

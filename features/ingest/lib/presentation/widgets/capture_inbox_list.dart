@@ -1,4 +1,8 @@
+import 'dart:async';
+
+import 'package:cascade_flow_core/cascade_flow_core.dart';
 import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
+import 'package:cascade_flow_ingest/domain/use_cases/archive_capture_item.dart';
 import 'package:cascade_flow_ingest/presentation/providers/capture_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -41,13 +45,13 @@ class CaptureInboxList extends ConsumerWidget {
   }
 }
 
-class _CaptureInboxListView extends StatelessWidget {
+class _CaptureInboxListView extends ConsumerWidget {
   const _CaptureInboxListView({required this.items});
 
   final List<CaptureItem> items;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ListView.separated(
       key: CaptureInboxListKeys.listView,
       shrinkWrap: true,
@@ -56,11 +60,23 @@ class _CaptureInboxListView extends StatelessWidget {
       separatorBuilder: (context, index) => const Divider(height: 0),
       itemBuilder: (context, index) {
         final item = items[index];
-        return ListTile(
-          key: CaptureInboxListKeys.itemTile(item.id.value),
-          title: Text(item.content),
-          subtitle: Text(_subtitleFor(context, item)),
-          leading: const Icon(Icons.inbox),
+        return Dismissible(
+          key: Key('captureInbox_dismiss_${item.id.value}'),
+          direction: DismissDirection.horizontal,
+          background: const _ArchiveBackground(),
+          secondaryBackground: const _DeleteBackground(),
+          confirmDismiss: (direction) => _handleDismiss(
+            context,
+            ref,
+            direction,
+            item,
+          ),
+          child: ListTile(
+            key: CaptureInboxListKeys.itemTile(item.id.value),
+            title: Text(item.content),
+            subtitle: Text(_subtitleFor(context, item)),
+            leading: const Icon(Icons.inbox),
+          ),
         );
       },
     );
@@ -70,6 +86,48 @@ class _CaptureInboxListView extends StatelessWidget {
     final createdAt = item.createdAt.value.toLocal();
     final formattedTime = TimeOfDay.fromDateTime(createdAt).format(context);
     return '${item.context.channel} · $formattedTime';
+  }
+}
+
+class _ArchiveBackground extends StatelessWidget {
+  const _ArchiveBackground();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Theme.of(context).colorScheme.secondaryContainer,
+      alignment: Alignment.centerLeft,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: const <Widget>[
+          Icon(Icons.archive),
+          SizedBox(width: 12),
+          Text('Archive'),
+        ],
+      ),
+    );
+  }
+}
+
+class _DeleteBackground extends StatelessWidget {
+  const _DeleteBackground();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Theme.of(context).colorScheme.errorContainer,
+      alignment: Alignment.centerRight,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: const <Widget>[
+          Text('Delete'),
+          SizedBox(width: 12),
+          Icon(Icons.delete),
+        ],
+      ),
+    );
   }
 }
 
@@ -109,5 +167,121 @@ class _CaptureInboxError extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+Future<bool?> _handleDismiss(
+  BuildContext context,
+  WidgetRef ref,
+  DismissDirection direction,
+  CaptureItem item,
+) async {
+  switch (direction) {
+    case DismissDirection.startToEnd:
+      return _archiveItem(context, ref, item);
+    case DismissDirection.endToStart:
+      return _confirmDelete(context, ref, item);
+    default:
+      return false;
+  }
+}
+
+Future<bool> _archiveItem(
+  BuildContext context,
+  WidgetRef ref,
+  CaptureItem item,
+) async {
+  final archiveUseCase = ref.read(archiveCaptureItemUseCaseProvider);
+  final repository = ref.read(captureRepositoryProvider);
+  final container = ref.container;
+  final messenger = ScaffoldMessenger.of(context);
+
+  final result = archiveUseCase(
+    request: ArchiveCaptureItemRequest(item: item),
+  );
+
+  switch (result) {
+    case SuccessResult<CaptureItem, Failure>(value: final archived):
+      await repository.save(archived);
+      container.invalidate(captureInboxItemsProvider);
+
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text('Capture "${item.content}" archived'),
+            action: SnackBarAction(
+              label: 'Undo',
+              onPressed: () {
+                unawaited(() async {
+                  await repository.save(item);
+                  container.invalidate(captureInboxItemsProvider);
+                }());
+              },
+            ),
+          ),
+        );
+      return true;
+    case FailureResult<CaptureItem, Failure>(failure: final failure):
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              'Failed to archive capture: ${failure.message}',
+            ),
+          ),
+        );
+      return false;
+  }
+}
+
+Future<bool> _confirmDelete(
+  BuildContext context,
+  WidgetRef ref,
+  CaptureItem item,
+) async {
+  final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Delete capture?'),
+          content: Text(
+            'Deleting "${item.content}" cannot be undone.',
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Delete'),
+            ),
+          ],
+        ),
+      ) ??
+      false;
+
+  if (!confirmed) {
+    return false;
+  }
+
+  final repository = ref.read(captureRepositoryProvider);
+  final container = ref.container;
+  final messenger = ScaffoldMessenger.of(context);
+
+  try {
+    await repository.delete(item.id);
+    container.invalidate(captureInboxItemsProvider);
+    return true;
+  } on Object catch (error) {
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text('Delete failed: $error'),
+        ),
+      );
+    return false;
   }
 }
