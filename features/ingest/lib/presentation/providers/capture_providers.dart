@@ -6,8 +6,8 @@ import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
 import 'package:cascade_flow_ingest/domain/repositories/capture_repository.dart';
 import 'package:cascade_flow_ingest/domain/use_cases/archive_capture_item.dart';
 import 'package:cascade_flow_ingest/domain/use_cases/capture_quick_entry.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meta/meta.dart';
-import 'package:riverpod/riverpod.dart';
 
 /// Default number of capture items fetched per inbox request.
 const int captureInboxDefaultBatchSize = 50;
@@ -122,6 +122,37 @@ class CaptureInboxPaginationState {
           : loadMoreError as AsyncError<Object>?,
     );
   }
+
+  /// Returns a state that reflects an in-flight load-more request.
+  CaptureInboxPaginationState beginLoadMore() {
+    return copyWith(
+      isLoadingMore: true,
+      loadMoreError: null,
+    );
+  }
+
+  /// Returns a state that appends [appended] items and updates [hasMore].
+  CaptureInboxPaginationState append(
+    List<CaptureItem> appended, {
+    required bool hasMore,
+  }) {
+    final updated = <CaptureItem>[...items, ...appended];
+    return CaptureInboxPaginationState(
+      items: updated,
+      hasMore: hasMore,
+    );
+  }
+
+  /// Returns a state that captures the error produced during load-more.
+  CaptureInboxPaginationState withLoadMoreError(
+    Object error,
+    StackTrace stackTrace,
+  ) {
+    return copyWith(
+      isLoadingMore: false,
+      loadMoreError: AsyncError<Object>(error, stackTrace),
+    );
+  }
 }
 
 /// Controller that orchestrates paginated inbox loading with Riverpod.
@@ -164,32 +195,21 @@ class CaptureInboxPaginationController
       return;
     }
 
-    final loadingMore = current.copyWith(
-      isLoadingMore: true,
-      loadMoreError: null,
-    );
+    final loadingMore = current.beginLoadMore();
     state = AsyncValue.data(loadingMore);
 
     final cursor = current.items.isEmpty ? null : current.items.last.id;
 
     try {
       final next = await _loadPage(startAfter: cursor);
-      final merged = <CaptureItem>[...current.items, ...next];
       state = AsyncValue.data(
-        loadingMore.copyWith(
-          items: merged,
+        loadingMore.append(
+          next,
           hasMore: next.length == captureInboxDefaultBatchSize,
-          isLoadingMore: false,
-          loadMoreError: null,
         ),
       );
     } on Object catch (error, stackTrace) {
-      state = AsyncValue.data(
-        loadingMore.copyWith(
-          isLoadingMore: false,
-          loadMoreError: AsyncError<Object>(error, stackTrace),
-        ),
-      );
+      state = AsyncValue.data(loadingMore.withLoadMoreError(error, stackTrace));
     }
   }
 
@@ -203,6 +223,7 @@ class CaptureInboxPaginationController
 }
 
 /// Provider exposing the paginated inbox controller to widgets.
+// ignore: specify_nonobvious_property_types
 final captureInboxPaginationControllerProvider =
     NotifierProvider.autoDispose<
       CaptureInboxPaginationController,

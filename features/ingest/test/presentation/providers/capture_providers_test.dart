@@ -133,7 +133,7 @@ void main() {
 
     test('appends next page when loadNextPage is invoked', () async {
       // ARRANGE
-      final totalItems = captureInboxDefaultBatchSize + 5;
+      const totalItems = captureInboxDefaultBatchSize + 5;
       final repository = _RecordingCaptureRepository()
         ..inboxItems = List<CaptureItem>.generate(
           totalItems,

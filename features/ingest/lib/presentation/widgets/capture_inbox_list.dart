@@ -60,13 +60,12 @@ class _CaptureInboxListView extends ConsumerWidget {
     return NotificationListener<ScrollNotification>(
       onNotification: (notification) {
         if (_shouldRequestNext(notification)) {
-          controller.loadNextPage();
+          unawaited(controller.loadNextPage());
         }
         return false;
       },
       child: ListView.separated(
         key: CaptureInboxListKeys.listView,
-        shrinkWrap: false,
         physics: const ClampingScrollPhysics(),
         itemCount: state.items.length + (state.isLoadingMore ? 1 : 0),
         separatorBuilder: (context, index) => const Divider(height: 0),
@@ -318,8 +317,9 @@ class _CaptureInboxActions {
   }
 
   void _refreshInbox() {
-    _container.invalidate(captureInboxItemsProvider);
-    _container.invalidate(captureInboxPaginationControllerProvider);
+    _container
+      ..invalidate(captureInboxItemsProvider)
+      ..invalidate(captureInboxPaginationControllerProvider);
   }
 
   Future<void> _undoArchive(CaptureItem item) async {
