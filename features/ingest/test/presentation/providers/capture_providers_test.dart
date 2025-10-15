@@ -39,6 +39,32 @@ void main() {
       expect(inbox, equals(repository.inboxItems));
       expect(repository.loadInboxInvocations, equals(1));
     });
+
+    test(
+      'requests default batch size when loading inbox items',
+      () async {
+        // ARRANGE
+        final repository = _RecordingCaptureRepository()
+          ..inboxItems = <CaptureItem>[
+            buildTestCaptureItem(id: 'capture-1'),
+            buildTestCaptureItem(id: 'capture-2'),
+            buildTestCaptureItem(id: 'capture-3'),
+          ];
+        final container = ProviderContainer(
+          overrides: [
+            captureRepositoryProvider.overrideWithValue(repository),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        // ACT
+        final items = await container.read(captureInboxItemsProvider.future);
+
+        // ASSERT
+        expect(repository.lastLimit, equals(50));
+        expect(items, equals(repository.inboxItems));
+      },
+    );
   });
 
   group('captureQuickEntryControllerProvider', () {
@@ -133,6 +159,7 @@ class _RecordingCaptureRepository implements CaptureRepository {
   final List<CaptureItem> savedItems = <CaptureItem>[];
   final List<EntityId> deletedIds = <EntityId>[];
   int loadInboxInvocations = 0;
+  int? lastLimit;
 
   @override
   Future<void> save(CaptureItem item) async {
@@ -142,6 +169,7 @@ class _RecordingCaptureRepository implements CaptureRepository {
   @override
   Future<List<CaptureItem>> loadInbox({int? limit}) async {
     loadInboxInvocations++;
+    lastLimit = limit;
     final items = limit == null
         ? List<CaptureItem>.from(inboxItems)
         : inboxItems.take(limit).toList();
