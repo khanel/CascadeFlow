@@ -5,8 +5,8 @@
 ### Primary Feature: Ingest
 - **Status**: Active development
 - **Scope**: Capture item management with inbox functionality
-- **Current Work**: Provider implementation and widget development
-- **Open Files**: `capture_providers.dart`, `capture_inbox_list.dart`
+- **Current Work**: Presentation coverage, swipe gestures, and controller state validation for quick capture flows
+- **Open Files**: `capture_providers.dart`, `capture_inbox_list.dart`, `capture_quick_add_sheet.dart`, archive/delete gesture tests
 
 ### Architecture Implementation
 - **Feature-Sliced Design**: Modular packages with clear boundaries
@@ -19,6 +19,7 @@
 - Infrastructure providers established for storage and logging
 - In-memory Hive initializer for development testing
 - Secure storage stub for key management
+- Archive use case provider exposed for presentation layer overrides
 
 ### Core Domain Events
 - `DomainEvent` base class for event-driven architecture
@@ -30,6 +31,18 @@
 - Updated `go_router` to latest version (16.2.4)
 - Maintained compatibility with Flutter 3.24+ constraints
 
+### Presentation Test Coverage
+- Added provider-level tests for `CaptureQuickEntryController` success and failure paths
+- Added widget tests for `CaptureInboxList` covering loading, empty, data, and error states
+- Added widget tests for `CaptureQuickAddSheet` covering submission lifecycle and error handling
+- Added gesture tests validating archive undo flow and delete confirmations
+
+### Capture Inbox Gestures
+- Inbox items rendered with `Dismissible` supporting archive (start-to-end) and delete (end-to-start) gestures
+- Archive action persists via `ArchiveCaptureItem` use case, invalidates inbox provider, and exposes undo snackbar
+- Delete action confirms via dialog, cascades repository delete, and reports failures with snackbar messaging
+- Provider container used for safe invalidation when widget is disposed, avoiding `ref` access in delayed callbacks
+- Gesture orchestration centralized in `_CaptureInboxActions` to capture dependencies eagerly and remove duplicated snackbar logic
 ## Active Decisions
 
 ### State Management Pattern

@@ -35,13 +35,23 @@
 - ✅ VS Code project configuration
 - ✅ Git repository with proper ignore patterns
 
+### Ingest Presentation
+- ✅ Inbox list supports swipe-to-archive with undo snackbar and Riverpod invalidation
+- ✅ Swipe-to-delete confirms via dialog and reports failures with snackbars
+
+### Testing
+- ✅ Provider tests cover `CaptureQuickEntryController` success and failure flows
+- ✅ Widget tests validate `CaptureQuickAddSheet` submission lifecycle and error handling
+- ✅ Widget tests cover `CaptureInboxList` loading, empty, data, and error states
+- ✅ Gesture tests exercise capture inbox archive/delete flows and undo interactions
+
 ## What's Left to Build
 
 ### Feature Implementation
 - 🔄 **Ingest Feature** (In Progress)
   - Capture item creation and management
-  - Inbox list with prioritization
-  - Filing and archiving workflows
+  - Inbox list prioritization and batching
+  - Filing and archiving workflows (archive/delete gestures implemented for inbox)
 - ⏳ **Focus Feature**
   - Session scheduling and management
   - Time blocking with notifications
