@@ -37,12 +37,14 @@
 - Added widget tests for `CaptureQuickAddSheet` covering submission lifecycle and error handling
 - Added gesture tests validating archive undo flow and delete confirmations
 
-### Capture Inbox Gestures
+### Capture Inbox Gestures & Data Flow
 - Inbox items rendered with `Dismissible` supporting archive (start-to-end) and delete (end-to-start) gestures
 - Archive action persists via `ArchiveCaptureItem` use case, invalidates inbox provider, and exposes undo snackbar
 - Delete action confirms via dialog, cascades repository delete, and reports failures with snackbar messaging
 - Provider container used for safe invalidation when widget is disposed, avoiding `ref` access in delayed callbacks
 - Gesture orchestration centralized in `_CaptureInboxActions` to capture dependencies eagerly and remove duplicated snackbar logic
+- Repository now delivers inbox items sorted by newest-first timestamps to prioritize fresh captures
+- Repository results wrapped in `List.unmodifiable` to guard against accidental mutation by consumers
 ## Active Decisions
 
 ### State Management Pattern

@@ -38,6 +38,8 @@
 ### Ingest Presentation
 - ✅ Inbox list supports swipe-to-archive with undo snackbar and Riverpod invalidation
 - ✅ Swipe-to-delete confirms via dialog and reports failures with snackbars
+- ✅ Inbox repository sorts items newest-first so recent captures appear at the top
+- ✅ Repository returns unmodifiable inbox lists to prevent downstream mutation bugs
 
 ### Testing
 - ✅ Provider tests cover `CaptureQuickEntryController` success and failure flows
