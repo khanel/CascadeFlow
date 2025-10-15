@@ -35,8 +35,9 @@ class _RecordingCaptureRepository implements CaptureRepository {
     int? limit,
     EntityId? startAfter,
   }) async {
-    final base =
-        limit == null ? List<CaptureItem>.from(savedItems) : savedItems.take(limit).toList();
+    final base = limit == null
+        ? List<CaptureItem>.from(savedItems)
+        : savedItems.take(limit).toList();
     if (startAfter == null) {
       return List.unmodifiable(base);
     }

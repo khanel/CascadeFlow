@@ -55,26 +55,41 @@ final Provider<ArchiveCaptureItem> archiveCaptureItemUseCaseProvider =
       );
     });
 
-/// Loads capture inbox items for presentation.
+/// Arguments describing a paged inbox request.
 typedef CaptureInboxPageArgs = ({int? limit, EntityId? startAfter});
 
+/// Provides the default inbox page used by the capture inbox list.
 final FutureProvider<List<CaptureItem>> captureInboxItemsProvider =
     FutureProvider.autoDispose<List<CaptureItem>>((ref) async {
-      final repository = ref.watch(captureRepositoryProvider);
-      return repository.loadInbox(limit: captureInboxDefaultBatchSize);
+      return _loadInboxPage(
+        ref,
+        limit: captureInboxDefaultBatchSize,
+      );
     });
 
 /// Loads a paginated slice of the inbox after an optional cursor.
-final captureInboxPageProvider =
-    FutureProvider.autoDispose
-        .family<List<CaptureItem>, CaptureInboxPageArgs>((ref, args) async {
-      final repository = ref.watch(captureRepositoryProvider);
-      final limit = args.limit ?? captureInboxDefaultBatchSize;
-      return repository.loadInbox(
-        limit: limit,
+final FutureProvider<List<CaptureItem>> Function(CaptureInboxPageArgs args)
+captureInboxPageProvider = FutureProvider.autoDispose
+    .family<List<CaptureItem>, CaptureInboxPageArgs>((ref, args) async {
+      return _loadInboxPage(
+        ref,
+        limit: args.limit ?? captureInboxDefaultBatchSize,
         startAfter: args.startAfter,
       );
     });
+
+/// Loads a page of inbox items using shared repository lookups.
+Future<List<CaptureItem>> _loadInboxPage(
+  Ref ref, {
+  required int limit,
+  EntityId? startAfter,
+}) {
+  final repository = ref.watch(captureRepositoryProvider);
+  return repository.loadInbox(
+    limit: limit,
+    startAfter: startAfter,
+  );
+}
 
 /// Describes the submission lifecycle for the quick-entry controller.
 enum CaptureQuickEntryStatus {

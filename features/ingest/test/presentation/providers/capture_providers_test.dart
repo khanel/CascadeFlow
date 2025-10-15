@@ -213,10 +213,9 @@ class _RecordingCaptureRepository implements CaptureRepository {
     final sliced = startIndex >= 0 && startIndex + 1 < inboxItems.length
         ? inboxItems.sublist(startIndex + 1)
         : startIndex >= 0
-            ? <CaptureItem>[]
-            : List<CaptureItem>.from(inboxItems);
-    final items =
-        limit == null ? sliced : sliced.take(limit).toList();
+        ? <CaptureItem>[]
+        : List<CaptureItem>.from(inboxItems);
+    final items = limit == null ? sliced : sliced.take(limit).toList();
     return List.unmodifiable(items);
   }
 
