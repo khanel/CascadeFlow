@@ -42,6 +42,7 @@
 - ✅ Repository returns unmodifiable inbox lists to prevent downstream mutation bugs
 - ✅ Inbox repository supports optional limit parameter for batched loading
 - ✅ Inbox provider fetches 50-item batches by default to reduce unnecessary loads
+- ✅ Added paged inbox provider to fetch subsequent batches using `startAfter` cursor
 - ✅ Inbox repository honors `startAfter` cursor to resume pagination seamlessly
 
 ### Testing
