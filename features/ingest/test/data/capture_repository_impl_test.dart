@@ -63,6 +63,28 @@ void main() {
     expect(inboxItems, equals(<CaptureItem>[newer, older]));
   });
 
+  test('loadInbox applies limit when provided', () async {
+    // ARRANGE
+    final first = buildTestCaptureItem(
+      id: 'capture-limit-1',
+      createdMicros: 10,
+      updatedMicros: 10,
+    );
+    final second = buildTestCaptureItem(
+      id: 'capture-limit-2',
+      createdMicros: 20,
+      updatedMicros: 20,
+    );
+    await repository.save(first);
+    await repository.save(second);
+
+    // ACT
+    final inboxItems = await repository.loadInbox(limit: 1);
+
+    // ASSERT
+    expect(inboxItems, equals(<CaptureItem>[second]));
+  });
+
   test('save overwrites existing item '
       'preserving latest domain state', () async {
     // ARRANGE
