@@ -35,6 +35,7 @@ class CaptureRepositoryImpl implements CaptureRepository {
             (CaptureItem a, CaptureItem b) =>
                 b.createdAt.compareTo(a.createdAt),
           );
+
     if (limit != null && limit < 0) {
       throw ArgumentError.value(
         limit,
@@ -42,18 +43,19 @@ class CaptureRepositoryImpl implements CaptureRepository {
         'Limit must be greater than or equal to zero',
       );
     }
-    final paged = switch (startAfter) {
-      null => sortedInbox,
-      final cursor => _itemsAfterCursor(sortedInbox, cursor),
-    };
+
+    final paged = _sliceAfter(sortedInbox, startAfter);
     final limited = limit == null ? paged : paged.take(limit).toList();
     return List.unmodifiable(limited);
   }
 
-  List<CaptureItem> _itemsAfterCursor(
+  List<CaptureItem> _sliceAfter(
     List<CaptureItem> items,
-    EntityId cursor,
+    EntityId? cursor,
   ) {
+    if (cursor == null) {
+      return items;
+    }
     final index = items.indexWhere((item) => item.id == cursor);
     if (index < 0) {
       return items;
