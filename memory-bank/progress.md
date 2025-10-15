@@ -44,12 +44,14 @@
 - ✅ Inbox provider fetches 50-item batches by default to reduce unnecessary loads
 - ✅ Added paged inbox provider to fetch subsequent batches using `startAfter` cursor
 - ✅ Inbox repository honors `startAfter` cursor to resume pagination seamlessly
+- ✅ `CaptureInboxList` now drives infinite scrolling via `CaptureInboxPaginationController` with load-more indicator support
 
 ### Testing
 - ✅ Provider tests cover `CaptureQuickEntryController` success and failure flows
 - ✅ Widget tests validate `CaptureQuickAddSheet` submission lifecycle and error handling
 - ✅ Widget tests cover `CaptureInboxList` loading, empty, data, and error states
 - ✅ Gesture tests exercise capture inbox archive/delete flows and undo interactions
+- ✅ Added tests for inbox pagination controller behavior and scroll-triggered page loading
 
 ## What's Left to Build
 

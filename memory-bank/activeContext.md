@@ -38,6 +38,8 @@
 - Added gesture tests validating archive undo flow and delete confirmations
 
 ### Capture Inbox Gestures & Data Flow
+- Pagination now handled by `CaptureInboxPaginationController`, exposing `CaptureInboxPaginationState` for infinite scrolling and load-more indicators
+- Pagination controller now guards its initial load Future and uses state helpers (`beginLoadMore`, `append`, `withLoadMoreError`) to keep repeated rebuilds and gesture-driven reloads stable
 - Inbox items rendered with `Dismissible` supporting archive (start-to-end) and delete (end-to-start) gestures
 - Archive action persists via `ArchiveCaptureItem` use case, invalidates inbox provider, and exposes undo snackbar
 - Delete action confirms via dialog, cascades repository delete, and reports failures with snackbar messaging
