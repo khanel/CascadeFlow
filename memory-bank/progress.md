@@ -41,6 +41,7 @@
 - ✅ Inbox repository sorts items newest-first so recent captures appear at the top
 - ✅ Repository returns unmodifiable inbox lists to prevent downstream mutation bugs
 - ✅ Inbox repository supports optional limit parameter for batched loading
+- ✅ Inbox provider fetches 50-item batches by default to reduce unnecessary loads
 
 ### Testing
 - ✅ Provider tests cover `CaptureQuickEntryController` success and failure flows
