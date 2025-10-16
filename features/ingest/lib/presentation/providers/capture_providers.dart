@@ -465,6 +465,60 @@ class CaptureQuickEntryController extends Notifier<CaptureQuickEntryState> {
   }
 }
 
+/// Controller for managing filter presets.
+/// Maintains a list of saved presets and provides operations to save, load, and delete them.
+class CaptureFilterPresetController extends Notifier<List<CaptureFilterPreset>> {
+  CaptureInboxFilterStore? _store;
+
+  @override
+  List<CaptureFilterPreset> build() {
+    _store ??= ref.read(captureInboxFilterStoreProvider);
+    _loadPresets();
+    return [];
+  }
+
+  /// Loads presets from storage.
+  Future<void> _loadPresets() async {
+    final store = _store;
+    if (store == null) return;
+    try {
+      final presets = await store.loadPresets();
+      state = presets;
+    } on Object {
+      state = [];
+    }
+  }
+
+  /// Saves a new preset or updates an existing one.
+  Future<void> savePreset(CaptureFilterPreset preset) async {
+    final store = _store;
+    if (store == null) return;
+    await store.savePreset(preset);
+    await _loadPresets(); // Refresh state
+  }
+
+  /// Deletes a preset by name.
+  Future<void> deletePreset(String name) async {
+    final store = _store;
+    if (store == null) return;
+    await store.deletePreset(name);
+    await _loadPresets(); // Refresh state
+  }
+
+  /// Applies a preset's filter to the current filter controller.
+  void applyPreset(CaptureFilterPreset preset, CaptureInboxFilterController filterController) {
+    filterController.state = preset.filter;
+    filterController._save(preset.filter);
+  }
+}
+
+/// Provider for the filter preset controller.
+final NotifierProvider<CaptureFilterPresetController, List<CaptureFilterPreset>>
+captureFilterPresetProvider =
+    NotifierProvider<CaptureFilterPresetController, List<CaptureFilterPreset>>(
+      CaptureFilterPresetController.new,
+    );
+
 /// Provider exposing the quick-entry controller to presentation code.
 final NotifierProvider<CaptureQuickEntryController, CaptureQuickEntryState>
 captureQuickEntryControllerProvider =

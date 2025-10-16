@@ -1,6 +1,80 @@
 import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
 import 'package:meta/meta.dart';
 
+/// Represents a saved filter preset with a name and configuration.
+@immutable
+class CaptureFilterPreset {
+  /// Creates a preset with the given [name] and [filter].
+  const CaptureFilterPreset({
+    required this.name,
+    required this.filter,
+    this.createdAt,
+  });
+
+  /// Restores a preset from the provided JSON map.
+  factory CaptureFilterPreset.fromJson(Map<String, dynamic> json) {
+    final name = json['name'] as String?;
+    final filterMap = json['filter'] as Map<String, dynamic>?;
+    final createdAtString = json['createdAt'] as String?;
+
+    if (name == null || filterMap == null) {
+      throw ArgumentError('Invalid preset JSON: missing name or filter');
+    }
+
+    return CaptureFilterPreset(
+      name: name,
+      filter: CaptureInboxFilter.fromJson(filterMap),
+      createdAt: createdAtString != null ? DateTime.parse(createdAtString) : null,
+    );
+  }
+
+  /// Unique name identifying this preset.
+  final String name;
+
+  /// Filter configuration for this preset.
+  final CaptureInboxFilter filter;
+
+  /// When this preset was created (optional for backwards compatibility).
+  final DateTime? createdAt;
+
+  /// Serializes this preset to a JSON-serializable map.
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'name': name,
+    'filter': filter.toJson(),
+    'createdAt': createdAt?.toIso8601String(),
+  };
+
+  /// Creates a copy with optional overrides.
+  CaptureFilterPreset copyWith({
+    String? name,
+    CaptureInboxFilter? filter,
+    DateTime? createdAt,
+  }) {
+    return CaptureFilterPreset(
+      name: name ?? this.name,
+      filter: filter ?? this.filter,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is CaptureFilterPreset &&
+        other.name == name &&
+        other.filter == filter &&
+        other.createdAt == createdAt;
+  }
+
+  @override
+  int get hashCode => Object.hash(name, filter, createdAt);
+
+  @override
+  String toString() {
+    return 'CaptureFilterPreset(name: $name, filter: $filter, createdAt: $createdAt)';
+  }
+}
+
 /// Represents user-selected filters for the capture inbox.
 @immutable
 class CaptureInboxFilter {
