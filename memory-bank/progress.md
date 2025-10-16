@@ -51,6 +51,8 @@
 - ✅ Inbox repository honors `startAfter` cursor to resume pagination seamlessly
 - ✅ `CaptureInboxList` now drives infinite scrolling via `CaptureInboxPaginationController` with load-more indicator support
 - ✅ Inbox list supports long-press-to-file with dialog confirmation
+- ✅ Inbox list exposes source/channel filter chips with a filtered-empty state message
+- ✅ Refactored filter controller and inbox list layout to limit redundant rebuilds and improve readability
 
 ### Testing
 - ✅ Provider tests cover `CaptureQuickEntryController` success and failure flows
@@ -60,6 +62,7 @@
 - ✅ Added tests for inbox pagination controller behavior and scroll-triggered page loading
 - ✅ Added controller-level validation tests for quick entry (empty and whitespace submissions)
 - ✅ TDD cycle for filing gesture, including dialog and use case integration
+- ✅ Widget tests assert inbox filtering by capture source and channel selections
 
 ## What's Left to Build
 
@@ -68,6 +71,7 @@
   - Capture item creation and management
   - Inbox list prioritization and batching
   - Filing and archiving workflows (archive/delete/file gestures implemented for inbox)
+  - Persist inbox filter selections and expose saved views
 - ⏳ **Focus Feature**
   - Session scheduling and management
   - Time blocking with notifications

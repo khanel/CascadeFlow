@@ -5,8 +5,8 @@
 ### Primary Feature: Ingest
 - **Status**: Active development
 - **Scope**: Capture item management with inbox functionality
-- **Current Work**: Inbox management gestures (swipe and long-press)
-- **Open Files**: `capture_inbox_list.dart`, archive/delete gesture tests
+- **Current Work**: Inbox filtering controls (source/channel chips)
+- **Open Files**: `capture_inbox_list.dart`, inbox filter widget tests
 
 ### Architecture Implementation
 - **Feature-Sliced Design**: Modular packages with clear boundaries
@@ -48,6 +48,7 @@
 - Added widget tests for `CaptureInboxList` covering loading, empty, data, and error states
 - Added widget tests for `CaptureQuickAddSheet` covering submission lifecycle and error handling
 - Added gesture tests validating archive undo flow and delete confirmations
+- Added widget tests verifying capture inbox filtering by source and channel chips
 
 ### Capture Inbox Gestures & Data Flow
 - Pagination now handled by `CaptureInboxPaginationController`, exposing `CaptureInboxPaginationState` for infinite scrolling and load-more indicators
@@ -63,6 +64,13 @@
 - `captureInboxItemsProvider` now requests 50-item batches by default to keep UI updates snappy
 - `captureInboxPageProvider` exposes paginated inbox loading with `limit`/`startAfter` arguments for incremental fetches
 - `CaptureRepository.loadInbox` also respects `startAfter` cursors so pagination resumes after the last item returned
+
+### Capture Inbox Filtering Controls
+- Added `CaptureInboxFilterController` provider to manage source/channel selections
+- Introduced filter chip bar with "All sources" and "All channels" toggles plus dynamic chip lists
+- Updated inbox list to apply filters before rendering and show a filtered-empty state when no items match
+- Extended pagination list to request additional pages when filtered results are scrolled to the threshold
+- Refactored filter controller to short-circuit redundant updates and split inbox list rendering into focused widgets for maintainability
 
 ### Capture Domain Status Helpers
 - `CaptureItem` exposes `isInbox`, `isFiled`, and `isArchived` getters to reduce direct status comparisons throughout the domain layer
