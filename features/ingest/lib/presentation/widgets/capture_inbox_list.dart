@@ -75,18 +75,17 @@ class _CaptureInboxListView extends ConsumerWidget {
             return const _CaptureInboxLoadingMore();
           }
           final item = state.items[index];
+          final actions = _CaptureInboxActions(context: context, ref: ref);
           return Dismissible(
             key: Key('captureInbox_dismiss_${item.id.value}'),
             background: const _ArchiveBackground(),
             secondaryBackground: const _DeleteBackground(),
-            confirmDismiss: (direction) => _handleDismiss(
-              context,
-              ref,
+            confirmDismiss: (direction) => actions.confirmDismiss(
               direction,
               item,
             ),
             child: GestureDetector(
-              onLongPress: () => _handleLongPress(context, ref, item),
+              onLongPress: () => actions.file(item),
               child: ListTile(
                 key: CaptureInboxListKeys.itemTile(item.id.value),
                 title: Text(item.content),
@@ -209,77 +208,69 @@ class _CaptureInboxLoadingMore extends StatelessWidget {
   }
 }
 
-Future<bool?> _handleDismiss(
-  BuildContext context,
-  WidgetRef ref,
-  DismissDirection direction,
-  CaptureItem item,
-) async {
-  final actions = _CaptureInboxActions(
-    context: context,
-    ref: ref,
-  );
-
-  return switch (direction) {
-    DismissDirection.startToEnd => actions.archive(item),
-    DismissDirection.endToStart => actions.confirmDelete(item),
-    DismissDirection.horizontal ||
-    DismissDirection.vertical ||
-    DismissDirection.up ||
-    DismissDirection.down ||
-    DismissDirection.none => false,
-  };
-}
-
-Future<void> _handleLongPress(
-  BuildContext context,
-  WidgetRef ref,
-  CaptureItem item,
-) async {
-  await showDialog<void>(
-    context: context,
-    builder: (context) => SimpleDialog(
-      title: Text(item.content),
-      children: [
-        SimpleDialogOption(
-          child: const Text('File'),
-          onPressed: () {
-            Navigator.of(context).pop();
-            final useCase = ref.read(fileCaptureItemUseCaseProvider);
-            final result = useCase(
-              request: FileCaptureItemRequest(item: item),
-            );
-            final actions = _CaptureInboxActions(context: context, ref: ref);
-
-            switch (result) {
-              case SuccessResult<CaptureItem, Failure>(value: final filed):
-                unawaited(actions.saveAndRefresh(filed, 'filed'));
-              case FailureResult<CaptureItem, Failure>(
-                  failure: final failure
-                ):
-                actions.showMessage('Failed to file capture: ${failure.message}');
-            }
-          },
-        ),
-      ],
-    ),
-  );
-}
-
 class _CaptureInboxActions {
   _CaptureInboxActions({
     required this.context,
     required WidgetRef ref,
   }) : _archiveUseCase = ref.read(archiveCaptureItemUseCaseProvider),
+       _fileUseCase = ref.read(fileCaptureItemUseCaseProvider),
        _repository = ref.read(captureRepositoryProvider),
        _container = ref.container;
 
   final BuildContext context;
   final ArchiveCaptureItem _archiveUseCase;
+  final FileCaptureItem _fileUseCase;
   final CaptureRepository _repository;
   final ProviderContainer _container;
 
   ScaffoldMessengerState get _messenger => ScaffoldMessenger.of(context);
+
+  Future<void> file(CaptureItem item) async {
+    final filed =
+        await showDialog<bool>(
+          context: context,
+          builder: (context) => SimpleDialog(
+            title: Text(item.content),
+            children: [
+              SimpleDialogOption(
+                child: const Text('File'),
+                onPressed: () => Navigator.of(context).pop(true),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+
+    if (!filed) {
+      return;
+    }
+
+    final result = _fileUseCase(
+      request: FileCaptureItemRequest(item: item),
+    );
+
+    switch (result) {
+      case SuccessResult<CaptureItem, Failure>(value: final filed):
+        await saveAndRefresh(filed, 'filed');
+      case FailureResult<CaptureItem, Failure>(failure: final failure):
+        showMessage('Failed to file capture: ${failure.message}');
+    }
+  }
+
+  Future<bool> confirmDismiss(
+    DismissDirection direction,
+    CaptureItem item,
+  ) {
+    return switch (direction) {
+      DismissDirection.startToEnd => archive(item),
+      DismissDirection.endToStart => confirmDelete(item),
+      DismissDirection.horizontal ||
+      DismissDirection.vertical ||
+      DismissDirection.up ||
+      DismissDirection.down ||
+      DismissDirection.none => Future.value(false),
+    };
+  }
 
   Future<bool> archive(CaptureItem item) async {
     final result = _archiveUseCase(

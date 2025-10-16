@@ -197,8 +197,9 @@ void main() {
       expect(secondLoad.startAfter, equals(firstPage.last.id));
     });
 
-    testWidgets('shows file dialog on long press and files item',
-        (tester) async {
+    testWidgets('shows file dialog on long press and files item', (
+      tester,
+    ) async {
       final item = buildTestCaptureItem(
         id: 'capture-1',
         content: 'Draft meeting notes',
@@ -221,8 +222,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final tileFinder =
-          find.byKey(CaptureInboxListKeys.itemTile(item.id.value));
+      final tileFinder = find.byKey(
+        CaptureInboxListKeys.itemTile(item.id.value),
+      );
       expect(tileFinder, findsOneWidget);
 
       await tester.longPress(tileFinder);
@@ -250,7 +252,8 @@ class _StubCaptureRepository implements CaptureRepository {
   final Future<List<CaptureItem>> Function({
     int? limit,
     EntityId? startAfter,
-  }) onLoadInbox;
+  })
+  onLoadInbox;
 
   final List<CaptureItem> savedItems = [];
 

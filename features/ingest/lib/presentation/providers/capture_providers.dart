@@ -58,17 +58,18 @@ final Provider<ArchiveCaptureItem> archiveCaptureItemUseCaseProvider =
 
 /// Publishes domain events emitted by the file use case.
 final Provider<FileCaptureItemEventPublisher>
-    fileCaptureItemEventPublisherProvider =
-    Provider<FileCaptureItemEventPublisher>((ref) => (_) {});
+fileCaptureItemEventPublisherProvider = Provider<FileCaptureItemEventPublisher>(
+  (ref) => (_) {},
+);
 
 /// Builds the file capture item use case used by the inbox gestures.
 final Provider<FileCaptureItem> fileCaptureItemUseCaseProvider =
     Provider<FileCaptureItem>((ref) {
-  return FileCaptureItem(
-    nowProvider: () => Timestamp(DateTime.now().toUtc()),
-    publishEvent: ref.watch(fileCaptureItemEventPublisherProvider),
-  );
-});
+      return FileCaptureItem(
+        nowProvider: () => Timestamp(DateTime.now().toUtc()),
+        publishEvent: ref.watch(fileCaptureItemEventPublisherProvider),
+      );
+    });
 
 /// Arguments describing a paged inbox request.
 typedef CaptureInboxPageArgs = ({int? limit, EntityId? startAfter});
