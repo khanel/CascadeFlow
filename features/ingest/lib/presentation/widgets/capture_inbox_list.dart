@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:cascade_flow_core/cascade_flow_core.dart';
 import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
@@ -58,86 +59,113 @@ class _CaptureInboxListView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final filter = ref.watch(captureInboxFilterProvider);
-    final controller = ref.read(
-      captureInboxPaginationControllerProvider.notifier,
-    );
-    final filteredItems = state.items.where(filter.matches).toList();
-    final availableChannels = _availableChannels(
-      state.items,
-      selectedChannel: filter.channel,
-    );
-    final filters = _CaptureInboxFilterBar(
+    final filteredItems = filter.apply(state.items).toList(growable: false);
+    final channelOptions = _buildChannelOptions(state.items, filter);
+    final filterBar = _CaptureInboxFilterBar(
       filter: filter,
-      channels: availableChannels,
+      channelOptions: channelOptions,
     );
 
-    if (filteredItems.isEmpty) {
-      final empty = filter.isFiltering
-          ? const _CaptureInboxFilteredEmptyState()
-          : const _CaptureInboxEmptyState();
-
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          filters,
-          const SizedBox(height: 12),
-          Expanded(child: empty),
-        ],
-      );
-    }
+    final body = filteredItems.isEmpty
+        ? (filter.isFiltering
+              ? const _CaptureInboxFilteredEmptyState()
+              : const _CaptureInboxEmptyState())
+        : _CaptureInboxListContent(
+            items: filteredItems,
+            paginationState: state,
+          );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        filters,
+        filterBar,
         const SizedBox(height: 12),
-        Expanded(
-          child: NotificationListener<ScrollNotification>(
-            onNotification: (notification) {
-              if (_shouldRequestNext(notification)) {
-                unawaited(controller.loadNextPage());
-              }
-              return false;
-            },
-            child: ListView.separated(
-              key: CaptureInboxListKeys.listView,
-              physics: const ClampingScrollPhysics(),
-              itemCount: filteredItems.length + (state.isLoadingMore ? 1 : 0),
-              separatorBuilder: (context, index) => const Divider(height: 0),
-              itemBuilder: (context, index) {
-                if (index >= filteredItems.length) {
-                  return const _CaptureInboxLoadingMore();
-                }
-                final item = filteredItems[index];
-                final actions = _CaptureInboxActions(context: context, ref: ref);
-                return Dismissible(
-                  key: Key('captureInbox_dismiss_${item.id.value}'),
-                  background: const _ArchiveBackground(),
-                  secondaryBackground: const _DeleteBackground(),
-                  confirmDismiss: (direction) => actions.confirmDismiss(
-                    direction,
-                    item,
-                  ),
-                  child: GestureDetector(
-                    onLongPress: () => actions.file(item),
-                    child: ListTile(
-                      key: CaptureInboxListKeys.itemTile(item.id.value),
-                      title: Text(item.content),
-                      subtitle: Text(_subtitleFor(context, item)),
-                      leading: const Icon(Icons.inbox),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
+        Expanded(child: body),
       ],
     );
   }
 
+  List<_CaptureInboxChannelOption> _buildChannelOptions(
+    List<CaptureItem> items,
+    CaptureInboxFilter filter,
+  ) {
+    final channels = SplayTreeSet<String>();
+    for (final item in items) {
+      channels.add(item.context.channel);
+    }
+    final selectedChannel = filter.channel;
+    if (selectedChannel != null && selectedChannel.isNotEmpty) {
+      channels.add(selectedChannel);
+    }
+    return channels
+        .map(
+          (channel) => _CaptureInboxChannelOption(
+            value: channel,
+            isSelected: filter.isChannelSelected(channel),
+          ),
+        )
+        .toList(growable: false);
+  }
+}
+
+class _CaptureInboxListContent extends ConsumerWidget {
+  const _CaptureInboxListContent({
+    required this.items,
+    required this.paginationState,
+  });
+
+  final List<CaptureItem> items;
+  final CaptureInboxPaginationState paginationState;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.read(
+      captureInboxPaginationControllerProvider.notifier,
+    );
+
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        if (_shouldRequestNext(notification)) {
+          unawaited(controller.loadNextPage());
+        }
+        return false;
+      },
+      child: ListView.separated(
+        key: CaptureInboxListKeys.listView,
+        physics: const ClampingScrollPhysics(),
+        itemCount: items.length + (paginationState.isLoadingMore ? 1 : 0),
+        separatorBuilder: (context, index) => const Divider(height: 0),
+        itemBuilder: (context, index) {
+          if (index >= items.length) {
+            return const _CaptureInboxLoadingMore();
+          }
+          final item = items[index];
+          final actions = _CaptureInboxActions(context: context, ref: ref);
+          return Dismissible(
+            key: Key('captureInbox_dismiss_${item.id.value}'),
+            background: const _ArchiveBackground(),
+            secondaryBackground: const _DeleteBackground(),
+            confirmDismiss: (direction) => actions.confirmDismiss(
+              direction,
+              item,
+            ),
+            child: GestureDetector(
+              onLongPress: () => actions.file(item),
+              child: ListTile(
+                key: CaptureInboxListKeys.itemTile(item.id.value),
+                title: Text(item.content),
+                subtitle: Text(_subtitleFor(context, item)),
+                leading: const Icon(Icons.inbox),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   bool _shouldRequestNext(ScrollNotification notification) {
-    if (!state.hasMore || state.isLoadingMore) {
+    if (!paginationState.hasMore || paginationState.isLoadingMore) {
       return false;
     }
     return notification.metrics.extentAfter < 200;
@@ -148,31 +176,16 @@ class _CaptureInboxListView extends ConsumerWidget {
     final formattedTime = TimeOfDay.fromDateTime(createdAt).format(context);
     return '${item.context.channel} · $formattedTime';
   }
-
-  List<String> _availableChannels(
-    List<CaptureItem> items, {
-    String? selectedChannel,
-  }) {
-    final channels = <String>{};
-    for (final item in items) {
-      channels.add(item.context.channel);
-    }
-    if (selectedChannel != null && selectedChannel.isNotEmpty) {
-      channels.add(selectedChannel);
-    }
-    final sorted = channels.toList()..sort();
-    return sorted;
-  }
 }
 
 class _CaptureInboxFilterBar extends ConsumerWidget {
   const _CaptureInboxFilterBar({
     required this.filter,
-    required this.channels,
+    required this.channelOptions,
   });
 
   final CaptureInboxFilter filter;
-  final List<String> channels;
+  final List<_CaptureInboxChannelOption> channelOptions;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -193,13 +206,13 @@ class _CaptureInboxFilterBar extends ConsumerWidget {
             for (final source in CaptureSource.values)
               ChoiceChip(
                 label: Text(_sourceLabel(source)),
-                selected: filter.source == source,
+                selected: filter.isSourceSelected(source),
                 onSelected: (selected) =>
                     notifier.setSource(selected ? source : null),
               ),
           ],
         ),
-        if (channels.isNotEmpty) ...<Widget>[
+        if (channelOptions.isNotEmpty) ...<Widget>[
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
@@ -210,12 +223,12 @@ class _CaptureInboxFilterBar extends ConsumerWidget {
                 selected: filter.channel == null,
                 onSelected: (_) => notifier.setChannel(null),
               ),
-              for (final channel in channels)
+              for (final option in channelOptions)
                 ChoiceChip(
-                  label: Text(channel),
-                  selected: filter.channel == channel,
+                  label: Text(option.value),
+                  selected: option.isSelected,
                   onSelected: (selected) =>
-                      notifier.setChannel(selected ? channel : null),
+                      notifier.setChannel(selected ? option.value : null),
                 ),
             ],
           ),
@@ -223,6 +236,16 @@ class _CaptureInboxFilterBar extends ConsumerWidget {
       ],
     );
   }
+}
+
+class _CaptureInboxChannelOption {
+  const _CaptureInboxChannelOption({
+    required this.value,
+    required this.isSelected,
+  });
+
+  final String value;
+  final bool isSelected;
 }
 
 String _sourceLabel(CaptureSource source) {

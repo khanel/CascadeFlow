@@ -247,7 +247,6 @@ void main() {
         buildTestCaptureItem(
           id: 'capture-1',
           content: 'Quick entry item',
-          source: CaptureSource.quickCapture,
         ),
         buildTestCaptureItem(
           id: 'capture-2',

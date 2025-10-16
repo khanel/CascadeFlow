@@ -36,6 +36,11 @@ class CaptureInboxFilter {
     this.channel,
   });
 
+  /// Shared empty filter instance with no constraints.
+  static const CaptureInboxFilter empty = CaptureInboxFilter();
+
+  static const Object _sentinel = Object();
+
   /// Selected capture source constraint when applied.
   final CaptureSource? source;
 
@@ -56,45 +61,98 @@ class CaptureInboxFilter {
     return true;
   }
 
-  /// Returns a copy of this filter with a new [channel] while preserving source.
+  /// Returns a copy of this filter with a new [channel] while preserving
+  /// the selected source.
   CaptureInboxFilter withChannel(String? value) {
     if (channel == value) {
       return this;
     }
+    return copyWith(channel: value);
+  }
+
+  /// Applies the current filter to [items], returning the filtered iterable.
+  Iterable<CaptureItem> apply(Iterable<CaptureItem> items) {
+    return items.where(matches);
+  }
+
+  /// Indicates whether the provided [value] matches the active source filter.
+  bool isSourceSelected(CaptureSource value) => source == value;
+
+  /// Indicates whether the provided [value] matches the active channel filter.
+  bool isChannelSelected(String value) => channel == value;
+
+  /// Creates a copy overriding [source] and/or [channel].
+  CaptureInboxFilter copyWith({
+    Object? source = _sentinel,
+    Object? channel = _sentinel,
+  }) {
+    final resolvedSource = identical(source, _sentinel)
+        ? this.source
+        : source as CaptureSource?;
+    final resolvedChannel = identical(channel, _sentinel)
+        ? this.channel
+        : channel as String?;
     return CaptureInboxFilter(
-      source: source,
-      channel: value,
+      source: resolvedSource,
+      channel: resolvedChannel,
     );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is CaptureInboxFilter &&
+        other.source == source &&
+        other.channel == channel;
+  }
+
+  @override
+  int get hashCode => Object.hash(source, channel);
+
+  @override
+  String toString() {
+    return 'CaptureInboxFilter(source: $source, channel: $channel)';
   }
 }
 
 /// Maintains the inbox filter selection.
 class CaptureInboxFilterController extends Notifier<CaptureInboxFilter> {
   @override
-  CaptureInboxFilter build() => const CaptureInboxFilter();
+  CaptureInboxFilter build() => CaptureInboxFilter.empty;
 
   /// Clears all filter selections.
   void clear() {
-    state = const CaptureInboxFilter();
+    if (state == CaptureInboxFilter.empty) {
+      return;
+    }
+    state = CaptureInboxFilter.empty;
   }
 
   /// Sets the active source filter and resets the channel selection.
   void setSource(CaptureSource? source) {
-    state = CaptureInboxFilter(
+    final next = state.copyWith(
       source: source,
       channel: null,
     );
+    if (next == state) {
+      return;
+    }
+    state = next;
   }
 
   /// Sets the active channel filter while preserving the selected source.
   void setChannel(String? channel) {
-    state = state.withChannel(channel);
+    final next = state.withChannel(channel);
+    if (next == state) {
+      return;
+    }
+    state = next;
   }
 }
 
 /// Provides the current capture inbox filter.
-// ignore: specify_nonobvious_property_types
-final captureInboxFilterProvider =
+final NotifierProvider<CaptureInboxFilterController, CaptureInboxFilter>
+captureInboxFilterProvider =
     NotifierProvider<CaptureInboxFilterController, CaptureInboxFilter>(
       CaptureInboxFilterController.new,
     );
