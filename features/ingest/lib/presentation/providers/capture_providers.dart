@@ -10,12 +10,11 @@ import 'package:cascade_flow_ingest/domain/repositories/capture_repository.dart'
 import 'package:cascade_flow_ingest/domain/use_cases/archive_capture_item.dart';
 import 'package:cascade_flow_ingest/domain/use_cases/capture_quick_entry.dart';
 import 'package:cascade_flow_ingest/domain/use_cases/file_capture_item.dart';
+import 'package:cascade_flow_ingest/shared/capture_inbox_constants.dart';
+import 'package:cascade_flow_ingest/shared/capture_inbox_exceptions.dart';
 import 'package:cascade_flow_ingest/shared/capture_inbox_filter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meta/meta.dart';
-
-/// Default number of capture items fetched per inbox request.
-const int captureInboxDefaultBatchSize = 50;
 
 /// Provides the Hive-backed data source for capture inbox operations.
 final Provider<CaptureLocalDataSource> captureLocalDataSourceProvider =
@@ -105,15 +104,20 @@ class CaptureInboxFilterController extends Notifier<CaptureInboxFilter> {
     if (store == null) {
       return;
     }
-    final persistence = filter == CaptureInboxFilter.empty
+
+    final persistence = _shouldClearFilter(filter)
         ? store.clear()
         : store.save(filter);
+
     unawaited(
       persistence.catchError(
         (Object error, StackTrace stackTrace) => null,
       ),
     );
   }
+
+  bool _shouldClearFilter(CaptureInboxFilter filter) =>
+      filter == CaptureInboxFilter.empty;
 }
 
 /// Provides the current capture inbox filter.
@@ -175,7 +179,7 @@ final FutureProvider<List<CaptureItem>> captureInboxItemsProvider =
     FutureProvider.autoDispose<List<CaptureItem>>((ref) async {
       return _loadInboxPage(
         ref,
-        limit: captureInboxDefaultBatchSize,
+        limit: CaptureInboxConstants.defaultBatchSize,
       );
     });
 
@@ -185,7 +189,7 @@ captureInboxPageProvider = FutureProvider.autoDispose
     .family<List<CaptureItem>, CaptureInboxPageArgs>((ref, args) async {
       return _loadInboxPage(
         ref,
-        limit: args.limit ?? captureInboxDefaultBatchSize,
+        limit: args.limit ?? CaptureInboxConstants.defaultBatchSize,
         startAfter: args.startAfter,
       );
     });
@@ -284,7 +288,7 @@ class CaptureInboxPaginationController
   Future<void> _loadInitial() async {
     try {
       final items = await _loadPage();
-      final hasMore = items.length == captureInboxDefaultBatchSize;
+      final hasMore = _hasMoreItems(items);
       state = AsyncValue.data(
         CaptureInboxPaginationState(
           items: items,
@@ -296,6 +300,9 @@ class CaptureInboxPaginationController
     }
   }
 
+  bool _hasMoreItems(List<CaptureItem> items) =>
+      items.length == CaptureInboxConstants.defaultBatchSize;
+
   /// Requests the next page of inbox items when available.
   Future<void> loadNextPage() async {
     final current = state.maybeWhen(
@@ -303,21 +310,21 @@ class CaptureInboxPaginationController
       orElse: () => null,
     );
 
-    if (current == null || current.isLoadingMore || !current.hasMore) {
+    if (_shouldSkipLoadMore(current)) {
       return;
     }
 
-    final loadingMore = current.beginLoadMore();
+    final loadingMore = current!.beginLoadMore();
     state = AsyncValue.data(loadingMore);
 
-    final cursor = current.items.isEmpty ? null : current.items.last.id;
+    final cursor = _getCursorForNextPage(current);
 
     try {
       final next = await _loadPage(startAfter: cursor);
       state = AsyncValue.data(
         loadingMore.append(
           next,
-          hasMore: next.length == captureInboxDefaultBatchSize,
+          hasMore: _hasMoreItems(next),
         ),
       );
     } on Object catch (error, stackTrace) {
@@ -325,10 +332,16 @@ class CaptureInboxPaginationController
     }
   }
 
+  bool _shouldSkipLoadMore(CaptureInboxPaginationState? current) =>
+      current == null || current.isLoadingMore || !current.hasMore;
+
+  EntityId? _getCursorForNextPage(CaptureInboxPaginationState current) =>
+      current.items.isEmpty ? null : current.items.last.id;
+
   Future<List<CaptureItem>> _loadPage({EntityId? startAfter}) {
     final repository = ref.read(captureRepositoryProvider);
     return repository.loadInbox(
-      limit: captureInboxDefaultBatchSize,
+      limit: CaptureInboxConstants.defaultBatchSize,
       startAfter: startAfter,
     );
   }
@@ -465,57 +478,96 @@ class CaptureQuickEntryController extends Notifier<CaptureQuickEntryState> {
   }
 }
 
-/// Controller for managing filter presets.
-/// Maintains a list of saved presets and provides operations to save, load, and delete them.
-class CaptureFilterPresetController extends Notifier<List<CaptureFilterPreset>> {
+/// Controller for managing filter presets. Maintains a list of saved presets
+/// and provides operations to save, load, and delete them.
+class CaptureFilterPresetController
+    extends Notifier<AsyncValue<List<CaptureFilterPreset>>> {
   CaptureInboxFilterStore? _store;
+  Future<void>? _initialLoad;
+
+  /// Completes when the initial preset load finishes.
+  Future<void> whenReady() => _initialLoad ?? Future<void>.value();
 
   @override
-  List<CaptureFilterPreset> build() {
+  AsyncValue<List<CaptureFilterPreset>> build() {
     _store ??= ref.read(captureInboxFilterStoreProvider);
-    _loadPresets();
-    return [];
+    _initialLoad ??= _loadInitial();
+    return const AsyncValue.loading();
   }
 
-  /// Loads presets from storage.
-  Future<void> _loadPresets() async {
+  Future<void> _loadInitial() async {
     final store = _store;
-    if (store == null) return;
+    if (store == null) {
+      state = const AsyncValue.data([]);
+      return;
+    }
+
     try {
       final presets = await store.loadPresets();
-      state = presets;
-    } on Object {
-      state = [];
+      state = AsyncValue.data(presets);
+    } on FilterPresetException catch (error, stackTrace) {
+      state = AsyncValue.error(error, stackTrace);
+    } on Object catch (error) {
+      state = AsyncValue.error(error, StackTrace.current);
     }
+  }
+
+  /// Reloads presets from storage.
+  Future<void> reloadPresets() async {
+    await _loadInitial();
   }
 
   /// Saves a new preset or updates an existing one.
   Future<void> savePreset(CaptureFilterPreset preset) async {
     final store = _store;
     if (store == null) return;
-    await store.savePreset(preset);
-    await _loadPresets(); // Refresh state
+
+    try {
+      await store.savePreset(preset);
+      await _loadInitial(); // Refresh state
+    } on FilterPresetException catch (error, stackTrace) {
+      state = AsyncValue.error(error, stackTrace);
+    } on Object catch (error) {
+      state = AsyncValue.error(error, StackTrace.current);
+    }
   }
 
   /// Deletes a preset by name.
   Future<void> deletePreset(String name) async {
     final store = _store;
     if (store == null) return;
-    await store.deletePreset(name);
-    await _loadPresets(); // Refresh state
+
+    try {
+      await store.deletePreset(name);
+      await _loadInitial(); // Refresh state
+    } on FilterPresetException catch (error, stackTrace) {
+      state = AsyncValue.error(error, stackTrace);
+    } on Object catch (error) {
+      state = AsyncValue.error(error, StackTrace.current);
+    }
   }
 
   /// Applies a preset's filter to the current filter controller.
-  void applyPreset(CaptureFilterPreset preset, CaptureInboxFilterController filterController) {
-    filterController.state = preset.filter;
-    filterController._save(preset.filter);
+  void applyPreset(
+    CaptureFilterPreset preset,
+    CaptureInboxFilterController filterController,
+  ) {
+    filterController
+      ..state = preset.filter
+      .._save(preset.filter);
   }
 }
 
 /// Provider for the filter preset controller.
-final NotifierProvider<CaptureFilterPresetController, List<CaptureFilterPreset>>
+final NotifierProvider<
+  CaptureFilterPresetController,
+  AsyncValue<List<CaptureFilterPreset>>
+>
 captureFilterPresetProvider =
-    NotifierProvider<CaptureFilterPresetController, List<CaptureFilterPreset>>(
+    NotifierProvider<
+      CaptureFilterPresetController,
+      AsyncValue<List<CaptureFilterPreset>>
+    >(
       CaptureFilterPresetController.new,
     );
 

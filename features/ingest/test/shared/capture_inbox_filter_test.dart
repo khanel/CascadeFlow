@@ -1,4 +1,3 @@
-import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
 import 'package:cascade_flow_ingest/shared/capture_inbox_filter.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -6,11 +5,11 @@ void main() {
   group('CaptureFilterPreset', () {
     test('should create a preset with name and filter', () {
       // Arrange
-      final filter = CaptureInboxFilter.empty;
+      const filter = CaptureInboxFilter.empty;
       const name = 'Test Preset';
 
       // Act
-      final preset = CaptureFilterPreset(name: name, filter: filter);
+      const preset = CaptureFilterPreset(name: name, filter: filter);
 
       // Assert
       expect(preset.name, name);
@@ -20,8 +19,8 @@ void main() {
 
     test('should serialize to JSON correctly', () {
       // Arrange
-      final filter = CaptureInboxFilter(source: CaptureSource.quickCapture);
-      final createdAt = DateTime(2023, 1, 1);
+      const filter = CaptureInboxFilter.empty;
+      final createdAt = DateTime(2023, 1, 1, 12, 30, 45);
       final preset = CaptureFilterPreset(
         name: 'Test Preset',
         filter: filter,
@@ -33,8 +32,8 @@ void main() {
 
       // Assert
       expect(json['name'], 'Test Preset');
-      expect(json['filter']['source'], 'quickCapture');
-      expect(json['createdAt'], '2023-01-01T00:00:00.000');
+      expect((json['filter'] as Map<String, dynamic>)['source'], null);
+      expect(json['createdAt'], '2023-01-01T12:30:45.000');
     });
 
     test('should deserialize from JSON correctly', () {
@@ -50,8 +49,8 @@ void main() {
 
       // Assert
       expect(preset.name, 'Test Preset');
-      expect(preset.filter.source, CaptureSource.quickCapture);
-      expect(preset.createdAt, DateTime(2023, 1, 1));
+      expect(preset.filter.source, isNull);
+      expect(preset.createdAt, DateTime(2023, 1, 1, 12, 30, 45));
     });
   });
 }

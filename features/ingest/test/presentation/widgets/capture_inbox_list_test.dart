@@ -5,6 +5,7 @@ import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
 import 'package:cascade_flow_ingest/domain/repositories/capture_repository.dart';
 import 'package:cascade_flow_ingest/presentation/providers/capture_providers.dart';
 import 'package:cascade_flow_ingest/presentation/widgets/capture_inbox_list.dart';
+import 'package:cascade_flow_ingest/shared/capture_inbox_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -138,7 +139,7 @@ void main() {
       tester,
     ) async {
       final firstPage = List<CaptureItem>.generate(
-        captureInboxDefaultBatchSize,
+        CaptureInboxConstants.defaultBatchSize,
         (index) => buildTestCaptureItem(
           id: 'capture-${index + 1}',
           createdMicros: index,
@@ -148,9 +149,9 @@ void main() {
       final remainingItems = List<CaptureItem>.generate(
         5,
         (index) => buildTestCaptureItem(
-          id: 'capture-${captureInboxDefaultBatchSize + index + 1}',
-          createdMicros: captureInboxDefaultBatchSize + index,
-          updatedMicros: captureInboxDefaultBatchSize + index,
+          id: 'capture-${CaptureInboxConstants.defaultBatchSize + index + 1}',
+          createdMicros: CaptureInboxConstants.defaultBatchSize + index,
+          updatedMicros: CaptureInboxConstants.defaultBatchSize + index,
         ),
       );
       final loads = <({int? limit, EntityId? startAfter})>[];
@@ -193,7 +194,7 @@ void main() {
 
       expect(loads.length, greaterThanOrEqualTo(2));
       final secondLoad = loads.last;
-      expect(secondLoad.limit, equals(captureInboxDefaultBatchSize));
+      expect(secondLoad.limit, equals(CaptureInboxConstants.defaultBatchSize));
       expect(secondLoad.startAfter, equals(firstPage.last.id));
     });
 

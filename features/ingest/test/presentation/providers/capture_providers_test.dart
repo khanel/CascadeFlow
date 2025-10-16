@@ -5,6 +5,7 @@ import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
 import 'package:cascade_flow_ingest/domain/repositories/capture_repository.dart';
 import 'package:cascade_flow_ingest/domain/use_cases/capture_quick_entry.dart';
 import 'package:cascade_flow_ingest/presentation/providers/capture_providers.dart';
+import 'package:cascade_flow_ingest/shared/capture_inbox_constants.dart';
 import 'package:cascade_flow_ingest/shared/capture_inbox_filter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod/riverpod.dart';
@@ -64,7 +65,10 @@ void main() {
         final items = await container.read(captureInboxItemsProvider.future);
 
         // ASSERT
-        expect(repository.lastLimit, equals(captureInboxDefaultBatchSize));
+        expect(
+          repository.lastLimit,
+          equals(CaptureInboxConstants.defaultBatchSize),
+        );
         expect(items, equals(repository.inboxItems));
       },
     );
@@ -136,7 +140,7 @@ void main() {
 
     test('appends next page when loadNextPage is invoked', () async {
       // ARRANGE
-      const totalItems = captureInboxDefaultBatchSize + 5;
+      const totalItems = CaptureInboxConstants.defaultBatchSize + 5;
       final repository = _RecordingCaptureRepository()
         ..inboxItems = List<CaptureItem>.generate(
           totalItems,
@@ -161,7 +165,7 @@ void main() {
       final initial = container.read(captureInboxPaginationControllerProvider);
       expect(
         initial.requireValue.items.length,
-        captureInboxDefaultBatchSize,
+        CaptureInboxConstants.defaultBatchSize,
       );
       expect(initial.requireValue.hasMore, isTrue);
 

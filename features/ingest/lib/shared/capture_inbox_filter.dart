@@ -24,7 +24,9 @@ class CaptureFilterPreset {
     return CaptureFilterPreset(
       name: name,
       filter: CaptureInboxFilter.fromJson(filterMap),
-      createdAt: createdAtString != null ? DateTime.parse(createdAtString) : null,
+      createdAt: createdAtString != null
+          ? DateTime.parse(createdAtString)
+          : null,
     );
   }
 
@@ -71,7 +73,8 @@ class CaptureFilterPreset {
 
   @override
   String toString() {
-    return 'CaptureFilterPreset(name: $name, filter: $filter, createdAt: $createdAt)';
+    return 'CaptureFilterPreset('
+        'name: $name, filter: $filter, createdAt: $createdAt)';
   }
 }
 
@@ -150,14 +153,12 @@ class CaptureInboxFilter {
     Object? source = _sentinel,
     Object? channel = _sentinel,
   }) {
-    final resolvedSource =
-        identical(source, _sentinel)
-            ? this.source
-            : source as CaptureSource?;
-    final resolvedChannel =
-        identical(channel, _sentinel)
-            ? this.channel
-            : channel as String?;
+    final resolvedSource = identical(source, _sentinel)
+        ? this.source
+        : source as CaptureSource?;
+    final resolvedChannel = identical(channel, _sentinel)
+        ? this.channel
+        : channel as String?;
     return CaptureInboxFilter(
       source: resolvedSource,
       channel: resolvedChannel,
