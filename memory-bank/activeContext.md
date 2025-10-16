@@ -5,7 +5,7 @@
 ### Primary Feature: Ingest
 - **Status**: Active development
 - **Scope**: Capture item management with inbox functionality
-- **Current Work**: Presentation coverage and swipe gestures for inbox management
+- **Current Work**: Inbox management gestures (swipe and long-press)
 - **Open Files**: `capture_inbox_list.dart`, archive/delete gesture tests
 
 ### Architecture Implementation
@@ -14,6 +14,13 @@
 - **Infrastructure Stubs**: In-memory implementations for early development
 
 ## Recent Changes
+
+### Capture Inbox Filing Gesture
+- Added long-press gesture to inbox items to trigger filing workflow
+- Followed TDD cycle, starting with a failing widget test for the dialog
+- Implemented a confirmation dialog to prevent accidental filing
+- Integrated the UI with the `FileCaptureItem` use case
+- Added `fileCaptureItemUseCaseProvider` to the presentation layer
 
 ### Quick Entry Controller Validation
 - Moved quick entry validation from the widget to the controller layer

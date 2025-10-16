@@ -50,6 +50,7 @@
 - ✅ Added paged inbox provider to fetch subsequent batches using `startAfter` cursor
 - ✅ Inbox repository honors `startAfter` cursor to resume pagination seamlessly
 - ✅ `CaptureInboxList` now drives infinite scrolling via `CaptureInboxPaginationController` with load-more indicator support
+- ✅ Inbox list supports long-press-to-file with dialog confirmation
 
 ### Testing
 - ✅ Provider tests cover `CaptureQuickEntryController` success and failure flows
@@ -58,6 +59,7 @@
 - ✅ Gesture tests exercise capture inbox archive/delete flows and undo interactions
 - ✅ Added tests for inbox pagination controller behavior and scroll-triggered page loading
 - ✅ Added controller-level validation tests for quick entry (empty and whitespace submissions)
+- ✅ TDD cycle for filing gesture, including dialog and use case integration
 
 ## What's Left to Build
 
@@ -65,7 +67,7 @@
 - 🔄 **Ingest Feature** (In Progress)
   - Capture item creation and management
   - Inbox list prioritization and batching
-  - Filing and archiving workflows (archive/delete gestures implemented for inbox)
+  - Filing and archiving workflows (archive/delete/file gestures implemented for inbox)
 - ⏳ **Focus Feature**
   - Session scheduling and management
   - Time blocking with notifications
