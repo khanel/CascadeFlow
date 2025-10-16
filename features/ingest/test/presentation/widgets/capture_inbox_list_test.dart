@@ -196,6 +196,49 @@ void main() {
       expect(secondLoad.limit, equals(captureInboxDefaultBatchSize));
       expect(secondLoad.startAfter, equals(firstPage.last.id));
     });
+
+    testWidgets('shows file dialog on long press and files item',
+        (tester) async {
+      final item = buildTestCaptureItem(
+        id: 'capture-1',
+        content: 'Draft meeting notes',
+      );
+      final repository = _StubCaptureRepository(
+        onLoadInbox: ({limit, startAfter}) async => [item],
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            captureRepositoryProvider.overrideWithValue(repository),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: CaptureInboxList(),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final tileFinder =
+          find.byKey(CaptureInboxListKeys.itemTile(item.id.value));
+      expect(tileFinder, findsOneWidget);
+
+      await tester.longPress(tileFinder);
+      await tester.pumpAndSettle();
+
+      final fileButtonFinder = find.text('File');
+      expect(fileButtonFinder, findsOneWidget);
+
+      await tester.tap(fileButtonFinder);
+      await tester.pumpAndSettle();
+
+      expect(repository.savedItems.length, 1);
+      final savedItem = repository.savedItems.first;
+      expect(savedItem.id, item.id);
+      expect(savedItem.status, CaptureStatus.filed);
+    });
   });
 }
 
@@ -207,20 +250,26 @@ class _StubCaptureRepository implements CaptureRepository {
   final Future<List<CaptureItem>> Function({
     int? limit,
     EntityId? startAfter,
-  })
-  onLoadInbox;
+  }) onLoadInbox;
+
+  final List<CaptureItem> savedItems = [];
 
   @override
-  Future<void> save(CaptureItem item) async {}
+  Future<void> save(CaptureItem item) async {
+    savedItems.add(item);
+  }
+
+  @override
+  Future<void> delete(EntityId id) async {}
 
   @override
   Future<List<CaptureItem>> loadInbox({
     int? limit,
     EntityId? startAfter,
   }) {
-    return onLoadInbox(limit: limit, startAfter: startAfter);
+    return onLoadInbox(
+      limit: limit,
+      startAfter: startAfter,
+    );
   }
-
-  @override
-  Future<void> delete(EntityId id) async {}
 }
