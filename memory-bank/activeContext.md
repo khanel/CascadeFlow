@@ -71,6 +71,7 @@
 - Updated inbox list to apply filters before rendering and show a filtered-empty state when no items match
 - Extended pagination list to request additional pages when filtered results are scrolled to the threshold
 - Refactored filter controller to short-circuit redundant updates and split inbox list rendering into focused widgets for maintainability
+- Persisted filter selections via `CaptureInboxFilterStore` using secure storage stubs, restoring them on controller bootstrap and syncing updates automatically
 
 ### Capture Domain Status Helpers
 - `CaptureItem` exposes `isInbox`, `isFiled`, and `isArchived` getters to reduce direct status comparisons throughout the domain layer

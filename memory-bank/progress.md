@@ -53,6 +53,7 @@
 - ✅ Inbox list supports long-press-to-file with dialog confirmation
 - ✅ Inbox list exposes source/channel filter chips with a filtered-empty state message
 - ✅ Refactored filter controller and inbox list layout to limit redundant rebuilds and improve readability
+- ✅ Inbox filter selections persist via secure storage and restore on startup
 
 ### Testing
 - ✅ Provider tests cover `CaptureQuickEntryController` success and failure flows
@@ -63,6 +64,7 @@
 - ✅ Added controller-level validation tests for quick entry (empty and whitespace submissions)
 - ✅ TDD cycle for filing gesture, including dialog and use case integration
 - ✅ Widget tests assert inbox filtering by capture source and channel selections
+- ✅ Added persistence tests for inbox filter store and controller restoration
 
 ## What's Left to Build
 
@@ -71,7 +73,8 @@
   - Capture item creation and management
   - Inbox list prioritization and batching
   - Filing and archiving workflows (archive/delete/file gestures implemented for inbox)
-  - Persist inbox filter selections and expose saved views
+  - Persisted inbox filter selections with secure storage-backed restoration
+  - Expose saved filter views and richer filtering presets
 - ⏳ **Focus Feature**
   - Session scheduling and management
   - Time blocking with notifications
