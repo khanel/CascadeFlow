@@ -52,5 +52,96 @@ void main() {
 
       expect(restored, CaptureInboxFilter.empty);
     });
+
+    group('Filter Presets', () {
+      test('returns empty list when no presets persisted', () async {
+        final storage = InMemorySecureStorage();
+        final store = CaptureInboxFilterStore(secureStorage: storage);
+
+        final presets = await store.loadPresets();
+
+        expect(presets, isEmpty);
+      });
+
+      test('saves and loads a preset correctly', () async {
+        final storage = InMemorySecureStorage();
+        final store = CaptureInboxFilterStore(secureStorage: storage);
+        final filter = CaptureInboxFilter(source: CaptureSource.quickCapture);
+        final preset = CaptureFilterPreset(
+          name: 'Quick Captures',
+          filter: filter,
+        );
+
+        await store.savePreset(preset);
+        final presets = await store.loadPresets();
+
+        expect(presets.length, 1);
+        expect(presets[0].name, 'Quick Captures');
+        expect(presets[0].filter.source, CaptureSource.quickCapture);
+      });
+
+      test('updates existing preset when saving with same name', () async {
+        final storage = InMemorySecureStorage();
+        final store = CaptureInboxFilterStore(secureStorage: storage);
+        final initialPreset = CaptureFilterPreset(
+          name: 'Test Preset',
+          filter: CaptureInboxFilter.empty,
+        );
+        final updatedPreset = CaptureFilterPreset(
+          name: 'Test Preset',
+          filter: CaptureInboxFilter(source: CaptureSource.voice),
+        );
+
+        await store.savePreset(initialPreset);
+        await store.savePreset(updatedPreset);
+        final presets = await store.loadPresets();
+
+        expect(presets.length, 1);
+        expect(presets[0].filter.source, CaptureSource.voice);
+      });
+
+      test('deletes a preset by name', () async {
+        final storage = InMemorySecureStorage();
+        final store = CaptureInboxFilterStore(secureStorage: storage);
+        await store.savePreset(CaptureFilterPreset(
+          name: 'Preset 1',
+          filter: CaptureInboxFilter.empty,
+        ));
+        await store.savePreset(CaptureFilterPreset(
+          name: 'Preset 2',
+          filter: CaptureInboxFilter.empty,
+        ));
+
+        await store.deletePreset('Preset 1');
+        final presets = await store.loadPresets();
+
+        expect(presets.length, 1);
+        expect(presets[0].name, 'Preset 2');
+      });
+
+      test('clears all presets', () async {
+        final storage = InMemorySecureStorage();
+        final store = CaptureInboxFilterStore(secureStorage: storage);
+        await store.savePreset(CaptureFilterPreset(
+          name: 'Preset 1',
+          filter: CaptureInboxFilter.empty,
+        ));
+
+        await store.clearPresets();
+        final presets = await store.loadPresets();
+
+        expect(presets, isEmpty);
+      });
+
+      test('handles corrupted preset data gracefully', () async {
+        final storage = InMemorySecureStorage();
+        final store = CaptureInboxFilterStore(secureStorage: storage);
+        await storage.write(key: 'captureInboxFilterPresets', value: 'invalid json');
+
+        final presets = await store.loadPresets();
+
+        expect(presets, isEmpty);
+      });
+    });
   });
 }
