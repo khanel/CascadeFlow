@@ -54,6 +54,10 @@
 - ✅ Inbox list exposes source/channel filter chips with a filtered-empty state message
 - ✅ Refactored filter controller and inbox list layout to limit redundant rebuilds and improve readability
 - ✅ Inbox filter selections persist via secure storage and restore on startup
+- ✅ Added filter preset management with save, load, delete, and clear operations
+- ✅ Implemented `CaptureFilterPreset` model for custom filter configurations
+- ✅ Enhanced `CaptureInboxFilterStore` with preset functionality and error handling
+- ✅ Added comprehensive tests for filter presets following TDD cycle
 
 ### Testing
 - ✅ Provider tests cover `CaptureQuickEntryController` success and failure flows

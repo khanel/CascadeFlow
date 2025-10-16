@@ -5,7 +5,7 @@
 ### Primary Feature: Ingest
 - **Status**: Active development
 - **Scope**: Capture item management with inbox functionality
-- **Current Work**: Inbox filtering controls (source/channel chips)
+- **Current Work**: Inbox filtering controls and presets
 - **Open Files**: `capture_inbox_list.dart`, inbox filter widget tests
 
 ### Architecture Implementation
@@ -72,6 +72,13 @@
 - Extended pagination list to request additional pages when filtered results are scrolled to the threshold
 - Refactored filter controller to short-circuit redundant updates and split inbox list rendering into focused widgets for maintainability
 - Persisted filter selections via `CaptureInboxFilterStore` using secure storage stubs, restoring them on controller bootstrap and syncing updates automatically
+
+### Capture Inbox Filter Presets
+- Added `CaptureFilterPreset` model for saving and loading custom filter configurations
+- Implemented preset management in `CaptureInboxFilterStore` with save, load, delete, and clear operations
+- Added comprehensive error handling for preset operations with `FilterPresetException`
+- Enhanced filter store with constants, improved serialization, and robust error handling
+- Followed TDD cycle: tests first (failing tests for presets), then implementation, then refactoring with error handling
 
 ### Capture Domain Status Helpers
 - `CaptureItem` exposes `isInbox`, `isFiled`, and `isArchived` getters to reduce direct status comparisons throughout the domain layer
