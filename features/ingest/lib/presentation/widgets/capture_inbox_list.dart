@@ -7,6 +7,7 @@ import 'package:cascade_flow_ingest/domain/repositories/capture_repository.dart'
 import 'package:cascade_flow_ingest/domain/use_cases/archive_capture_item.dart';
 import 'package:cascade_flow_ingest/domain/use_cases/file_capture_item.dart';
 import 'package:cascade_flow_ingest/presentation/providers/capture_providers.dart';
+import 'package:cascade_flow_ingest/shared/capture_inbox_filter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

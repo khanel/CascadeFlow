@@ -1,12 +1,16 @@
+import 'dart:async';
+
 import 'package:cascade_flow_core/cascade_flow_core.dart';
 import 'package:cascade_flow_infrastructure/cascade_flow_infrastructure.dart';
 import 'package:cascade_flow_ingest/data/hive/capture_local_data_source.dart';
+import 'package:cascade_flow_ingest/data/preferences/capture_inbox_filter_store.dart';
 import 'package:cascade_flow_ingest/data/repositories/capture_repository_impl.dart';
 import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
 import 'package:cascade_flow_ingest/domain/repositories/capture_repository.dart';
 import 'package:cascade_flow_ingest/domain/use_cases/archive_capture_item.dart';
 import 'package:cascade_flow_ingest/domain/use_cases/capture_quick_entry.dart';
 import 'package:cascade_flow_ingest/domain/use_cases/file_capture_item.dart';
+import 'package:cascade_flow_ingest/shared/capture_inbox_filter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meta/meta.dart';
 
@@ -27,98 +31,27 @@ final Provider<CaptureRepository> captureRepositoryProvider =
       return CaptureRepositoryImpl(localDataSource: dataSource);
     });
 
-/// Represents user-selected filters for the capture inbox.
-@immutable
-class CaptureInboxFilter {
-  /// Builds a filter with optional [source] and [channel] constraints.
-  const CaptureInboxFilter({
-    this.source,
-    this.channel,
-  });
-
-  /// Shared empty filter instance with no constraints.
-  static const CaptureInboxFilter empty = CaptureInboxFilter();
-
-  static const Object _sentinel = Object();
-
-  /// Selected capture source constraint when applied.
-  final CaptureSource? source;
-
-  /// Selected capture channel constraint when applied.
-  final String? channel;
-
-  /// Returns true when any filter constraint is active.
-  bool get isFiltering => source != null || channel != null;
-
-  /// Returns true when [item] satisfies the filter constraints.
-  bool matches(CaptureItem item) {
-    if (source != null && item.context.source != source) {
-      return false;
-    }
-    if (channel != null && item.context.channel != channel) {
-      return false;
-    }
-    return true;
-  }
-
-  /// Returns a copy of this filter with a new [channel] while preserving
-  /// the selected source.
-  CaptureInboxFilter withChannel(String? value) {
-    if (channel == value) {
-      return this;
-    }
-    return copyWith(channel: value);
-  }
-
-  /// Applies the current filter to [items], returning the filtered iterable.
-  Iterable<CaptureItem> apply(Iterable<CaptureItem> items) {
-    return items.where(matches);
-  }
-
-  /// Indicates whether the provided [value] matches the active source filter.
-  bool isSourceSelected(CaptureSource value) => source == value;
-
-  /// Indicates whether the provided [value] matches the active channel filter.
-  bool isChannelSelected(String value) => channel == value;
-
-  /// Creates a copy overriding [source] and/or [channel].
-  CaptureInboxFilter copyWith({
-    Object? source = _sentinel,
-    Object? channel = _sentinel,
-  }) {
-    final resolvedSource = identical(source, _sentinel)
-        ? this.source
-        : source as CaptureSource?;
-    final resolvedChannel = identical(channel, _sentinel)
-        ? this.channel
-        : channel as String?;
-    return CaptureInboxFilter(
-      source: resolvedSource,
-      channel: resolvedChannel,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is CaptureInboxFilter &&
-        other.source == source &&
-        other.channel == channel;
-  }
-
-  @override
-  int get hashCode => Object.hash(source, channel);
-
-  @override
-  String toString() {
-    return 'CaptureInboxFilter(source: $source, channel: $channel)';
-  }
-}
+/// Provides access to persisted capture inbox filter selections.
+final Provider<CaptureInboxFilterStore> captureInboxFilterStoreProvider =
+    Provider<CaptureInboxFilterStore>((ref) {
+      final storage = ref.watch(secureStorageProvider);
+      return CaptureInboxFilterStore(secureStorage: storage);
+    });
 
 /// Maintains the inbox filter selection.
 class CaptureInboxFilterController extends Notifier<CaptureInboxFilter> {
+  CaptureInboxFilterStore? _store;
+  Future<void>? _restoreTask;
+
+  /// Completes when the persisted filter state has been restored.
+  Future<void> whenReady() => _restoreTask ?? Future<void>.value();
+
   @override
-  CaptureInboxFilter build() => CaptureInboxFilter.empty;
+  CaptureInboxFilter build() {
+    _store ??= ref.read(captureInboxFilterStoreProvider);
+    _restoreTask ??= _restoreFromStorage();
+    return CaptureInboxFilter.empty;
+  }
 
   /// Clears all filter selections.
   void clear() {
@@ -126,6 +59,7 @@ class CaptureInboxFilterController extends Notifier<CaptureInboxFilter> {
       return;
     }
     state = CaptureInboxFilter.empty;
+    _save(state);
   }
 
   /// Sets the active source filter and resets the channel selection.
@@ -138,6 +72,7 @@ class CaptureInboxFilterController extends Notifier<CaptureInboxFilter> {
       return;
     }
     state = next;
+    _save(next);
   }
 
   /// Sets the active channel filter while preserving the selected source.
@@ -147,6 +82,30 @@ class CaptureInboxFilterController extends Notifier<CaptureInboxFilter> {
       return;
     }
     state = next;
+    _save(next);
+  }
+
+  Future<void> _restoreFromStorage() async {
+    final store = _store;
+    if (store == null) {
+      return;
+    }
+    final stored = await store.load();
+    if (stored != state) {
+      state = stored;
+    }
+  }
+
+  void _save(CaptureInboxFilter filter) {
+    final store = _store;
+    if (store == null) {
+      return;
+    }
+    if (filter == CaptureInboxFilter.empty) {
+      unawaited(store.clear());
+    } else {
+      unawaited(store.save(filter));
+    }
   }
 }
 
