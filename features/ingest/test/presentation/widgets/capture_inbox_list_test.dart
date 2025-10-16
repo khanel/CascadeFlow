@@ -241,6 +241,106 @@ void main() {
       expect(savedItem.id, item.id);
       expect(savedItem.status, CaptureStatus.filed);
     });
+
+    testWidgets('filters inbox items by capture source', (tester) async {
+      final items = <CaptureItem>[
+        buildTestCaptureItem(
+          id: 'capture-1',
+          content: 'Quick entry item',
+          source: CaptureSource.quickCapture,
+        ),
+        buildTestCaptureItem(
+          id: 'capture-2',
+          content: 'Automation item',
+          source: CaptureSource.automation,
+          channel: 'automation_flow',
+        ),
+      ];
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            captureRepositoryProvider.overrideWithValue(
+              _StubCaptureRepository(
+                onLoadInbox: ({limit, startAfter}) async => items,
+              ),
+            ),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: CaptureInboxList(),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Quick entry item'), findsOneWidget);
+      expect(find.text('Automation item'), findsOneWidget);
+
+      final automationChip = find.text('Automation');
+      expect(automationChip, findsOneWidget);
+
+      await tester.tap(automationChip);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Automation item'), findsOneWidget);
+      expect(find.text('Quick entry item'), findsNothing);
+    });
+
+    testWidgets('filters inbox items by capture channel', (tester) async {
+      final items = <CaptureItem>[
+        buildTestCaptureItem(
+          id: 'capture-1',
+          content: 'Keyboard capture',
+          channel: 'keyboard',
+        ),
+        buildTestCaptureItem(
+          id: 'capture-2',
+          content: 'Voice capture',
+          source: CaptureSource.voice,
+          channel: 'voice_memo',
+        ),
+        buildTestCaptureItem(
+          id: 'capture-3',
+          content: 'Integration capture',
+          source: CaptureSource.automation,
+          channel: 'integration_event',
+        ),
+      ];
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            captureRepositoryProvider.overrideWithValue(
+              _StubCaptureRepository(
+                onLoadInbox: ({limit, startAfter}) async => items,
+              ),
+            ),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: CaptureInboxList(),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Keyboard capture'), findsOneWidget);
+      expect(find.text('Voice capture'), findsOneWidget);
+      expect(find.text('Integration capture'), findsOneWidget);
+
+      final channelChip = find.text('integration_event');
+      expect(channelChip, findsOneWidget);
+
+      await tester.tap(channelChip);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Integration capture'), findsOneWidget);
+      expect(find.text('Keyboard capture'), findsNothing);
+      expect(find.text('Voice capture'), findsNothing);
+    });
   });
 }
 

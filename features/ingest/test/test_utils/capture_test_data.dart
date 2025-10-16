@@ -4,6 +4,7 @@ import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
 CaptureItem buildTestCaptureItem({
   required String id,
   CaptureStatus status = CaptureStatus.inbox,
+  CaptureSource source = CaptureSource.quickCapture,
   String content = 'Capture content',
   String channel = 'quick_sheet',
   int createdMicros = 0,
@@ -14,7 +15,7 @@ CaptureItem buildTestCaptureItem({
     id: EntityId(id),
     content: content,
     context: CaptureContext(
-      source: CaptureSource.quickCapture,
+      source: source,
       channel: channel,
     ),
     status: status,
