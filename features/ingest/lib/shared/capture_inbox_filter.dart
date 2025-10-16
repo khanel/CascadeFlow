@@ -10,6 +10,16 @@ class CaptureInboxFilter {
     this.channel,
   });
 
+  /// Restores a filter from the provided JSON map.
+  factory CaptureInboxFilter.fromJson(Map<String, dynamic> json) {
+    final sourceName = json['source'] as String?;
+    final channel = json['channel'] as String?;
+    return CaptureInboxFilter(
+      source: _sourceFromName(sourceName),
+      channel: channel,
+    );
+  }
+
   /// Shared empty filter instance with no constraints.
   static const CaptureInboxFilter empty = CaptureInboxFilter();
 
@@ -48,6 +58,12 @@ class CaptureInboxFilter {
   Iterable<CaptureItem> apply(Iterable<CaptureItem> items) {
     return items.where(matches);
   }
+
+  /// Serializes this filter to a JSON-serializable map.
+  Map<String, String?> toJson() => <String, String?>{
+    'source': source?.name,
+    'channel': channel,
+  };
 
   /// Indicates whether the provided [value] matches the active source filter.
   bool isSourceSelected(CaptureSource value) => source == value;
@@ -88,5 +104,18 @@ class CaptureInboxFilter {
   @override
   String toString() {
     return 'CaptureInboxFilter(source: $source, channel: $channel)';
+  }
+
+  /// Resolves a [CaptureSource] by its serialized [name].
+  static CaptureSource? _sourceFromName(String? name) {
+    if (name == null || name.isEmpty) {
+      return null;
+    }
+    for (final value in CaptureSource.values) {
+      if (value.name == name) {
+        return value;
+      }
+    }
+    return null;
   }
 }

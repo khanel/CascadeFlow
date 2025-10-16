@@ -90,9 +90,13 @@ class CaptureInboxFilterController extends Notifier<CaptureInboxFilter> {
     if (store == null) {
       return;
     }
-    final stored = await store.load();
-    if (stored != state) {
-      state = stored;
+    try {
+      final stored = await store.load();
+      if (stored != state) {
+        state = stored;
+      }
+    } on Object {
+      // Ignore persistence failures during bootstrap; state remains unchanged.
     }
   }
 
@@ -101,11 +105,14 @@ class CaptureInboxFilterController extends Notifier<CaptureInboxFilter> {
     if (store == null) {
       return;
     }
-    if (filter == CaptureInboxFilter.empty) {
-      unawaited(store.clear());
-    } else {
-      unawaited(store.save(filter));
-    }
+    final persistence = filter == CaptureInboxFilter.empty
+        ? store.clear()
+        : store.save(filter);
+    unawaited(
+      persistence.catchError(
+        (Object error, StackTrace stackTrace) => null,
+      ),
+    );
   }
 }
 

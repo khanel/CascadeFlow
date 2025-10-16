@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:cascade_flow_infrastructure/storage.dart';
-import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
 import 'package:cascade_flow_ingest/shared/capture_inbox_filter.dart';
 
 /// Persists capture inbox filter selections using secure storage.
@@ -22,12 +21,7 @@ class CaptureInboxFilterStore {
     }
     try {
       final decoded = jsonDecode(raw) as Map<String, dynamic>;
-      final sourceName = decoded['source'] as String?;
-      final channel = decoded['channel'] as String?;
-      return CaptureInboxFilter(
-        source: _captureSourceFromName(sourceName),
-        channel: channel,
-      );
+      return CaptureInboxFilter.fromJson(decoded);
     } on Object {
       // Corrupted storage results fall back to empty filter.
       return CaptureInboxFilter.empty;
@@ -36,30 +30,15 @@ class CaptureInboxFilterStore {
 
   /// Saves the provided [filter] snapshot to storage.
   Future<void> save(CaptureInboxFilter filter) {
-    final payload = <String, String?>{
-      'source': filter.source?.name,
-      'channel': filter.channel,
-    };
+    final payload = jsonEncode(filter.toJson());
     return _secureStorage.write(
       key: _storageKey,
-      value: jsonEncode(payload),
+      value: payload,
     );
   }
 
   /// Clears any stored filter selection.
   Future<void> clear() {
     return _secureStorage.delete(key: _storageKey);
-  }
-
-  CaptureSource? _captureSourceFromName(String? name) {
-    if (name == null || name.isEmpty) {
-      return null;
-    }
-    for (final value in CaptureSource.values) {
-      if (value.name == name) {
-        return value;
-      }
-    }
-    return null;
   }
 }
