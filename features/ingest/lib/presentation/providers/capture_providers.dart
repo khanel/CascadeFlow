@@ -6,6 +6,7 @@ import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
 import 'package:cascade_flow_ingest/domain/repositories/capture_repository.dart';
 import 'package:cascade_flow_ingest/domain/use_cases/archive_capture_item.dart';
 import 'package:cascade_flow_ingest/domain/use_cases/capture_quick_entry.dart';
+import 'package:cascade_flow_ingest/domain/use_cases/file_capture_item.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meta/meta.dart';
 
@@ -54,6 +55,20 @@ final Provider<ArchiveCaptureItem> archiveCaptureItemUseCaseProvider =
         publishEvent: ref.watch(archiveCaptureItemEventPublisherProvider),
       );
     });
+
+/// Publishes domain events emitted by the file use case.
+final Provider<FileCaptureItemEventPublisher>
+    fileCaptureItemEventPublisherProvider =
+    Provider<FileCaptureItemEventPublisher>((ref) => (_) {});
+
+/// Builds the file capture item use case used by the inbox gestures.
+final Provider<FileCaptureItem> fileCaptureItemUseCaseProvider =
+    Provider<FileCaptureItem>((ref) {
+  return FileCaptureItem(
+    nowProvider: () => Timestamp(DateTime.now().toUtc()),
+    publishEvent: ref.watch(fileCaptureItemEventPublisherProvider),
+  );
+});
 
 /// Arguments describing a paged inbox request.
 typedef CaptureInboxPageArgs = ({int? limit, EntityId? startAfter});

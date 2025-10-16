@@ -4,6 +4,7 @@ import 'package:cascade_flow_core/cascade_flow_core.dart';
 import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
 import 'package:cascade_flow_ingest/domain/repositories/capture_repository.dart';
 import 'package:cascade_flow_ingest/domain/use_cases/archive_capture_item.dart';
+import 'package:cascade_flow_ingest/domain/use_cases/file_capture_item.dart';
 import 'package:cascade_flow_ingest/presentation/providers/capture_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -84,11 +85,14 @@ class _CaptureInboxListView extends ConsumerWidget {
               direction,
               item,
             ),
-            child: ListTile(
-              key: CaptureInboxListKeys.itemTile(item.id.value),
-              title: Text(item.content),
-              subtitle: Text(_subtitleFor(context, item)),
-              leading: const Icon(Icons.inbox),
+            child: GestureDetector(
+              onLongPress: () => _handleLongPress(context, ref, item),
+              child: ListTile(
+                key: CaptureInboxListKeys.itemTile(item.id.value),
+                title: Text(item.content),
+                subtitle: Text(_subtitleFor(context, item)),
+                leading: const Icon(Icons.inbox),
+              ),
             ),
           );
         },
@@ -227,6 +231,41 @@ Future<bool?> _handleDismiss(
   };
 }
 
+Future<void> _handleLongPress(
+  BuildContext context,
+  WidgetRef ref,
+  CaptureItem item,
+) async {
+  await showDialog<void>(
+    context: context,
+    builder: (context) => SimpleDialog(
+      title: Text(item.content),
+      children: [
+        SimpleDialogOption(
+          child: const Text('File'),
+          onPressed: () {
+            Navigator.of(context).pop();
+            final useCase = ref.read(fileCaptureItemUseCaseProvider);
+            final result = useCase(
+              request: FileCaptureItemRequest(item: item),
+            );
+            final actions = _CaptureInboxActions(context: context, ref: ref);
+
+            switch (result) {
+              case SuccessResult<CaptureItem, Failure>(value: final filed):
+                unawaited(actions.saveAndRefresh(filed, 'filed'));
+              case FailureResult<CaptureItem, Failure>(
+                  failure: final failure
+                ):
+                actions.showMessage('Failed to file capture: ${failure.message}');
+            }
+          },
+        ),
+      ],
+    ),
+  );
+}
+
 class _CaptureInboxActions {
   _CaptureInboxActions({
     required this.context,
@@ -251,7 +290,7 @@ class _CaptureInboxActions {
       case SuccessResult<CaptureItem, Failure>(value: final archived):
         await _repository.save(archived);
         _refreshInbox();
-        _showMessage(
+        showMessage(
           'Capture "${item.content}" archived',
           action: SnackBarAction(
             label: 'Undo',
@@ -260,9 +299,15 @@ class _CaptureInboxActions {
         );
         return true;
       case FailureResult<CaptureItem, Failure>(failure: final failure):
-        _showMessage('Failed to archive capture: ${failure.message}');
+        showMessage('Failed to archive capture: ${failure.message}');
         return false;
     }
+  }
+
+  Future<void> saveAndRefresh(CaptureItem item, String action) async {
+    await _repository.save(item);
+    _refreshInbox();
+    showMessage('Capture "${item.content}" $action');
   }
 
   Future<bool> confirmDelete(CaptureItem item) async {
@@ -297,12 +342,12 @@ class _CaptureInboxActions {
       _refreshInbox();
       return true;
     } on Object catch (error) {
-      _showMessage('Delete failed: $error');
+      showMessage('Delete failed: $error');
       return false;
     }
   }
 
-  void _showMessage(
+  void showMessage(
     String message, {
     SnackBarAction? action,
   }) {
