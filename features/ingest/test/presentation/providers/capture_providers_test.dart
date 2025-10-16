@@ -1,8 +1,11 @@
 import 'package:cascade_flow_core/cascade_flow_core.dart';
+import 'package:cascade_flow_infrastructure/storage.dart';
+import 'package:cascade_flow_ingest/data/preferences/capture_inbox_filter_store.dart';
 import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
 import 'package:cascade_flow_ingest/domain/repositories/capture_repository.dart';
 import 'package:cascade_flow_ingest/domain/use_cases/capture_quick_entry.dart';
 import 'package:cascade_flow_ingest/presentation/providers/capture_providers.dart';
+import 'package:cascade_flow_ingest/shared/capture_inbox_filter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod/riverpod.dart';
 
@@ -291,6 +294,69 @@ void main() {
         expect(state.item, isNull);
       },
     );
+  });
+
+  group('captureInboxFilterProvider', () {
+    test('restores persisted filter on initialization', () async {
+      // ARRANGE
+      final storage = InMemorySecureStorage();
+      final store = CaptureInboxFilterStore(secureStorage: storage);
+      await store.save(
+        const CaptureInboxFilter(
+          source: CaptureSource.voice,
+          channel: 'voice_memos',
+        ),
+      );
+      final container = ProviderContainer(
+        overrides: [
+          captureInboxFilterStoreProvider.overrideWithValue(store),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      // ACT
+      final controller = container.read(
+        captureInboxFilterProvider.notifier,
+      );
+      await controller.whenReady();
+      final filter = container.read(captureInboxFilterProvider);
+
+      // ASSERT
+      expect(filter.source, CaptureSource.voice);
+      expect(filter.channel, 'voice_memos');
+    });
+
+    test('persists updates when filter selections change', () async {
+      // ARRANGE
+      final storage = InMemorySecureStorage();
+      final store = CaptureInboxFilterStore(secureStorage: storage);
+      final container = ProviderContainer(
+        overrides: [
+          captureInboxFilterStoreProvider.overrideWithValue(store),
+        ],
+      );
+      addTearDown(container.dispose);
+      final controller = container.read(
+        captureInboxFilterProvider.notifier,
+      );
+      await controller.whenReady();
+
+      // ACT
+      controller
+        ..setSource(CaptureSource.automation)
+        ..setChannel('integration');
+      await Future<void>.delayed(Duration.zero);
+      final storedAfterSet = await store.load();
+
+      controller.clear();
+      await Future<void>.delayed(Duration.zero);
+      final storedAfterClear = await store.load();
+
+      // ASSERT
+      expect(storedAfterSet.source, CaptureSource.automation);
+      expect(storedAfterSet.channel, 'integration');
+      expect(storedAfterClear, CaptureInboxFilter.empty);
+    });
   });
 }
 
