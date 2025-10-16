@@ -27,6 +27,78 @@ final Provider<CaptureRepository> captureRepositoryProvider =
       return CaptureRepositoryImpl(localDataSource: dataSource);
     });
 
+/// Represents user-selected filters for the capture inbox.
+@immutable
+class CaptureInboxFilter {
+  /// Builds a filter with optional [source] and [channel] constraints.
+  const CaptureInboxFilter({
+    this.source,
+    this.channel,
+  });
+
+  /// Selected capture source constraint when applied.
+  final CaptureSource? source;
+
+  /// Selected capture channel constraint when applied.
+  final String? channel;
+
+  /// Returns true when any filter constraint is active.
+  bool get isFiltering => source != null || channel != null;
+
+  /// Returns true when [item] satisfies the filter constraints.
+  bool matches(CaptureItem item) {
+    if (source != null && item.context.source != source) {
+      return false;
+    }
+    if (channel != null && item.context.channel != channel) {
+      return false;
+    }
+    return true;
+  }
+
+  /// Returns a copy of this filter with a new [channel] while preserving source.
+  CaptureInboxFilter withChannel(String? value) {
+    if (channel == value) {
+      return this;
+    }
+    return CaptureInboxFilter(
+      source: source,
+      channel: value,
+    );
+  }
+}
+
+/// Maintains the inbox filter selection.
+class CaptureInboxFilterController extends Notifier<CaptureInboxFilter> {
+  @override
+  CaptureInboxFilter build() => const CaptureInboxFilter();
+
+  /// Clears all filter selections.
+  void clear() {
+    state = const CaptureInboxFilter();
+  }
+
+  /// Sets the active source filter and resets the channel selection.
+  void setSource(CaptureSource? source) {
+    state = CaptureInboxFilter(
+      source: source,
+      channel: null,
+    );
+  }
+
+  /// Sets the active channel filter while preserving the selected source.
+  void setChannel(String? channel) {
+    state = state.withChannel(channel);
+  }
+}
+
+/// Provides the current capture inbox filter.
+// ignore: specify_nonobvious_property_types
+final captureInboxFilterProvider =
+    NotifierProvider<CaptureInboxFilterController, CaptureInboxFilter>(
+      CaptureInboxFilterController.new,
+    );
+
 /// Publishes domain events emitted by the quick entry use case.
 final Provider<CaptureQuickEntryEventPublisher>
 captureQuickEntryEventPublisherProvider =

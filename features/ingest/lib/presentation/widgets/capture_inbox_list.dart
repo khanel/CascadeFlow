@@ -20,6 +20,9 @@ abstract final class CaptureInboxListKeys {
   /// Key applied to the populated inbox list view.
   static const Key listView = Key('captureInbox_listView');
 
+  /// Key applied to the filtered empty state placeholder.
+  static const Key filteredEmptyState = Key('captureInbox_filteredEmpty');
+
   /// Generates a key for a specific inbox list tile.
   static Key itemTile(String id) => Key('captureInbox_item_$id');
 }
@@ -54,48 +57,82 @@ class _CaptureInboxListView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final filter = ref.watch(captureInboxFilterProvider);
     final controller = ref.read(
       captureInboxPaginationControllerProvider.notifier,
     );
+    final filteredItems = state.items.where(filter.matches).toList();
+    final availableChannels = _availableChannels(
+      state.items,
+      selectedChannel: filter.channel,
+    );
+    final filters = _CaptureInboxFilterBar(
+      filter: filter,
+      channels: availableChannels,
+    );
 
-    return NotificationListener<ScrollNotification>(
-      onNotification: (notification) {
-        if (_shouldRequestNext(notification)) {
-          unawaited(controller.loadNextPage());
-        }
-        return false;
-      },
-      child: ListView.separated(
-        key: CaptureInboxListKeys.listView,
-        physics: const ClampingScrollPhysics(),
-        itemCount: state.items.length + (state.isLoadingMore ? 1 : 0),
-        separatorBuilder: (context, index) => const Divider(height: 0),
-        itemBuilder: (context, index) {
-          if (index >= state.items.length) {
-            return const _CaptureInboxLoadingMore();
-          }
-          final item = state.items[index];
-          final actions = _CaptureInboxActions(context: context, ref: ref);
-          return Dismissible(
-            key: Key('captureInbox_dismiss_${item.id.value}'),
-            background: const _ArchiveBackground(),
-            secondaryBackground: const _DeleteBackground(),
-            confirmDismiss: (direction) => actions.confirmDismiss(
-              direction,
-              item,
+    if (filteredItems.isEmpty) {
+      final empty = filter.isFiltering
+          ? const _CaptureInboxFilteredEmptyState()
+          : const _CaptureInboxEmptyState();
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          filters,
+          const SizedBox(height: 12),
+          Expanded(child: empty),
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        filters,
+        const SizedBox(height: 12),
+        Expanded(
+          child: NotificationListener<ScrollNotification>(
+            onNotification: (notification) {
+              if (_shouldRequestNext(notification)) {
+                unawaited(controller.loadNextPage());
+              }
+              return false;
+            },
+            child: ListView.separated(
+              key: CaptureInboxListKeys.listView,
+              physics: const ClampingScrollPhysics(),
+              itemCount: filteredItems.length + (state.isLoadingMore ? 1 : 0),
+              separatorBuilder: (context, index) => const Divider(height: 0),
+              itemBuilder: (context, index) {
+                if (index >= filteredItems.length) {
+                  return const _CaptureInboxLoadingMore();
+                }
+                final item = filteredItems[index];
+                final actions = _CaptureInboxActions(context: context, ref: ref);
+                return Dismissible(
+                  key: Key('captureInbox_dismiss_${item.id.value}'),
+                  background: const _ArchiveBackground(),
+                  secondaryBackground: const _DeleteBackground(),
+                  confirmDismiss: (direction) => actions.confirmDismiss(
+                    direction,
+                    item,
+                  ),
+                  child: GestureDetector(
+                    onLongPress: () => actions.file(item),
+                    child: ListTile(
+                      key: CaptureInboxListKeys.itemTile(item.id.value),
+                      title: Text(item.content),
+                      subtitle: Text(_subtitleFor(context, item)),
+                      leading: const Icon(Icons.inbox),
+                    ),
+                  ),
+                );
+              },
             ),
-            child: GestureDetector(
-              onLongPress: () => actions.file(item),
-              child: ListTile(
-                key: CaptureInboxListKeys.itemTile(item.id.value),
-                title: Text(item.content),
-                subtitle: Text(_subtitleFor(context, item)),
-                leading: const Icon(Icons.inbox),
-              ),
-            ),
-          );
-        },
-      ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -110,6 +147,96 @@ class _CaptureInboxListView extends ConsumerWidget {
     final createdAt = item.createdAt.value.toLocal();
     final formattedTime = TimeOfDay.fromDateTime(createdAt).format(context);
     return '${item.context.channel} · $formattedTime';
+  }
+
+  List<String> _availableChannels(
+    List<CaptureItem> items, {
+    String? selectedChannel,
+  }) {
+    final channels = <String>{};
+    for (final item in items) {
+      channels.add(item.context.channel);
+    }
+    if (selectedChannel != null && selectedChannel.isNotEmpty) {
+      channels.add(selectedChannel);
+    }
+    final sorted = channels.toList()..sort();
+    return sorted;
+  }
+}
+
+class _CaptureInboxFilterBar extends ConsumerWidget {
+  const _CaptureInboxFilterBar({
+    required this.filter,
+    required this.channels,
+  });
+
+  final CaptureInboxFilter filter;
+  final List<String> channels;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifier = ref.read(captureInboxFilterProvider.notifier);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: <Widget>[
+            ChoiceChip(
+              label: const Text('All sources'),
+              selected: filter.source == null,
+              onSelected: (_) => notifier.setSource(null),
+            ),
+            for (final source in CaptureSource.values)
+              ChoiceChip(
+                label: Text(_sourceLabel(source)),
+                selected: filter.source == source,
+                onSelected: (selected) =>
+                    notifier.setSource(selected ? source : null),
+              ),
+          ],
+        ),
+        if (channels.isNotEmpty) ...<Widget>[
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: <Widget>[
+              ChoiceChip(
+                label: const Text('All channels'),
+                selected: filter.channel == null,
+                onSelected: (_) => notifier.setChannel(null),
+              ),
+              for (final channel in channels)
+                ChoiceChip(
+                  label: Text(channel),
+                  selected: filter.channel == channel,
+                  onSelected: (selected) =>
+                      notifier.setChannel(selected ? channel : null),
+                ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+String _sourceLabel(CaptureSource source) {
+  switch (source) {
+    case CaptureSource.quickCapture:
+      return 'Quick capture';
+    case CaptureSource.automation:
+      return 'Automation';
+    case CaptureSource.voice:
+      return 'Voice';
+    case CaptureSource.shareSheet:
+      return 'Share sheet';
+    case CaptureSource.import:
+      return 'Import';
   }
 }
 
@@ -168,6 +295,25 @@ class _CaptureInboxEmptyState extends StatelessWidget {
           Icon(Icons.inbox_outlined, size: 40),
           SizedBox(height: 12),
           Text('Your capture inbox is clear. Enjoy the focus!'),
+        ],
+      ),
+    );
+  }
+}
+
+class _CaptureInboxFilteredEmptyState extends StatelessWidget {
+  const _CaptureInboxFilteredEmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      key: CaptureInboxListKeys.filteredEmptyState,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Icon(Icons.filter_alt_off, size: 40),
+          SizedBox(height: 12),
+          Text('No captures match the current filters.'),
         ],
       ),
     );
