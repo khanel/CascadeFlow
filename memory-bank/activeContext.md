@@ -2,11 +2,11 @@
 
 ## Current Development Focus
 
-### Primary Feature: Ingest
-- **Status**: Active development
-- **Scope**: Capture item management with inbox functionality
-- **Current Work**: Inbox filtering controls and presets
-- **Open Files**: `capture_inbox_list.dart`, inbox filter widget tests
+### Primary Feature: Ingest - Critical Blocker Resolution
+- **Status**: Pre-Production Readiness Check
+- **Issue**: Data persistence using in-memory stubs (no persistence across app restarts)
+- **Action Required**: Implement real Hive CE storage to replace `InMemoryHiveInitializer`
+- **Priority**: BLOCKER for user value - cannot proceed to Focus without functional ingest
 
 ### Architecture Implementation
 - **Feature-Sliced Design**: Modular packages with clear boundaries
@@ -83,6 +83,16 @@
 ### Capture Domain Status Helpers
 - `CaptureItem` exposes `isInbox`, `isFiled`, and `isArchived` getters to reduce direct status comparisons throughout the domain layer
 - Filing workflow implemented via `FileCaptureItem` use case, transitioning items to the new `CaptureStatus.filed` state while emitting `CaptureItemFiled` events
+
+### Blue Phase Refactoring Completion
+- **Status**: ✅ Complete - all 72 tests passing
+- **Technical Debt Addressed**:
+  - Extracted common error handling in `CaptureInboxFilterStore.load/loadPresets` into generic `_loadWithDefault<T>()` helper
+  - Simplified preset menu building in `_CaptureInboxFilterBar` with cleaner menu item construction
+  - Eliminated redundant try-catch patterns in `CaptureFilterPresetController` with `_performPresetOperation()` helper
+  - Fixed unused catch clause warning and code style issues
+- **Code Quality Improvements**: Reduced duplication, enhanced readability, improved maintainability while preserving 100% functionality
+- **Verification**: Flutter analyze reports only minor style warnings, flutter test shows "All tests passed!"
 ## Active Decisions
 
 ### State Management Pattern
