@@ -29,6 +29,7 @@ abstract final class CaptureInboxListKeys {
   static Key itemTile(String id) => Key('captureInbox_item_$id');
 }
 
+/// Keys referenced by widget tests interacting with the filter bar.
 abstract final class CaptureInboxFilterBarKeys {
   /// Key applied to the filter presets button.
   static const Key presetsButton = Key('captureInbox_presetsButton');
@@ -266,13 +267,15 @@ class _CaptureInboxFilterBar extends ConsumerWidget {
     AsyncValue<List<CaptureFilterPreset>> presetsAsync,
   ) {
     return presetsAsync.maybeWhen(
-      data: (presets) => presets.map(
-        (preset) => PopupMenuItem<CaptureFilterPreset>(
-          value: preset,
-          child: Text(preset.name),
-        ),
-      ).toList(),
-      orElse: () => <PopupMenuEntry<CaptureFilterPreset>>[],
+      data: (presets) => presets
+          .map(
+            (preset) => PopupMenuItem(
+              value: preset,
+              child: Text(preset.name),
+            ),
+          )
+          .toList(),
+      orElse: () => [],
     );
   }
 }

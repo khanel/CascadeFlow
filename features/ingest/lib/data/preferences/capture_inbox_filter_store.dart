@@ -6,7 +6,7 @@ import 'package:cascade_flow_ingest/shared/capture_inbox_filter.dart';
 
 /// Persists capture inbox filter selections and presets using secure storage.
 class CaptureInboxFilterStore {
-  /// Creates a store that persists inbox filters via the provided storage.
+  /// Creates a store for persisting inbox filters.
   CaptureInboxFilterStore({required InMemorySecureStorage secureStorage})
     : _secureStorage = secureStorage;
 
@@ -17,16 +17,11 @@ class CaptureInboxFilterStore {
 
   /// Loads the previously stored filter, returning empty filter when absent.
   Future<CaptureInboxFilter> load() async {
-    try {
-      final raw = await _secureStorage.read(key: _storageKey);
-      if (raw == null || raw.isEmpty) {
-        return CaptureInboxFilter.empty;
-      }
-      final decoded = jsonDecode(raw) as Map<String, dynamic>;
-      return CaptureInboxFilter.fromJson(decoded);
-    } on Object catch (error) {
-      return CaptureInboxFilter.empty;
-    }
+    return _loadWithDefault(
+      _storageKey,
+      () => CaptureInboxFilter.empty,
+      (decoded) => CaptureInboxFilter.fromJson(decoded as Map<String, dynamic>),
+    );
   }
 
   /// Saves the provided [filter] snapshot to storage.
@@ -52,21 +47,16 @@ class CaptureInboxFilterStore {
 
   /// Loads all saved filter presets.
   Future<List<CaptureFilterPreset>> loadPresets() async {
-    try {
-      final raw = await _secureStorage.read(key: _presetsStorageKey);
-      if (raw == null || raw.isEmpty) {
-        return [];
-      }
-      final decoded = jsonDecode(raw) as List<dynamic>;
-      return decoded
+    return _loadWithDefault(
+      _presetsStorageKey,
+      () => <CaptureFilterPreset>[],
+      (decoded) => (decoded as List<dynamic>)
           .map(
             (json) =>
                 CaptureFilterPreset.fromJson(json as Map<String, dynamic>),
           )
-          .toList();
-    } on Object catch (error) {
-      return [];
-    }
+          .toList(),
+    );
   }
 
   /// Saves a new or updated filter preset.
@@ -95,6 +85,24 @@ class CaptureInboxFilterStore {
   /// Clears all saved presets.
   Future<void> clearPresets() {
     return _secureStorage.delete(key: _presetsStorageKey);
+  }
+
+  /// Generic helper for loading with default fallback on errors.
+  Future<T> _loadWithDefault<T>(
+    String key,
+    T Function() defaultValue,
+    T Function(dynamic decoded) fromJson,
+  ) async {
+    try {
+      final raw = await _secureStorage.read(key: key);
+      if (raw == null || raw.isEmpty) {
+        return defaultValue();
+      }
+      final decoded = jsonDecode(raw);
+      return fromJson(decoded);
+    } on Object {
+      return defaultValue();
+    }
   }
 
   /// Helper method to modify presets with proper error handling.

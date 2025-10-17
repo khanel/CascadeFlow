@@ -217,7 +217,7 @@ class CaptureInboxPaginationState {
   /// Inbox items currently loaded in memory.
   final List<CaptureItem> items;
 
-  /// Indicates that additional items are available beyond the current page.
+  /// Whether additional items are available beyond the current page.
   final bool hasMore;
 
   /// Whether an additional page request is currently in flight.
@@ -528,26 +528,26 @@ class CaptureFilterPresetController
 
   /// Saves a new preset or updates an existing one.
   Future<void> savePreset(CaptureFilterPreset preset) async {
-    final store = _store;
-    if (store == null) return;
-
-    try {
-      await store.savePreset(preset);
-      await _loadInitial(); // Refresh state
-    } on FilterPresetException catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace);
-    } on Object catch (error) {
-      state = AsyncValue.error(error, StackTrace.current);
-    }
+    await _performPresetOperation(
+      () => _store!.savePreset(preset),
+    );
   }
 
   /// Deletes a preset by name.
   Future<void> deletePreset(String name) async {
-    final store = _store;
-    if (store == null) return;
+    await _performPresetOperation(
+      () => _store!.deletePreset(name),
+    );
+  }
+
+  /// Helper method to perform preset operations with consistent error handling.
+  Future<void> _performPresetOperation(
+    Future<void> Function() operation,
+  ) async {
+    if (_store == null) return;
 
     try {
-      await store.deletePreset(name);
+      await operation();
       await _loadInitial(); // Refresh state
     } on FilterPresetException catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);

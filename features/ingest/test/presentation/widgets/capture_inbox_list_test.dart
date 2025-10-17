@@ -364,11 +364,15 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byKey(CaptureInboxFilterBarKeys.presetsButton), findsOneWidget);
+      expect(
+        find.byKey(CaptureInboxFilterBarKeys.presetsButton),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('shows presets menu when presets button is tapped',
-        (tester) async {
+    testWidgets('shows presets menu when presets button is tapped', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -401,9 +405,7 @@ void main() {
 }
 
 class _StubCaptureRepository implements CaptureRepository {
-  _StubCaptureRepository({
-    required this.onLoadInbox,
-  });
+  _StubCaptureRepository({required this.onLoadInbox});
 
   final Future<List<CaptureItem>> Function({
     int? limit,
