@@ -14,6 +14,7 @@ class CaptureItem {
     required this.status,
     required this.createdAt,
     required this.updatedAt,
+    required this.archivedAt,
     required this.metadata,
   });
 
@@ -24,6 +25,7 @@ class CaptureItem {
     required CaptureContext context,
     required Timestamp createdAt,
     Timestamp? updatedAt,
+    Timestamp? archivedAt,
     CaptureStatus status = CaptureStatus.inbox,
     Map<String, String>? metadata,
   }) {
@@ -39,6 +41,7 @@ class CaptureItem {
       status: status,
       createdAt: createdAt,
       updatedAt: resolvedUpdatedAt,
+      archivedAt: archivedAt,
       metadata: normalizedMetadata,
     );
   }
@@ -60,6 +63,9 @@ class CaptureItem {
 
   /// Timestamp indicating when the capture was last modified.
   final Timestamp updatedAt;
+
+  /// Timestamp indicating when the capture was archived, if applicable.
+  final Timestamp? archivedAt;
 
   /// Additional metadata persisted alongside the capture entry.
   final Map<String, String> metadata;
@@ -117,6 +123,7 @@ class CaptureItem {
         other.status == status &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt &&
+        other.archivedAt == archivedAt &&
         _metadataEquality.equals(other.metadata, metadata);
   }
 
@@ -128,6 +135,7 @@ class CaptureItem {
     status,
     createdAt,
     updatedAt,
+    archivedAt,
     _metadataEquality.hash(metadata),
   );
 
@@ -144,6 +152,7 @@ class CaptureItem {
     CaptureStatus? status,
     Timestamp? createdAt,
     Timestamp? updatedAt,
+    Timestamp? archivedAt,
     Map<String, String>? metadata,
   }) {
     return CaptureItem.create(
@@ -153,6 +162,7 @@ class CaptureItem {
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      archivedAt: archivedAt ?? this.archivedAt,
       metadata: metadata ?? this.metadata,
     );
   }

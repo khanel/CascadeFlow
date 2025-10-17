@@ -1,24 +1,23 @@
 import 'dart:async';
 
 import 'package:cascade_flow_core/cascade_flow_core.dart';
+import 'hive_initializer.dart';
 
 /// In-memory stub used to simulate Hive initialisation during local testing.
-class InMemoryHiveInitializer {
-  /// Tracks whether `initialize` has already been invoked.
-  Future<void>? _initialization;
-
+class InMemoryHiveInitializer extends HiveInitializer {
   /// Lazily created boxes keyed by their Hive name.
   final Map<String, InMemoryHiveBox<dynamic>> _boxes =
       <String, InMemoryHiveBox<dynamic>>{};
 
-  /// Marks the initializer as ready. Subsequent calls reuse the same future.
-  Future<void> initialize() {
-    return _initialization ??= Future<void>.value();
+  @override
+  Future<void> doInitialize() {
+    return Future<void>.value();
   }
 
+  @override
   /// Opens (or creates) an in-memory encrypted box with the given [name].
-  Future<InMemoryHiveBox<T>> openEncryptedBox<T>(String name) async {
-    final initialization = _initialization;
+  Future<HiveBox<T>> openEncryptedBox<T>(String name) async {
+    final initialization = this.initialization;
     if (initialization == null) {
       throw const InfrastructureFailure(
         message: 'Hive initializer used before initialize() was called.',
@@ -38,7 +37,7 @@ class InMemoryHiveInitializer {
 }
 
 /// Minimal box abstraction that mimics the Hive API relied upon by tests.
-class InMemoryHiveBox<T> {
+class InMemoryHiveBox<T> implements HiveBox<T> {
   /// Creates an in-memory box identified by [name].
   InMemoryHiveBox({required this.name});
 
@@ -47,34 +46,40 @@ class InMemoryHiveBox<T> {
 
   final Map<String, T> _items = <String, T>{};
 
+  @override
   /// Stores [value] under [key].
   Future<void> put(String key, T value) {
     _items[key] = value;
     return Future<void>.value();
   }
 
+  @override
   /// Retrieves a value for [key], returning `null` when it is absent.
   Future<T?> get(String key) {
     return Future<T?>.value(_items[key]);
   }
 
+  @override
   /// Returns an immutable snapshot of the stored values.
   Future<List<T>> values() {
     return Future<List<T>>.value(List.unmodifiable(_items.values));
   }
 
+  @override
   /// Deletes the value stored under [key], doing nothing when it is absent.
   Future<void> delete(String key) {
     _items.remove(key);
     return Future<void>.value();
   }
 
+  @override
   /// Removes every stored value.
   Future<void> clear() {
     _items.clear();
     return Future<void>.value();
   }
 
+  @override
   /// Returns the value at [key], throwing when it has not been written yet.
   T require(String key) {
     final value = _items[key];

@@ -7,11 +7,11 @@ const String captureItemsBoxName = 'capture_items';
 /// Local data source responsible for interacting with the capture inbox box.
 class CaptureLocalDataSource {
   /// Creates a data source backed by the provided [initializer].
-  CaptureLocalDataSource({required InMemoryHiveInitializer initializer})
+  CaptureLocalDataSource({required HiveInitializer initializer})
     : _initializer = initializer;
 
-  final InMemoryHiveInitializer _initializer;
-  Future<InMemoryHiveBox<CaptureItemHiveModel>>? _captureBoxFuture;
+  final HiveInitializer _initializer;
+  Future<HiveBox<CaptureItemHiveModel>>? _captureBoxFuture;
 
   /// Ensures the capture inbox box is opened before use.
   Future<void> warmUp() async {
@@ -42,7 +42,7 @@ class CaptureLocalDataSource {
     return _useBox((box) => box.values());
   }
 
-  Future<InMemoryHiveBox<CaptureItemHiveModel>> _ensureBox() async {
+  Future<HiveBox<CaptureItemHiveModel>> _ensureBox() async {
     final existing = _captureBoxFuture;
     if (existing != null) {
       return existing;
@@ -52,7 +52,7 @@ class CaptureLocalDataSource {
   }
 
   Future<T> _useBox<T>(
-    Future<T> Function(InMemoryHiveBox<CaptureItemHiveModel> box) action,
+    Future<T> Function(HiveBox<CaptureItemHiveModel> box) action,
   ) async {
     final box = await _ensureBox();
     return action(box);
