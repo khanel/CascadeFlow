@@ -66,7 +66,6 @@ void main() {
       test('saves and loads a preset correctly', () async {
         final storage = InMemorySecureStorage();
         final store = CaptureInboxFilterStore(secureStorage: storage);
-        // Unused variable commented out to fix linting warning
         const preset = CaptureFilterPreset(
           name: 'Quick Captures',
           filter: CaptureInboxFilter.empty,
@@ -77,7 +76,7 @@ void main() {
 
         expect(presets.length, 1);
         expect(presets[0].name, 'Quick Captures');
-        expect(presets[0].filter.source, isNotNull);
+        expect(presets[0].filter.source, isNull);
       });
 
       test('updates existing preset when saving with same name', () async {
@@ -89,7 +88,7 @@ void main() {
         );
         const updatedPreset = CaptureFilterPreset(
           name: 'Test Preset',
-          filter: CaptureInboxFilter.empty,
+          filter: CaptureInboxFilter(channel: 'updated'),
         );
 
         await store.savePreset(initialPreset);
@@ -97,7 +96,7 @@ void main() {
         final presets = await store.loadPresets();
 
         expect(presets.length, 1);
-        expect(presets[0].filter.source, isNotNull);
+        expect(presets[0].filter.channel, 'updated');
       });
 
       test('deletes a preset by name', () async {

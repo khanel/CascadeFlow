@@ -1,3 +1,4 @@
+import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
 import 'package:cascade_flow_ingest/shared/capture_inbox_filter.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -41,7 +42,7 @@ void main() {
       final json = {
         'name': 'Test Preset',
         'filter': {'source': 'quickCapture'},
-        'createdAt': '2023-01-01T00:00:00.000',
+        'createdAt': '2023-01-01T12:30:45.000',
       };
 
       // Act
@@ -49,7 +50,7 @@ void main() {
 
       // Assert
       expect(preset.name, 'Test Preset');
-      expect(preset.filter.source, isNull);
+      expect(preset.filter.source, CaptureSource.quickCapture);
       expect(preset.createdAt, DateTime(2023, 1, 1, 12, 30, 45));
     });
   });

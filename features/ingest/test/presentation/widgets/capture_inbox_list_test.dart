@@ -6,6 +6,7 @@ import 'package:cascade_flow_ingest/domain/repositories/capture_repository.dart'
 import 'package:cascade_flow_ingest/presentation/providers/capture_providers.dart';
 import 'package:cascade_flow_ingest/presentation/widgets/capture_inbox_list.dart';
 import 'package:cascade_flow_ingest/shared/capture_inbox_constants.dart';
+import 'package:cascade_flow_ingest/shared/capture_inbox_filter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -340,6 +341,61 @@ void main() {
       expect(find.text('Integration capture'), findsOneWidget);
       expect(find.text('Keyboard capture'), findsNothing);
       expect(find.text('Voice capture'), findsNothing);
+    });
+
+    testWidgets('renders filter preset button', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            captureRepositoryProvider.overrideWithValue(
+              _StubCaptureRepository(
+                onLoadInbox: ({limit, startAfter}) async => [
+                  buildTestCaptureItem(id: 'capture-1'),
+                ],
+              ),
+            ),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: CaptureInboxList(),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(CaptureInboxFilterBarKeys.presetsButton), findsOneWidget);
+    });
+
+    testWidgets('shows presets menu when presets button is tapped',
+        (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            captureRepositoryProvider.overrideWithValue(
+              _StubCaptureRepository(
+                onLoadInbox: ({limit, startAfter}) async => [
+                  buildTestCaptureItem(id: 'capture-1'),
+                ],
+              ),
+            ),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: CaptureInboxList(),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final menuButton = find.byKey(CaptureInboxFilterBarKeys.presetsButton);
+      expect(menuButton, findsOneWidget);
+
+      await tester.tap(menuButton);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(PopupMenuButton<CaptureFilterPreset>), findsOneWidget);
     });
   });
 }
