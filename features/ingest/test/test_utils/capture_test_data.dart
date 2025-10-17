@@ -1,5 +1,5 @@
 import 'package:cascade_flow_core/cascade_flow_core.dart';
-import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
+import 'package:cascade_flow_ingest/cascade_flow_ingest.dart';
 
 CaptureItem buildTestCaptureItem({
   required String id,
@@ -9,6 +9,7 @@ CaptureItem buildTestCaptureItem({
   String channel = 'quick_sheet',
   int createdMicros = 0,
   int updatedMicros = 0,
+  Timestamp? archivedAt,
   Map<String, String> metadata = const <String, String>{},
 }) {
   return CaptureItem.create(
@@ -25,6 +26,7 @@ CaptureItem buildTestCaptureItem({
     updatedAt: Timestamp(
       DateTime.fromMicrosecondsSinceEpoch(updatedMicros, isUtc: true),
     ),
+    archivedAt: archivedAt,
     metadata: metadata,
   );
 }
