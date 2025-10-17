@@ -84,6 +84,15 @@ class CaptureInboxFilterController extends Notifier<CaptureInboxFilter> {
     _save(next);
   }
 
+  /// Applies the provided filter, updating state and persistence.
+  void applyFilter(CaptureInboxFilter filter) {
+    if (filter == state) {
+      return;
+    }
+    state = filter;
+    _save(filter);
+  }
+
   Future<void> _restoreFromStorage() async {
     final store = _store;
     if (store == null) {

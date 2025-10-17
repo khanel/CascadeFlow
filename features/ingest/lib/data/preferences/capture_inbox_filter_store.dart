@@ -24,14 +24,8 @@ class CaptureInboxFilterStore {
       }
       final decoded = jsonDecode(raw) as Map<String, dynamic>;
       return CaptureInboxFilter.fromJson(decoded);
-    } on FilterSerializationException {
-      // Corrupted storage results fall back to empty filter.
-      rethrow;
     } on Object catch (error) {
-      throw FilterStorageException(
-        'Failed to load filter from storage',
-        error,
-      );
+      return CaptureInboxFilter.empty;
     }
   }
 
@@ -70,14 +64,8 @@ class CaptureInboxFilterStore {
                 CaptureFilterPreset.fromJson(json as Map<String, dynamic>),
           )
           .toList();
-    } on FilterSerializationException {
-      // Corrupted storage results in empty presets list.
-      rethrow;
     } on Object catch (error) {
-      throw FilterStorageException(
-        'Failed to load presets from storage',
-        error,
-      );
+      return [];
     }
   }
 

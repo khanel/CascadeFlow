@@ -29,6 +29,11 @@ abstract final class CaptureInboxListKeys {
   static Key itemTile(String id) => Key('captureInbox_item_$id');
 }
 
+abstract final class CaptureInboxFilterBarKeys {
+  /// Key applied to the filter presets button.
+  static const Key presetsButton = Key('captureInbox_presetsButton');
+}
+
 /// Renders the capture inbox entries retrieved from persistence.
 class CaptureInboxList extends ConsumerWidget {
   /// Creates an inbox list that reacts to repository updates.
@@ -191,6 +196,7 @@ class _CaptureInboxFilterBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.read(captureInboxFilterProvider.notifier);
+    final presetsAsync = ref.watch(captureFilterPresetProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -211,6 +217,16 @@ class _CaptureInboxFilterBar extends ConsumerWidget {
                 onSelected: (selected) =>
                     notifier.setSource(selected ? source : null),
               ),
+            PopupMenuButton<CaptureFilterPreset>(
+              key: CaptureInboxFilterBarKeys.presetsButton,
+              onSelected: (preset) => _applyPreset(preset, ref, notifier),
+              itemBuilder: (context) => _buildPresetMenuItems(presetsAsync),
+              child: TextButton.icon(
+                label: const Text('Presets'),
+                icon: const Icon(Icons.arrow_drop_down),
+                onPressed: null,
+              ),
+            ),
           ],
         ),
         if (channelOptions.isNotEmpty) ...<Widget>[
@@ -235,6 +251,28 @@ class _CaptureInboxFilterBar extends ConsumerWidget {
           ),
         ],
       ],
+    );
+  }
+
+  void _applyPreset(
+    CaptureFilterPreset preset,
+    WidgetRef ref,
+    CaptureInboxFilterController notifier,
+  ) {
+    notifier.applyFilter(preset.filter);
+  }
+
+  List<PopupMenuEntry<CaptureFilterPreset>> _buildPresetMenuItems(
+    AsyncValue<List<CaptureFilterPreset>> presetsAsync,
+  ) {
+    return presetsAsync.maybeWhen(
+      data: (presets) => presets.map(
+        (preset) => PopupMenuItem<CaptureFilterPreset>(
+          value: preset,
+          child: Text(preset.name),
+        ),
+      ).toList(),
+      orElse: () => <PopupMenuEntry<CaptureFilterPreset>>[],
     );
   }
 }
