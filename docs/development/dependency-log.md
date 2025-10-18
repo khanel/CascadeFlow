@@ -54,6 +54,14 @@ Entries
 - Scope/usage: Root app widget wraps MaterialApp with ProviderScope
 - PR/Issue: n/a
 
+- Date: 2025-10-18
+- Changed by: @codex
+- Affected pubspec: packages/infrastructure/pubspec.yaml
+- Packages: hive_ce@^2.14.0, hive_ce_flutter@^2.3.2, path_provider@^2.1.5
+- Why: implement real Hive CE storage to replace InMemoryHiveInitializer (Green Phase TDD)
+- Scope/usage: RealHiveInitializer with persistent encrypted boxes for capture items
+- PR/Issue: TDD Green Phase - Complete data persistence implementation
+
 - Date:
 - Changed by:
 - Affected pubspec:
