@@ -1,5 +1,6 @@
 import 'package:cascade_flow_core/cascade_flow_core.dart';
 import 'package:cascade_flow_ingest/domain/entities/capture_item.dart';
+import 'package:hive_ce/hive.dart';
 
 /// Hive persistence model for `CaptureItem`.
 class CaptureItemHiveModel {
@@ -83,4 +84,62 @@ class CaptureItemHiveModel {
       metadata: Map<String, String>.from(metadata),
     );
   }
+}
+
+/// Unique Hive type identifier assigned to [CaptureItemHiveModelAdapter].
+const int captureItemHiveModelTypeId = 0;
+
+/// Hive `TypeAdapter` for serializing [CaptureItemHiveModel] instances.
+class CaptureItemHiveModelAdapter extends TypeAdapter<CaptureItemHiveModel> {
+  @override
+  int get typeId => captureItemHiveModelTypeId;
+
+  @override
+  CaptureItemHiveModel read(BinaryReader reader) {
+    final id = reader.readString();
+    final content = reader.readString();
+    final source = reader.readString();
+    final channel = reader.readString();
+    final createdAtMicros = reader.readInt();
+    final updatedAtMicros = reader.readInt();
+    final status = reader.readString();
+    final metadata = reader.readMap().cast<String, String>();
+
+    return CaptureItemHiveModel(
+      id: id,
+      content: content,
+      source: source,
+      channel: channel,
+      createdAtMicros: createdAtMicros,
+      updatedAtMicros: updatedAtMicros,
+      status: status,
+      metadata: metadata,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, CaptureItemHiveModel obj) {
+    writer
+      ..writeString(obj.id)
+      ..writeString(obj.content)
+      ..writeString(obj.source)
+      ..writeString(obj.channel)
+      ..writeInt(obj.createdAtMicros)
+      ..writeInt(obj.updatedAtMicros)
+      ..writeString(obj.status)
+      ..writeMap(obj.metadata);
+  }
+}
+
+bool _captureItemAdapterRegistered = false;
+
+/// Ensures the capture item adapter is registered exactly once with Hive.
+Future<void> registerCaptureItemHiveAdapter() async {
+  if (_captureItemAdapterRegistered) {
+    return;
+  }
+  if (!Hive.isAdapterRegistered(captureItemHiveModelTypeId)) {
+    Hive.registerAdapter(CaptureItemHiveModelAdapter());
+  }
+  _captureItemAdapterRegistered = true;
 }

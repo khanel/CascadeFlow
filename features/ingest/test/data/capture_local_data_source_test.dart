@@ -1,5 +1,4 @@
 import 'package:cascade_flow_infrastructure/storage.dart';
-import 'package:cascade_flow_ingest/cascade_flow_ingest.dart';
 import 'package:cascade_flow_ingest/data/hive/capture_item_hive_model.dart';
 import 'package:cascade_flow_ingest/data/hive/capture_local_data_source.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -23,6 +22,10 @@ class _RecordingInitializer extends InMemoryHiveInitializer {
 }
 
 void main() {
+  setUpAll(() async {
+    await registerCaptureItemHiveAdapter();
+  });
+
   test('warmUp initializes hive and opens capture inbox box', () async {
     // ARRANGE
     final initializer = _RecordingInitializer();
@@ -71,14 +74,12 @@ void main() {
       buildTestCaptureItem(
         id: 'capture-a',
         createdMicros: 50,
-        updatedMicros: 50,
       ),
     );
     final second = CaptureItemHiveModel.fromDomain(
       buildTestCaptureItem(
         id: 'capture-b',
         createdMicros: 60,
-        updatedMicros: 60,
       ),
     );
 
@@ -141,33 +142,44 @@ void main() {
     expect(persistedItem!.toDomain(), equals(model.toDomain()));
   });
 
-  test('ensures data persists after multiple initializer reinitializations', () async {
-    // Regression test: ensure reinitialization doesn't lose data with real storage
-    final initializer1 = RealHiveInitializer();
-    final dataSource1 = CaptureLocalDataSource(initializer: initializer1);
-    await dataSource1.warmUp();
+  test(
+    'ensures data persists after multiple initializer reinitializations',
+    () async {
+      // Regression test: ensure reinitialization doesn't lose data with real
+      // storage
+      final initializer1 = RealHiveInitializer();
+      final dataSource1 = CaptureLocalDataSource(initializer: initializer1);
+      await dataSource1.warmUp();
 
-    final item = CaptureItemHiveModel.fromDomain(
-      buildTestCaptureItem(
-        id: 'multi-init-test',
-        createdMicros: 1000,
-        updatedMicros: 1000,
-      ),
-    );
+      final item = CaptureItemHiveModel.fromDomain(
+        buildTestCaptureItem(
+          id: 'multi-init-test',
+          createdMicros: 1000,
+          updatedMicros: 1000,
+        ),
+      );
 
-    await dataSource1.save(item);
+      await dataSource1.save(item);
 
-    // Simulate multiple app startup cycles with new initializers (all accessing shared storage)
-    for (var i = 1; i <= 3; i++) {
-      final newInitializer = RealHiveInitializer();
-      final newDataSource = CaptureLocalDataSource(initializer: newInitializer);
-      await newDataSource.warmUp();
+      // Simulate multiple app startup cycles with new initializers
+      // (all accessing shared storage)
+      for (var i = 1; i <= 3; i++) {
+        final newInitializer = RealHiveInitializer();
+        final newDataSource = CaptureLocalDataSource(
+          initializer: newInitializer,
+        );
+        await newDataSource.warmUp();
 
-      final persistedItem = await newDataSource.read(item.id);
-      expect(persistedItem, isNotNull, reason: 'Item should persist across initialization #$i');
-      expect(persistedItem!.toDomain(), equals(item.toDomain()));
-    }
-  });
+        final persistedItem = await newDataSource.read(item.id);
+        expect(
+          persistedItem,
+          isNotNull,
+          reason: 'Item should persist across initialization #$i',
+        );
+        expect(persistedItem!.toDomain(), equals(item.toDomain()));
+      }
+    },
+  );
 
   test('handles concurrent access from multiple data sources', () async {
     // Simulate concurrent operations from different app components
@@ -178,10 +190,18 @@ void main() {
     await Future.wait([dataSource1.warmUp(), dataSource2.warmUp()]);
 
     final item1 = CaptureItemHiveModel.fromDomain(
-      buildTestCaptureItem(id: 'concurrent-a', createdMicros: 100, updatedMicros: 100),
+      buildTestCaptureItem(
+        id: 'concurrent-a',
+        createdMicros: 100,
+        updatedMicros: 100,
+      ),
     );
     final item2 = CaptureItemHiveModel.fromDomain(
-      buildTestCaptureItem(id: 'concurrent-b', createdMicros: 200, updatedMicros: 200),
+      buildTestCaptureItem(
+        id: 'concurrent-b',
+        createdMicros: 200,
+        updatedMicros: 200,
+      ),
     );
 
     // Save from different sources concurrently
@@ -198,8 +218,17 @@ void main() {
       dataSource2.readAll(),
     ]);
 
-    expect((results[0] as CaptureItemHiveModel).toDomain(), equals(item2.toDomain())); // item2 from dataSource1
-    expect((results[1] as CaptureItemHiveModel).toDomain(), equals(item1.toDomain()));  // item1 from dataSource2
+    final item2FromDataSource1 = results[0]! as CaptureItemHiveModel;
+    final item1FromDataSource2 = results[1]! as CaptureItemHiveModel;
+
+    expect(
+      item2FromDataSource1.toDomain(),
+      equals(item2.toDomain()),
+    ); // item2 from dataSource1
+    expect(
+      item1FromDataSource2.toDomain(),
+      equals(item1.toDomain()),
+    ); // item1 from dataSource2
     expect(results[2], hasLength(2)); // dataSource1 sees both items
     expect(results[3], hasLength(2)); // dataSource2 sees both items
   });
@@ -208,7 +237,6 @@ void main() {
     // Ensure serialization/deserialization preserves data integrity
     final originalItem = buildTestCaptureItem(
       id: 'roundtrip-test',
-      source: CaptureSource.quickCapture,
       channel: 'test-channel',
       createdMicros: 500,
       updatedMicros: 600,
@@ -227,8 +255,11 @@ void main() {
     expect(roundtripItem.createdAt, equals(originalItem.createdAt));
     expect(roundtripItem.updatedAt, equals(originalItem.updatedAt));
     expect(roundtripItem.archivedAt, equals(originalItem.archivedAt));
-    expect(roundtripItem.context.source, equals(originalItem.context!.source));
-    expect(roundtripItem.context.channel, equals(originalItem.context!.channel));
+    expect(roundtripItem.context.source, equals(originalItem.context.source));
+    expect(
+      roundtripItem.context.channel,
+      equals(originalItem.context.channel),
+    );
     expect(roundtripItem.metadata, equals(originalItem.metadata));
   });
 
@@ -239,13 +270,16 @@ void main() {
     await dataSource.warmUp();
 
     // Create multiple items
-    final items = List.generate(5, (index) => CaptureItemHiveModel.fromDomain(
-      buildTestCaptureItem(
-        id: 'consistency-$index',
-        createdMicros: index * 100,
-        updatedMicros: index * 100,
+    final items = List.generate(
+      5,
+      (index) => CaptureItemHiveModel.fromDomain(
+        buildTestCaptureItem(
+          id: 'consistency-$index',
+          createdMicros: index * 100,
+          updatedMicros: index * 100,
+        ),
       ),
-    ));
+    );
 
     // Save all items
     for (final item in items) {
@@ -262,7 +296,10 @@ void main() {
     // Verify deletion worked
     final afterDelete = await dataSource.readAll();
     expect(afterDelete, hasLength(4));
-    expect(afterDelete.map((m) => m.id), isNot(contains('consistency-2')));
+    expect(
+      afterDelete.map((m) => m.id).toList(),
+      isNot(contains('consistency-2')),
+    );
 
     // Verify remaining items are unchanged
     for (var i = 0; i < 5; i++) {

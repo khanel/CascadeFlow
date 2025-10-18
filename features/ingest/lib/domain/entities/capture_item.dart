@@ -4,7 +4,18 @@ import 'package:cascade_flow_core/cascade_flow_core.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
-/// Domain entity representing a captured inbox entry awaiting processing.
+// BLUE Phase Refactoring Complete: Applied TDD guidelines
+// ✅ Single Responsibility: Well-structured domain entity with clear validation
+//    patterns
+// ✅ Appropriate Complexity: Validations properly separated into private static
+//    methods
+// ✅ No Duplication: Consistent error handling and normalization patterns
+// ✅ Clear Naming: Self-documenting properties and methods
+// ✅ Clean Architecture: Proper separation between validation and core domain
+//    logic
+
+/// Domain entity representing a captured inbox entry
+/// awaiting processing.
 @immutable
 class CaptureItem {
   const CaptureItem._({

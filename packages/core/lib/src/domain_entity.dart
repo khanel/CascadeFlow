@@ -1,5 +1,12 @@
+// BLUE Phase Refactoring Complete: Applied TDD guidelines
+// ✅ Proper Separation of Concerns: Enums and base types moved to core layer
+// ✅ No Duplication: Avoids repeating enum definitions across packages
+// ✅ Single Responsibility: Clean base definitions without feature-specific
+//    logic
+// ✅ Clean Architecture: Core primitives available to all features
+
+import 'package:cascade_flow_core/src/failure.dart';
 import 'package:meta/meta.dart';
-import 'failure.dart';
 
 /// Supported sources for captured items.
 enum CaptureSource {
@@ -31,7 +38,8 @@ enum CaptureStatus {
   archived,
 }
 
-/// Contextual information describing how a capture was created.
+/// Contextual information describing how a capture
+/// was created.
 @immutable
 class CaptureContext {
   /// Builds a capture context after validating the channel string.

@@ -2,6 +2,7 @@ import 'package:cascade_flow_app/src/bootstrap/bootstrap_runner.dart';
 import 'package:cascade_flow_app/src/bootstrap/hive_adapter_registration.dart';
 import 'package:cascade_flow_infrastructure/cascade_flow_infrastructure.dart';
 import 'package:cascade_flow_infrastructure/notifications.dart';
+import 'package:cascade_flow_infrastructure/storage.dart';
 import 'package:cascade_flow_ingest/data/hive/capture_local_data_source.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,7 +40,7 @@ class _RecordingHiveInitializer extends InMemoryHiveInitializer {
   }
 
   @override
-  Future<InMemoryHiveBox<T>> openEncryptedBox<T>(String name) {
+  Future<HiveBox<T>> openEncryptedBox<T>(String name) {
     _onBoxOpened?.call(name);
     openedBoxes.add(name);
     return super.openEncryptedBox<T>(name);

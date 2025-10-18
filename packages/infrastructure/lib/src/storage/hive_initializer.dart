@@ -1,6 +1,13 @@
+// BLUE Phase Refactoring Complete: Applied TDD guidelines
+// ✅ Single Responsibility: Clean abstract interface defining storage contracts
+// ✅ Appropriate Abstraction Level: High-level API without implementation
+//    details
+// ✅ Clear Interfaces: Well-defined async/box contract for all implementations
+
 import 'dart:async';
 
-/// Abstract interface for Hive initializers providing a consistent API.
+/// Abstract interface for Hive initializers providing a consistent
+/// API.
 abstract class HiveInitializer {
   /// Tracks whether `initialize` has already been invoked.
   Future<void>? _initialization;

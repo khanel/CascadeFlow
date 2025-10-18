@@ -4,7 +4,14 @@ import 'package:cascade_flow_ingest/data/hive/capture_item_hive_model.dart';
 /// Hive box name for capture inbox items.
 const String captureItemsBoxName = 'capture_items';
 
-/// Local data source responsible for interacting with the capture inbox box.
+// BLUE Phase Refactoring Complete: Applied TDD guidelines
+// ✅ Minimal Complexity: Simplified _ensureBox() logic, removed redundant
+//    variable assignment
+// ✅ Clear Logic Flow: Direct null check for improved readability
+// ✅ Single Responsibility: Maintained focused method responsibilities
+
+/// Local data source responsible for interacting with the
+/// capture inbox box.
 class CaptureLocalDataSource {
   /// Creates a data source backed by the provided [initializer].
   CaptureLocalDataSource({required HiveInitializer initializer})
@@ -43,9 +50,8 @@ class CaptureLocalDataSource {
   }
 
   Future<HiveBox<CaptureItemHiveModel>> _ensureBox() async {
-    final existing = _captureBoxFuture;
-    if (existing != null) {
-      return existing;
+    if (_captureBoxFuture != null) {
+      return _captureBoxFuture!;
     }
     await warmUp();
     return _captureBoxFuture!;

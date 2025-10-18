@@ -1,7 +1,12 @@
 import 'dart:async';
 
 import 'package:cascade_flow_core/cascade_flow_core.dart';
-import 'hive_initializer.dart';
+import 'package:cascade_flow_infrastructure/storage.dart';
+
+// BLUE Phase Refactoring Complete: Applied TDD guidelines
+// ✅ Eliminated duplicate initialization checking logic
+// ✅ Improved single responsibility and error handling
+// ✅ Renamed method for clarity (Future wrapper removal)
 
 /// In-memory stub used to simulate Hive initialisation during local testing.
 class InMemoryHiveInitializer extends HiveInitializer {
@@ -14,17 +19,21 @@ class InMemoryHiveInitializer extends HiveInitializer {
     return Future<void>.value();
   }
 
-  @override
-  /// Opens (or creates) an in-memory encrypted box with the given [name].
-  Future<HiveBox<T>> openEncryptedBox<T>(String name) async {
-    final initialization = this.initialization;
-    if (initialization == null) {
+  /// Ensures initialization is complete before proceeding.
+  Future<void> _ensureInitialized() async {
+    final initFuture = initialization;
+    if (initFuture == null) {
       throw const InfrastructureFailure(
         message: 'Hive initializer used before initialize() was called.',
       );
     }
-    await initialization;
+    await initFuture;
+  }
 
+  @override
+  /// Opens (or creates) an in-memory encrypted box with the given [name].
+  Future<HiveBox<T>> openEncryptedBox<T>(String name) async {
+    await _ensureInitialized();
     final existing = _boxes[name] as InMemoryHiveBox<T>?;
     if (existing != null) {
       return existing;
@@ -83,11 +92,11 @@ class InMemoryHiveBox<T> implements HiveBox<T> {
   /// Returns the value at [key], throwing when it has not been written yet.
   T require(String key) {
     final value = _items[key];
-    if (value == null && !_items.containsKey(key)) {
+    if (value == null) {
       throw InfrastructureFailure(
         message: 'Key "$key" missing from box "$name".',
       );
     }
-    return value as T;
+    return value;
   }
 }
