@@ -46,4 +46,7 @@ abstract class HiveBox<T> {
 
   /// Returns the value at [key], throwing when it has not been written yet.
   T require(String key);
+
+  /// Closes the box.
+  Future<void> close();
 }

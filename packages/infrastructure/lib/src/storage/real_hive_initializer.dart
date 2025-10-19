@@ -1,8 +1,12 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:cascade_flow_core/cascade_flow_core.dart';
 import 'package:cascade_flow_infrastructure/storage.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_ce/hive.dart';
+import 'package:path_provider/path_provider.dart';
 
 // REFACTORING COMPLETE: BLUE phase of TDD cycle
 // ✅ Eliminated duplicate initialization checking logic
@@ -13,24 +17,18 @@ import 'package:hive_ce/hive.dart';
 
 /// Real Hive CE initializer for production use with persistent storage.
 class RealHiveInitializer extends HiveInitializer {
-  /// Directory path for Hive storage.
-  late final String _hiveDirectory;
+  static const _keyStorageKey = 'hive_encryption_key';
+
+  final FlutterSecureStorage _secureStorage;
+
+  RealHiveInitializer([
+    this._secureStorage = const FlutterSecureStorage(),
+  ]);
 
   @override
   Future<void> doInitialize() async {
-    _setupStorageDirectory();
-    Hive.init(_hiveDirectory);
-  }
-
-  /// Sets up the storage directory for Hive, ensuring it exists.
-  void _setupStorageDirectory() {
-    // For testing, use a consistent test directory to simulate real persistence
-    final tempDir = Directory.systemTemp;
-    _hiveDirectory = '${tempDir.path}/hive_test';
-    final hiveDir = Directory(_hiveDirectory);
-    if (!hiveDir.existsSync()) {
-      hiveDir.createSync(recursive: true);
-    }
+    final appDocsDir = await getApplicationDocumentsDirectory();
+    Hive.init(appDocsDir.path);
   }
 
   /// Ensures initialization is complete before proceeding.
@@ -48,8 +46,25 @@ class RealHiveInitializer extends HiveInitializer {
   /// Opens (or creates) a real Hive box with the given [name].
   Future<HiveBox<T>> openEncryptedBox<T>(String name) async {
     await _ensureInitialized();
-    final box = await Hive.openBox<T>(name);
+    final encryptionKey = await _getOrGenerateEncryptionKey();
+    final box = await Hive.openBox<T>(
+      name,
+      encryptionCipher: HiveAesCipher(encryptionKey),
+    );
     return RealHiveBox<T>._(box);
+  }
+
+  Future<Uint8List> _getOrGenerateEncryptionKey() async {
+    final existingKey = await _secureStorage.read(key: _keyStorageKey);
+    if (existingKey != null) {
+      return base64Url.decode(existingKey);
+    }
+    final newKey = Hive.generateSecureKey();
+    await _secureStorage.write(
+      key: _keyStorageKey,
+      value: base64Url.encode(newKey),
+    );
+    return Uint8List.fromList(newKey);
   }
 
   /// Opens (or creates) an unencrypted Hive box (for testing or non-sensitive
@@ -100,4 +115,7 @@ class RealHiveBox<T> implements HiveBox<T> {
     }
     return _box.get(key) as T;
   }
+
+  @override
+  Future<void> close() => _box.close();
 }

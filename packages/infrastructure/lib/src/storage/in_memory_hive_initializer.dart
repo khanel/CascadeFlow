@@ -99,4 +99,9 @@ class InMemoryHiveBox<T> implements HiveBox<T> {
     }
     return value;
   }
+
+  @override
+  Future<void> close() {
+    return Future.value();
+  }
 }
