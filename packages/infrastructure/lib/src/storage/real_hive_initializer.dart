@@ -6,6 +6,7 @@ import 'package:cascade_flow_core/cascade_flow_core.dart';
 import 'package:cascade_flow_infrastructure/storage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_ce/hive.dart';
+import 'package:meta/meta.dart';
 import 'package:path_provider/path_provider.dart';
 
 // REFACTORING COMPLETE: BLUE phase of TDD cycle
@@ -17,13 +18,14 @@ import 'package:path_provider/path_provider.dart';
 
 /// Real Hive CE initializer for production use with persistent storage.
 class RealHiveInitializer extends HiveInitializer {
-  static const _keyStorageKey = 'hive_encryption_key';
-
-  final FlutterSecureStorage _secureStorage;
-
+  /// Creates a real Hive initializer for production use.
   RealHiveInitializer([
     this._secureStorage = const FlutterSecureStorage(),
   ]);
+
+  static const _keyStorageKey = 'hive_encryption_key';
+
+  final FlutterSecureStorage _secureStorage;
 
   @override
   Future<void> doInitialize() async {
@@ -31,21 +33,10 @@ class RealHiveInitializer extends HiveInitializer {
     Hive.init(appDocsDir.path);
   }
 
-  /// Ensures initialization is complete before proceeding.
-  Future<void> _ensureInitialized() async {
-    final initFuture = initialization;
-    if (initFuture == null) {
-      throw const InfrastructureFailure(
-        message: 'Hive initializer used before initialize() was called.',
-      );
-    }
-    await initFuture;
-  }
-
   @override
   /// Opens (or creates) a real Hive box with the given [name].
   Future<HiveBox<T>> openEncryptedBox<T>(String name) async {
-    await _ensureInitialized();
+    await ensureInitialized();
     final encryptionKey = await _getOrGenerateEncryptionKey();
     final box = await Hive.openBox<T>(
       name,
@@ -69,8 +60,9 @@ class RealHiveInitializer extends HiveInitializer {
 
   /// Opens (or creates) an unencrypted Hive box (for testing or non-sensitive
   /// data).
+  @visibleForTesting
   Future<RealHiveBox<T>> openBox<T>(String name) async {
-    await _ensureInitialized();
+    await ensureInitialized();
     final box = await Hive.openBox<T>(name);
     return RealHiveBox<T>._(box);
   }
@@ -85,7 +77,9 @@ class RealHiveBox<T> implements HiveBox<T> {
 
   @override
   /// Stores [value] under [key].
-  Future<void> put(String key, T value) => Future.value(_box.put(key, value));
+  Future<void> put(String key, T value) async {
+    await _box.put(key, value);
+  }
 
   @override
   /// Retrieves a value for [key], returning `null` when it is absent.
@@ -97,7 +91,9 @@ class RealHiveBox<T> implements HiveBox<T> {
 
   @override
   /// Deletes the value stored under [key], doing nothing when it is absent.
-  Future<void> delete(String key) => Future.value(_box.delete(key));
+  Future<void> delete(String key) async {
+    await _box.delete(key);
+  }
 
   @override
   /// Removes every stored value.

@@ -19,21 +19,10 @@ class InMemoryHiveInitializer extends HiveInitializer {
     return Future<void>.value();
   }
 
-  /// Ensures initialization is complete before proceeding.
-  Future<void> _ensureInitialized() async {
-    final initFuture = initialization;
-    if (initFuture == null) {
-      throw const InfrastructureFailure(
-        message: 'Hive initializer used before initialize() was called.',
-      );
-    }
-    await initFuture;
-  }
-
   @override
   /// Opens (or creates) an in-memory encrypted box with the given [name].
   Future<HiveBox<T>> openEncryptedBox<T>(String name) async {
-    await _ensureInitialized();
+    await ensureInitialized();
     final existing = _boxes[name] as InMemoryHiveBox<T>?;
     if (existing != null) {
       return existing;

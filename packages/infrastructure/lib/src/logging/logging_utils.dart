@@ -18,10 +18,11 @@ Future<T> runWithLogging<T>({
 }
 
 /// Callback invoked after the error has been logged.
-typedef LogErrorHandler = void Function(
-  Object error,
-  StackTrace stackTrace,
-);
+typedef LogErrorHandler =
+    void Function(
+      Object error,
+      StackTrace stackTrace,
+    );
 
 void _logUnhandledError(
   PrintLogger logger,
@@ -35,13 +36,13 @@ void _logUnhandledError(
 }
 
 String _describeError(Object error) => switch (error) {
-      StateError(:final message) => 'StateError: $message',
-      ArgumentError(:final message) => 'ArgumentError: $message',
-      AssertionError(:final message?) => 'AssertionError: $message',
-      AssertionError() => 'AssertionError',
-      FormatException(:final message) => 'FormatException: $message',
-      _ => _fallbackDescription(error),
-    };
+  StateError(:final message) => 'StateError: $message',
+  ArgumentError(:final message) => 'ArgumentError: $message',
+  AssertionError(:final message?) => 'AssertionError: $message',
+  AssertionError() => 'AssertionError',
+  FormatException(:final message) => 'FormatException: $message',
+  _ => _fallbackDescription(error),
+};
 
 String _fallbackDescription(Object error) {
   final typeName = error.runtimeType.toString();

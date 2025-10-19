@@ -2,7 +2,7 @@
 class PrintLogger {
   /// Creates a logger that writes to [printer] (defaults to `print`).
   const PrintLogger({void Function(String line)? printer})
-      : _printer = printer ?? print;
+    : _printer = printer ?? print;
 
   final void Function(String line) _printer;
 

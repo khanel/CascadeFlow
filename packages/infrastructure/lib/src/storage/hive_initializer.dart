@@ -6,6 +6,8 @@
 
 import 'dart:async';
 
+import 'package:cascade_flow_core/cascade_flow_core.dart';
+
 /// Abstract interface for Hive initializers providing a consistent
 /// API.
 abstract class HiveInitializer {
@@ -25,6 +27,17 @@ abstract class HiveInitializer {
 
   /// Opens (or creates) an encrypted box with the given [name].
   Future<HiveBox<T>> openEncryptedBox<T>(String name);
+
+  /// Ensures initialization is complete before proceeding.
+  Future<void> ensureInitialized() async {
+    final initFuture = initialization;
+    if (initFuture == null) {
+      throw const InfrastructureFailure(
+        message: 'Hive initializer used before initialize() was called.',
+      );
+    }
+    await initFuture;
+  }
 }
 
 /// Common interface for Hive box operations.

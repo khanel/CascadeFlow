@@ -34,15 +34,15 @@ void main() {
       final logger = PrintLogger(printer: (_) {});
 
       Future<void> invoke() => runWithLogging<void>(
-            logger: logger,
-            body: () {
-              throw StateError('boom');
-            },
-            onError: (error, stackTrace) {
-              capturedError = error;
-              capturedStackTrace = stackTrace;
-            },
-          );
+        logger: logger,
+        body: () {
+          throw StateError('boom');
+        },
+        onError: (error, stackTrace) {
+          capturedError = error;
+          capturedStackTrace = stackTrace;
+        },
+      );
 
       // Act & Assert
       await expectLater(invoke, throwsA(isA<StateError>()));

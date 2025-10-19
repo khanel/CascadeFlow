@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:cascade_flow_infrastructure/src/storage/hive_initializer.dart';
 import 'package:cascade_flow_infrastructure/src/storage/real_hive_initializer.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -29,14 +28,14 @@ void main() {
       // Arrange
       final initializer1 = RealHiveInitializer();
       await initializer1.initialize();
-      final box1 = await initializer1.openEncryptedBox('testBox');
+      final box1 = await initializer1.openEncryptedBox<String>('testBox');
       await box1.put('key', 'value');
       await box1.close();
 
       // Act
       final initializer2 = RealHiveInitializer();
       await initializer2.initialize();
-      final box2 = await initializer2.openEncryptedBox('testBox');
+      final box2 = await initializer2.openEncryptedBox<String>('testBox');
       final value = await box2.get('key');
 
       // Assert
