@@ -1,11 +1,11 @@
 # Progress: CascadeFlow
 
-## Current Status: **Green Phase Complete - Real Storage Implemented**
+## Current Status: **Deep Review Complete - Ingest Feature**
 
 ### Overall Project Health
 - **Architecture**: ✅ Established (feature-sliced design implemented)
 - **Core Infrastructure**: 🟡 Partially complete (stubs in place, real implementations pending)
-- **Feature Development**: ✅ **Ingest feature Blue Phase complete** - all 72 tests passing
+- **Feature Development**: 🟡 **Ingest feature requires further work** - Comprehensive review completed, technical debt identified
 - **Testing**: ✅ TDD Red-Green-Blue cycles successfully implemented and validated
 - **Documentation**: ✅ Comprehensive docs and memory bank updated
 
@@ -125,6 +125,17 @@
   - System notification integration
 
 ### Technical Debt & Improvements
+- ⏳ **Ingest Data Layer (High Priority):**
+  - Refactor `CaptureLocalDataSource` to return `Result` types for better error handling.
+  - Optimize `CaptureRepositoryImpl.loadInbox` to use Hive queries for efficient filtering.
+  - Implement explicit error handling in `CaptureRepositoryImpl`.
+  - Add data migration helpers.
+- ⏳ **Ingest Presentation Layer (Medium Priority):**
+    - Implement keyboard shortcuts for the quick-add sheet.
+    - Add a voice capture stub to the UI.
+    - Implement golden tests for UI consistency.
+- ⏳ **Ingest Domain Layer (Low Priority):**
+    - Implement the "optional attachments descriptor" in the `CaptureItem` entity.
 - ⏳ **Error Handling**
   - Comprehensive error boundaries in UI
   - User-friendly error messages

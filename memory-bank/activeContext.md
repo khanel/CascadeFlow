@@ -2,12 +2,10 @@
 
 ## Current Development Focus
 
-### Primary Feature: Ingest - Real Storage Implementation Complete
-- **Status**: ✅ Green Phase Complete - Real Hive CE storage implemented and tested
-- **Previous Issue**: Data persistence using in-memory stubs resolved
-- **Green Phase Achievement**: TDD cycle completed with failing test (RED) made to pass by implementing RealHiveInitializer with TypeAdapter
-- **Impact**: Data now persists across app sessions, enabling production readiness for Focus workflows
-- **Next**: Complete Red-Green-Blue refactor cycle for Focus Session Management
+### Primary Feature: Ingest - Deep Review Complete
+- **Status**: 🟡 Technical Debt Identified - Comprehensive review complete
+- **Previous Issue**: The data layer implementation did not fully align with the `ingest-plan.md`.
+- **Next**: Address the identified technical debt in the data layer, and implement missing features in the presentation and domain layers.
 
 ### Architecture Implementation
 - **Feature-Sliced Design**: Modular packages with clear boundaries
@@ -139,6 +137,17 @@
 4. Add comprehensive testing coverage
 
 ### Technical Debt
+- **Ingest Data Layer (High Priority):**
+  - Refactor `CaptureLocalDataSource` to return `Result` types.
+  - Optimize `CaptureRepositoryImpl.loadInbox` to use Hive queries.
+  - Implement explicit error handling in `CaptureRepositoryImpl`.
+  - Add data migration helpers.
+- **Ingest Presentation Layer (Medium Priority):**
+    - Implement keyboard shortcuts for the quick-add sheet.
+    - Add a voice capture stub to the UI.
+    - Implement golden tests for UI consistency.
+- **Ingest Domain Layer (Low Priority):**
+    - Implement the "optional attachments descriptor" in the `CaptureItem` entity.
 - Replace infrastructure stubs with real implementations
 - Implement proper error boundaries in UI
 - Add performance monitoring and optimization
