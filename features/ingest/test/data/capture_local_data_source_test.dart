@@ -57,9 +57,10 @@ void main() {
 
     // ACT
     await dataSource.save(model);
-    final stored = await dataSource.read(model.id);
+    final result = await dataSource.read(model.id);
 
     // ASSERT
+    final stored = result.getRight().toNullable();
     expect(stored, isNotNull);
     expect(stored!.toDomain(), equals(item));
   });
