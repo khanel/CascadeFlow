@@ -1,7 +1,13 @@
+import 'dart:io';
+
 import 'package:cascade_flow_infrastructure/storage.dart';
 import 'package:cascade_flow_ingest/data/hive/capture_item_hive_model.dart';
 import 'package:cascade_flow_ingest/data/hive/capture_local_data_source.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive_ce/hive.dart';
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import '../test_utils/capture_test_data.dart';
 
 class _RecordingInitializer extends InMemoryHiveInitializer {
@@ -21,7 +27,38 @@ class _RecordingInitializer extends InMemoryHiveInitializer {
   }
 }
 
+class _TestPathProvider extends Fake with MockPlatformInterfaceMixin
+    implements PathProviderPlatform {
+  _TestPathProvider(this.path);
+
+  final String path;
+
+  @override
+  Future<String?> getApplicationDocumentsPath() async => path;
+}
+
+Future<T> _withPersistentStorageOverrides<T>(
+  Future<T> Function() action,
+) async {
+  final tempDir = await Directory.systemTemp.createTemp(
+    'capture_local_data_source_test_',
+  );
+  final originalPathProvider = PathProviderPlatform.instance;
+  PathProviderPlatform.instance = _TestPathProvider(tempDir.path);
+  FlutterSecureStorage.setMockInitialValues({});
+
+  try {
+    return await action();
+  } finally {
+    PathProviderPlatform.instance = originalPathProvider;
+    await Hive.deleteFromDisk();
+    await tempDir.delete(recursive: true);
+  }
+}
+
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   setUpAll(() async {
     await registerCaptureItemHiveAdapter();
   });
@@ -57,10 +94,9 @@ void main() {
 
     // ACT
     await dataSource.save(model);
-    final result = await dataSource.read(model.id);
+    final stored = await dataSource.read(model.id);
 
     // ASSERT
-    final stored = result.getRight().toNullable();
     expect(stored, isNotNull);
     expect(stored!.toDomain(), equals(item));
   });
@@ -121,26 +157,28 @@ void main() {
 
   test('persists data across data source instances', () async {
     // ARRANGE - Save data with first instance
-    final initializer = RealHiveInitializer();
-    final firstDataSource = CaptureLocalDataSource(initializer: initializer);
-    await firstDataSource.warmUp();
-    final model = CaptureItemHiveModel.fromDomain(
-      buildTestCaptureItem(
-        id: 'persistent-item',
-        createdMicros: 200,
-        updatedMicros: 200,
-      ),
-    );
-    await firstDataSource.save(model);
+    await _withPersistentStorageOverrides(() async {
+      final initializer = RealHiveInitializer();
+      final firstDataSource = CaptureLocalDataSource(initializer: initializer);
+      await firstDataSource.warmUp();
+      final model = CaptureItemHiveModel.fromDomain(
+        buildTestCaptureItem(
+          id: 'persistent-item',
+          createdMicros: 200,
+          updatedMicros: 200,
+        ),
+      );
+      await firstDataSource.save(model);
 
-    // ACT - Try to read from new instance (simulating app restart)
-    final secondDataSource = CaptureLocalDataSource(initializer: initializer);
-    await secondDataSource.warmUp();
-    final persistedItem = await secondDataSource.read(model.id);
+      // ACT - Try to read from new instance (simulating app restart)
+      final secondDataSource = CaptureLocalDataSource(initializer: initializer);
+      await secondDataSource.warmUp();
+      final persistedItem = await secondDataSource.read(model.id);
 
-    // ASSERT - Data persists with real Hive storage
-    expect(persistedItem, isNotNull);
-    expect(persistedItem!.toDomain(), equals(model.toDomain()));
+      // ASSERT - Data persists with real Hive storage
+      expect(persistedItem, isNotNull);
+      expect(persistedItem!.toDomain(), equals(model.toDomain()));
+    });
   });
 
   test(
@@ -148,37 +186,39 @@ void main() {
     () async {
       // Regression test: ensure reinitialization doesn't lose data with real
       // storage
-      final initializer1 = RealHiveInitializer();
-      final dataSource1 = CaptureLocalDataSource(initializer: initializer1);
-      await dataSource1.warmUp();
+      await _withPersistentStorageOverrides(() async {
+        final initializer1 = RealHiveInitializer();
+        final dataSource1 = CaptureLocalDataSource(initializer: initializer1);
+        await dataSource1.warmUp();
 
-      final item = CaptureItemHiveModel.fromDomain(
-        buildTestCaptureItem(
-          id: 'multi-init-test',
-          createdMicros: 1000,
-          updatedMicros: 1000,
-        ),
-      );
-
-      await dataSource1.save(item);
-
-      // Simulate multiple app startup cycles with new initializers
-      // (all accessing shared storage)
-      for (var i = 1; i <= 3; i++) {
-        final newInitializer = RealHiveInitializer();
-        final newDataSource = CaptureLocalDataSource(
-          initializer: newInitializer,
+        final item = CaptureItemHiveModel.fromDomain(
+          buildTestCaptureItem(
+            id: 'multi-init-test',
+            createdMicros: 1000,
+            updatedMicros: 1000,
+          ),
         );
-        await newDataSource.warmUp();
 
-        final persistedItem = await newDataSource.read(item.id);
-        expect(
-          persistedItem,
-          isNotNull,
-          reason: 'Item should persist across initialization #$i',
-        );
-        expect(persistedItem!.toDomain(), equals(item.toDomain()));
-      }
+        await dataSource1.save(item);
+
+        // Simulate multiple app startup cycles with new initializers
+        // (all accessing shared storage)
+        for (var i = 1; i <= 3; i++) {
+          final newInitializer = RealHiveInitializer();
+          final newDataSource = CaptureLocalDataSource(
+            initializer: newInitializer,
+          );
+          await newDataSource.warmUp();
+
+          final persistedItem = await newDataSource.read(item.id);
+          expect(
+            persistedItem,
+            isNotNull,
+            reason: 'Item should persist across initialization #$i',
+          );
+          expect(persistedItem!.toDomain(), equals(item.toDomain()));
+        }
+      });
     },
   );
 
