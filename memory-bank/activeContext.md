@@ -79,7 +79,7 @@
 - Added widget-level tests (`app/test/storage_overrides_test.dart`) covering platform selection and verifying Hive persistence across container restarts
 - Blue refactor tightened platform override logic (reused `RealHiveInitializer.new`/`FlutterSecureStorageAdapter.new`) and extracted shared test helpers for clearer expectations
 - Real Hive initializer now accepts the `SecureStorage` abstraction (defaulting to `FlutterSecureStorageAdapter`), letting tests inject `InMemorySecureStorage` without touching plugin channels; corresponding test helpers reuse shared storage instances to simulate app restarts
-- Navigation tests now pump `CascadeFlowApp` inside a `ProviderScope` using `createStorageOverridesForPlatform(isWebOverride: true)` so Riverpod-based capture UI can render without platform plugins
+- App bootstrap is now gated behind `runCascadeBootstrap`, showing a loading scaffold while adapters/boxes initialize; tests pump `CascadeBootstrap(isWebOverride: true)` instead of wiring storage overrides manually
 
 ### Capture Inbox Filter Presets
 - Added `CaptureFilterPreset` model for saving and loading custom filter configurations

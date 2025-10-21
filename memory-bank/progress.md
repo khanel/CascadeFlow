@@ -75,6 +75,7 @@
 - ✅ **TDD Validation**: All 72 tests passing, flutter analyze with no functional issues
 - ✅ Platform storage tests validate persistent overrides across Android/iOS/macOS/Windows/Linux and ensure Hive data survives container restarts
 - ✅ Real Hive initializer now consumes the `SecureStorage` abstraction with a Flutter adapter default, so tests can inject `InMemorySecureStorage` without touching plugin channels
+- ✅ App bootstrap waits on `runCascadeBootstrap`, showing a loading scaffold during initialization; tests pump `CascadeBootstrap(isWebOverride: true)` to reuse the production bootstrap path
 
 ## What's Left to Build
 
