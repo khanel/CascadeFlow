@@ -136,3 +136,51 @@ For every research effort, add or update an entry using the following structure 
   - [Effective Dart: Design](https://dart.dev/effective-dart/design) — guides intent-revealing helper design and consistent APIs.
 - Reuse Notes:
   - Apply during future refactors touching capture storage error handling or when porting patterns to other features’ data layers.
+
+### Topic: Hive Data Migration
+- Feature / Area: Infrastructure › Storage › Hive
+- Last Updated: 2025-10-21
+- References:
+ - Cite this entry in phase notes as “researchIndex.md › Hive Data Migration”
+
+#### RED Guidance
+- Summary:
+ - Develop tests that simulate schema changes in Hive models and expect the migration helper to correctly transform old data to the new format.
+ - Focus on verifying the migration logic correctly handles missing fields, type changes, and data transformations.
+- Key Practices:
+ - Create a test setup that initializes Hive with an older schema version.
+ - Write a test that attempts to open the box with the new schema and asserts that the migration process is triggered and successful.
+ - Use mock data representing the old schema and assert that the migrated data matches the expected new schema.
+ - Ensure tests cover various migration scenarios, including adding new fields, removing old fields, and changing field types.
+- Source Index:
+ - [Hive CE Migration Documentation](https://docs.hivedb.dev/#/hive_ce/migrations) — official guide on how to handle schema migrations with Hive CE.
+ - [Effective Dart: Testing](https://dart.dev/effective-dart/testing) — general Dart testing best practices.
+- Reuse Notes:
+ - Revisit when planning migrations for other Hive boxes or when Hive CE introduces new migration features.
+
+#### GREEN Guidance
+- Summary:
+ - Implement the simplest possible migration logic to make the failing RED tests pass.
+ - Focus on creating the necessary `MigrationStrategy` for Hive.
+- Key Practices:
+ - Implement the `MigrationStrategy` to handle version upgrades and downgrades if necessary.
+ - Provide a clear, step-by-step transformation of old data to the new schema within the migration function.
+ - Ensure that the migration process is efficient and does not cause data loss or corruption.
+- Source Index:
+ - [Hive CE Migration Examples](https://docs.hivedb.dev/#/hive_ce/migrations?id=examples) — practical examples of implementing migrations.
+- Reuse Notes:
+ - Apply when implementing new schema changes for any Hive box.
+
+#### BLUE Guidance
+- Summary:
+ - Refactor the migration helpers to be robust, reusable, and clearly documented.
+ - Ensure the migration strategy is easily extensible for future schema changes.
+- Key Practices:
+ - Centralize migration logic and version management.
+ - Add comments and documentation to explain complex migration steps.
+ - Verify that the migration process is performant for large datasets.
+- Source Index:
+ - [Effective Dart: Design](https://dart.dev/effective-dart/design) — guidelines for creating well-designed APIs.
+ - [Refactoring.Guru](https://refactoring.guru/) — general refactoring patterns.
+- Reuse Notes:
+ - Apply during future refactors of storage infrastructure or when introducing new data models.

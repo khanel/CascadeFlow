@@ -87,6 +87,7 @@
   - Filing and archiving workflows (archive/delete/file gestures implemented for inbox)
   - Persisted inbox filter selections with secure storage-backed restoration
   - Expose saved filter views and richer filtering presets
+  - Data migration helpers (In Progress)
 - ⏳ **Focus Feature**
   - Session scheduling and management
   - Time blocking with notifications
@@ -131,11 +132,11 @@
   - System notification integration
 
 ### Technical Debt & Improvements
-- ⏳ **Ingest Data Layer (High Priority):**
-  - Refactor `CaptureLocalDataSource` to return `Result` types for better error handling.
-  - Optimize `CaptureRepositoryImpl.loadInbox` to use Hive queries for efficient filtering.
-  - Implement explicit error handling in `CaptureRepositoryImpl`.
-  - Add data migration helpers.
+- ✅ **Ingest Data Layer (High Priority):**
+  - ✅ Refactor `CaptureLocalDataSource` to return `Result` types.
+  - ✅ Optimize `CaptureRepositoryImpl.loadInbox` to use Hive queries for efficient filtering.
+  - ✅ Implement explicit error handling in `CaptureRepositoryImpl`.
+  - 🔄 Add data migration helpers.
 - ⏳ **Ingest Presentation Layer (Medium Priority):**
     - Implement keyboard shortcuts for the quick-add sheet.
     - Add a voice capture stub to the UI.

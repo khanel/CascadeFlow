@@ -157,6 +157,16 @@
   - Fixed unused catch clause warning and code style issues
 - **Code Quality Improvements**: Reduced duplication, enhanced readability, improved maintainability while preserving 100% functionality
 - **Verification**: Flutter analyze reports only minor style warnings, flutter test shows "All tests passed!"
+
+### Ingest Data Layer Result Handling
+- **Status**: ✅ Complete - `CaptureLocalDataSource` and `CaptureRepositoryImpl` refactored to use `Result` types.
+- **Technical Debt Addressed**:
+  - `CaptureLocalDataSource.save`, `readResult`, `deleteResult` updated to return `Future<Result<T, InfrastructureFailure>>`.
+  - Consolidated `_mapToInfrastructureFailure` for centralized error mapping.
+  - `CaptureLocalDataSource.readInbox()` added for efficient inbox item retrieval.
+  - `CaptureRepositoryImpl.save` and `loadInbox` updated to handle `Result` types.
+- **Code Quality Improvements**: Enhanced error handling, improved type safety, and optimized data retrieval.
+- **Verification**: All related tests pass, and static analysis is clean.
 ## Active Decisions
 
 ### State Management Pattern
@@ -203,10 +213,10 @@
 
 ### Technical Debt
 - **Ingest Data Layer (High Priority):**
-  - Refactor `CaptureLocalDataSource` to return `Result` types.
-  - Optimize `CaptureRepositoryImpl.loadInbox` to use Hive queries.
-  - Implement explicit error handling in `CaptureRepositoryImpl`.
-  - Add data migration helpers.
+  - ✅ Refactor `CaptureLocalDataSource` to return `Result` types.
+  - ✅ Optimize `CaptureRepositoryImpl.loadInbox` to use Hive queries.
+  - ✅ Implement explicit error handling in `CaptureRepositoryImpl`.
+  - 🔄 Add data migration helpers.
 - **Ingest Presentation Layer (Medium Priority):**
     - Implement keyboard shortcuts for the quick-add sheet.
     - Add a voice capture stub to the UI.
