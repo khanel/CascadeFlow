@@ -54,6 +54,20 @@ class CaptureLocalDataSource {
     return _useBox((box) => box.get(id));
   }
 
+  /// Reads a capture model as a [Result], preserving Hive failure context.
+  Future<Result<CaptureItemHiveModel?, InfrastructureFailure>> readResult(
+    String id,
+  ) {
+    return Result.guardAsync<CaptureItemHiveModel?, InfrastructureFailure>(
+      body: () => read(id),
+      onError: (error, stackTrace) => _wrapReadError(
+        error: error,
+        stackTrace: stackTrace,
+        id: id,
+      ),
+    );
+  }
+
   /// Deletes the capture model identified by [id], ignoring missing entries.
   Future<void> delete(String id) async {
     await _useBox((box) => box.delete(id));
@@ -93,6 +107,25 @@ class CaptureLocalDataSource {
     }
     return InfrastructureFailure(
       message: 'Failed to save capture model "$id".',
+      cause: error,
+      stackTrace: stackTrace,
+    );
+  }
+
+  InfrastructureFailure _wrapReadError({
+    required Object error,
+    required StackTrace stackTrace,
+    required String id,
+  }) {
+    if (error is InfrastructureFailure) {
+      return InfrastructureFailure(
+        message: error.message,
+        cause: error.cause,
+        stackTrace: error.stackTrace ?? stackTrace,
+      );
+    }
+    return InfrastructureFailure(
+      message: 'Failed to read capture model "$id".',
       cause: error,
       stackTrace: stackTrace,
     );
