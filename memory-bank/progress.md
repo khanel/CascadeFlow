@@ -21,6 +21,7 @@
 - ✅ `CaptureStatus` expanded with a `filed` state to represent processed captures
 - ✅ `FileCaptureItem` use case handles filing transitions and emits `CaptureItemFiled` events
 - ✅ `CaptureItem` now exposes `isInbox`, `isFiled`, and `isArchived` helpers to simplify status checks
+- ✅ Added `readResult`, `deleteResult` methods to `CaptureLocalDataSource` with `Result` wrapping and error handling
 
 ### Core Domain
 - ✅ Domain events system (`DomainEvent` base class)

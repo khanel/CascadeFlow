@@ -57,6 +57,13 @@
 
 ## Recent Changes
 
+### Ingest Data Layer Result Methods
+- Added `CaptureLocalDataSource.readResult` to wrap Hive reads in `Result<CaptureItemHiveModel?, InfrastructureFailure>` with error handling.
+- Added `CaptureLocalDataSource.deleteResult` to wrap Hive deletes in `Result<void, InfrastructureFailure>` with error handling.
+- Introduced `_wrapReadError` and `_wrapDeleteError` helpers for consistent error messaging and stack trace preservation.
+- Added comprehensive tests for read and delete error handling, ensuring InfrastructureFailure wrapping for Hive failures.
+- Documented supporting research in `researchIndex.md › Capture Local Data Source Result Handling`; revisit or prune when ingest storage priorities shift.
+
 ### Ingest Data Layer Result Wrappers
 - Added `CaptureLocalDataSource.saveResult` to wrap Hive writes in `Result<void, InfrastructureFailure>` and preserve original error context.
 - Introduced `_wrapSaveError` helper so existing infrastructure failures retain stack traces while new failures use consistent messaging.
