@@ -4,7 +4,6 @@ import 'dart:typed_data';
 
 import 'package:cascade_flow_core/cascade_flow_core.dart';
 import 'package:cascade_flow_infrastructure/storage.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:meta/meta.dart';
 import 'package:path_provider/path_provider.dart';
@@ -20,12 +19,12 @@ import 'package:path_provider/path_provider.dart';
 class RealHiveInitializer extends HiveInitializer {
   /// Creates a real Hive initializer for production use.
   RealHiveInitializer([
-    this._secureStorage = const FlutterSecureStorage(),
-  ]);
+    SecureStorage? secureStorage,
+  ]) : _secureStorage = secureStorage ?? FlutterSecureStorageAdapter();
 
   static const _keyStorageKey = 'hive_encryption_key';
 
-  final FlutterSecureStorage _secureStorage;
+  final SecureStorage _secureStorage;
 
   @override
   Future<void> doInitialize() async {

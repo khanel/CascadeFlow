@@ -25,10 +25,14 @@ dependencies:
     sdk: flutter
   flutter_riverpod: ^3.0.1
   go_router: ^16.2.4
+  riverpod: ^3.0.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  hive_ce: ^2.14.0
+  path_provider_platform_interface: ^2.1.2
+  plugin_platform_interface: ^2.1.8
   very_good_analysis: ^10.0.0
 
 flutter:

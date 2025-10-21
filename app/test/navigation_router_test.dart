@@ -1,6 +1,9 @@
 import 'package:cascade_flow_app/main.dart';
+import 'package:cascade_flow_app/src/bootstrap/storage_overrides.dart';
+import 'package:cascade_flow_ingest/presentation/pages/capture_home_page.dart';
 import 'package:cascade_flow_presentation/cascade_flow_presentation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
@@ -10,7 +13,7 @@ void main() {
   testWidgets('MyApp uses StatefulShellRoute with six navigation branches', (
     tester,
   ) async {
-    await tester.pumpWidget(const CascadeFlowApp());
+    await _pumpCascadeApp(tester);
 
     final materialAppFinder = find.byType(MaterialApp);
     expect(materialAppFinder, findsOneWidget);
@@ -41,22 +44,17 @@ void main() {
     (tester) async {
       final captureTab = find.text('Capture');
       final planTab = find.text('Plan');
-      final captureRootFinder = find.byKey(
-        PresentationScaffoldKeys.root('capture'),
-      );
+      final captureRootFinder = find.byType(CaptureHomePage);
       final captureDetailsFinder = find.byKey(
         PresentationScaffoldKeys.detail('capture'),
       );
       final planRootFinder = find.byKey(PresentationScaffoldKeys.root('plan'));
-      final captureWorkspaceText = find.text(
-        PresentationScaffoldMessages.workspace('Capture'),
-      );
       final planWorkspaceText = find.text(
         PresentationScaffoldMessages.workspace('Plan'),
       );
 
       // ARRANGE: load app and ensure capture branch root is visible
-      await tester.pumpWidget(const CascadeFlowApp());
+      await _pumpCascadeApp(tester);
       await _pumpUntilVisible(
         tester,
         captureRootFinder,
@@ -96,7 +94,6 @@ void main() {
 
       // ASSERT: reselecting capture resets stack to root screen
       expect(captureRootFinder, findsOneWidget);
-      expect(captureWorkspaceText, findsOneWidget);
       expect(captureDetailsFinder, findsNothing);
     },
   );
@@ -104,8 +101,7 @@ void main() {
   testWidgets(
     'Each navigation branch exposes placeholder detail route',
     (tester) async {
-      await tester.pumpWidget(const CascadeFlowApp());
-      await tester.pump();
+      await _pumpCascadeApp(tester);
 
       final materialAppFinder = find.byType(MaterialApp);
       final materialApp = tester.widget<MaterialApp>(materialAppFinder);
@@ -168,6 +164,16 @@ Future<void> _pumpUntilVisible(WidgetTester tester, Finder finder) async {
   fail('Finder $finder not visible after $timeout.');
 }
 
+Future<void> _pumpCascadeApp(WidgetTester tester) async {
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: createStorageOverridesForPlatform(isWebOverride: true),
+      child: const CascadeFlowApp(),
+    ),
+  );
+  await tester.pump();
+}
+
 Future<void> _verifyBranchDetailRoute(
   WidgetTester tester,
   GoRouter router,
@@ -188,8 +194,12 @@ Future<void> _verifyBranchDetailRoute(
 
   router.go(branchRoute.path);
   await tester.pumpAndSettle();
-  expect(rootFinder, findsOneWidget);
-  expect(rootTextFinder, findsOneWidget);
+  if (branchId == 'capture') {
+    expect(find.byType(CaptureHomePage), findsOneWidget);
+  } else {
+    expect(rootFinder, findsOneWidget);
+    expect(rootTextFinder, findsOneWidget);
+  }
 
   final detailPath = '${branchRoute.path}/${detailRoute.path}';
   router.go(detailPath);
@@ -199,8 +209,12 @@ Future<void> _verifyBranchDetailRoute(
 
   router.go(branchRoute.path);
   await tester.pumpAndSettle();
-  expect(rootFinder, findsOneWidget);
-  expect(rootTextFinder, findsOneWidget);
+  if (branchId == 'capture') {
+    expect(find.byType(CaptureHomePage), findsOneWidget);
+  } else {
+    expect(rootFinder, findsOneWidget);
+    expect(rootTextFinder, findsOneWidget);
+  }
 }
 
 String _branchIdFromPath(String path) =>

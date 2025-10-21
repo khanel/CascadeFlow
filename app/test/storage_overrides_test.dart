@@ -2,14 +2,12 @@ import 'dart:io';
 
 import 'package:cascade_flow_app/src/bootstrap/storage_overrides.dart';
 import 'package:cascade_flow_infrastructure/cascade_flow_infrastructure.dart';
-import 'package:cascade_flow_infrastructure/storage.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-import 'package:riverpod/riverpod.dart';
 
 class _TestPathProvider extends Fake with MockPlatformInterfaceMixin
     implements PathProviderPlatform {
@@ -34,87 +32,106 @@ void main() {
       await Hive.deleteFromDisk();
     });
 
-    Future<void> _expectPersistentStorage(TargetPlatform platform) async {
+    Future<void> withPersistentPlatform(
+      TargetPlatform platform,
+      Future<void> Function() runTest,
+    ) async {
       debugDefaultTargetPlatformOverride = platform;
-      FlutterSecureStorage.setMockInitialValues({});
-
       final tempDir = await Directory.systemTemp.createTemp();
+      final originalPathProvider = PathProviderPlatform.instance;
       PathProviderPlatform.instance = _TestPathProvider(tempDir.path);
 
-      final container = ProviderContainer(
-        overrides: createStorageOverridesForPlatform(),
-      );
+      try {
+        await runTest();
+      } finally {
+        PathProviderPlatform.instance = originalPathProvider;
+        await tempDir.delete(recursive: true);
+      }
+    }
 
-      final initializer = container.read(hiveInitializerProvider);
-      final secureStorage = container.read(secureStorageProvider);
+    Future<void> expectPersistentStorage(TargetPlatform platform) async {
+      await withPersistentPlatform(platform, () async {
+        final container = ProviderContainer(
+          overrides: createStorageOverridesForPlatform(),
+        );
+        final initializer = container.read(hiveInitializerProvider);
+        final secureStorage = container.read(secureStorageProvider);
 
-      expect(initializer, isA<RealHiveInitializer>());
-      expect(secureStorage, isA<SecureStorage>());
-      expect(secureStorage, isNot(isA<InMemorySecureStorage>()));
-
-      container.dispose();
-      await tempDir.delete(recursive: true);
+        expect(initializer, isA<RealHiveInitializer>());
+        expect(secureStorage, isA<SecureStorage>());
+        expect(secureStorage, isNot(isA<InMemorySecureStorage>()));
+        container.dispose();
+      });
     }
 
     test('uses persistent storage on Android', () async {
-      await _expectPersistentStorage(TargetPlatform.android);
+      await expectPersistentStorage(TargetPlatform.android);
     });
 
     test('uses persistent storage on iOS', () async {
-      await _expectPersistentStorage(TargetPlatform.iOS);
+      await expectPersistentStorage(TargetPlatform.iOS);
     });
 
     test('uses persistent storage on macOS', () async {
-      await _expectPersistentStorage(TargetPlatform.macOS);
+      await expectPersistentStorage(TargetPlatform.macOS);
     });
 
     test('uses persistent storage on Windows', () async {
-      await _expectPersistentStorage(TargetPlatform.windows);
+      await expectPersistentStorage(TargetPlatform.windows);
     });
 
     test('uses persistent storage on Linux', () async {
-      await _expectPersistentStorage(TargetPlatform.linux);
+      await expectPersistentStorage(TargetPlatform.linux);
     });
 
     test('persists data across container restarts on Android', () async {
-      debugDefaultTargetPlatformOverride = TargetPlatform.android;
-      FlutterSecureStorage.setMockInitialValues({});
+      await withPersistentPlatform(
+        TargetPlatform.android,
+        () async {
+          final sharedSecureStorage = InMemorySecureStorage();
+          final firstContainer = ProviderContainer(
+            overrides: createStorageOverridesForPlatform(
+              persistentHiveInitializer: () => RealHiveInitializer(
+                sharedSecureStorage,
+              ),
+              persistentSecureStorage: () => sharedSecureStorage,
+            ),
+          );
+          final firstInitializer = firstContainer.read(hiveInitializerProvider);
+          await firstInitializer.initialize();
+          final box = await firstInitializer.openEncryptedBox<String>(
+            'test.box',
+          );
+          await box.put('persisted', 'value');
+          await box.close();
+          firstContainer.dispose();
 
-      final tempDir = await Directory.systemTemp.createTemp();
-      PathProviderPlatform.instance = _TestPathProvider(tempDir.path);
+          final secondContainer = ProviderContainer(
+            overrides: createStorageOverridesForPlatform(
+              persistentHiveInitializer: () => RealHiveInitializer(
+                sharedSecureStorage,
+              ),
+              persistentSecureStorage: () => sharedSecureStorage,
+            ),
+          );
+          final secondInitializer =
+              secondContainer.read(hiveInitializerProvider);
+          await secondInitializer.initialize();
+          final restoredBox =
+              await secondInitializer.openEncryptedBox<String>('test.box');
+          final restored = await restoredBox.get('persisted');
 
-      final firstContainer = ProviderContainer(
-        overrides: createStorageOverridesForPlatform(),
+          expect(restored, 'value');
+          await restoredBox.clear();
+          await restoredBox.close();
+          secondContainer.dispose();
+          await Hive.deleteFromDisk();
+        },
       );
-      final firstInitializer = firstContainer.read(hiveInitializerProvider);
-      await firstInitializer.initialize();
-      final box = await firstInitializer.openEncryptedBox<String>('test.box');
-      await box.put('persisted', 'value');
-      await box.close();
-      firstContainer.dispose();
-
-      final secondContainer = ProviderContainer(
-        overrides: createStorageOverridesForPlatform(),
-      );
-      final secondInitializer = secondContainer.read(hiveInitializerProvider);
-      await secondInitializer.initialize();
-      final restoredBox = await secondInitializer.openEncryptedBox<String>(
-        'test.box',
-      );
-      final restored = await restoredBox.get('persisted');
-
-      expect(restored, 'value');
-      await restoredBox.clear();
-      await restoredBox.close();
-      secondContainer.dispose();
-
-      await Hive.deleteFromDisk();
-      await tempDir.delete(recursive: true);
     });
 
     test('falls back to in-memory storage on web', () async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
-      FlutterSecureStorage.setMockInitialValues({});
 
       final container = ProviderContainer(
         overrides: createStorageOverridesForPlatform(isWebOverride: true),
@@ -124,7 +141,10 @@ void main() {
         container.read(hiveInitializerProvider),
         isA<InMemoryHiveInitializer>(),
       );
-      expect(container.read(secureStorageProvider), isA<InMemorySecureStorage>());
+      expect(
+        container.read(secureStorageProvider),
+        isA<InMemorySecureStorage>(),
+      );
 
       container.dispose();
     });

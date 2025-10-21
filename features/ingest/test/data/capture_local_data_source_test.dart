@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:cascade_flow_infrastructure/storage.dart';
 import 'package:cascade_flow_ingest/data/hive/capture_item_hive_model.dart';
 import 'package:cascade_flow_ingest/data/hive/capture_local_data_source.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
@@ -45,7 +44,6 @@ Future<T> _withPersistentStorageOverrides<T>(
   );
   final originalPathProvider = PathProviderPlatform.instance;
   PathProviderPlatform.instance = _TestPathProvider(tempDir.path);
-  FlutterSecureStorage.setMockInitialValues({});
 
   try {
     return await action();
@@ -158,7 +156,8 @@ void main() {
   test('persists data across data source instances', () async {
     // ARRANGE - Save data with first instance
     await _withPersistentStorageOverrides(() async {
-      final initializer = RealHiveInitializer();
+      final secureStorage = InMemorySecureStorage();
+      final initializer = RealHiveInitializer(secureStorage);
       final firstDataSource = CaptureLocalDataSource(initializer: initializer);
       await firstDataSource.warmUp();
       final model = CaptureItemHiveModel.fromDomain(
@@ -187,7 +186,8 @@ void main() {
       // Regression test: ensure reinitialization doesn't lose data with real
       // storage
       await _withPersistentStorageOverrides(() async {
-        final initializer1 = RealHiveInitializer();
+        final secureStorage = InMemorySecureStorage();
+        final initializer1 = RealHiveInitializer(secureStorage);
         final dataSource1 = CaptureLocalDataSource(initializer: initializer1);
         await dataSource1.warmUp();
 
@@ -204,7 +204,7 @@ void main() {
         // Simulate multiple app startup cycles with new initializers
         // (all accessing shared storage)
         for (var i = 1; i <= 3; i++) {
-          final newInitializer = RealHiveInitializer();
+          final newInitializer = RealHiveInitializer(secureStorage);
           final newDataSource = CaptureLocalDataSource(
             initializer: newInitializer,
           );

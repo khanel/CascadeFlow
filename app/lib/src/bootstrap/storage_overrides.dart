@@ -1,10 +1,14 @@
 import 'package:cascade_flow_infrastructure/cascade_flow_infrastructure.dart';
-import 'package:cascade_flow_infrastructure/storage.dart';
 import 'package:flutter/foundation.dart';
+// Riverpod currently exposes `Override` only from its internal framework
+// library. Once a public export becomes available we can drop this import.
 // ignore: implementation_imports
 import 'package:riverpod/src/framework.dart' show Override;
 
+/// Factory signature for creating a [HiveInitializer].
 typedef HiveInitializerFactory = HiveInitializer Function();
+
+/// Factory signature for creating a [SecureStorage].
 typedef SecureStorageFactory = SecureStorage Function();
 
 const Set<TargetPlatform> _persistentPlatforms = <TargetPlatform>{
@@ -15,6 +19,15 @@ const Set<TargetPlatform> _persistentPlatforms = <TargetPlatform>{
   TargetPlatform.linux,
 };
 
+/// Determines whether persistent storage should be used for the given
+/// [platform] / [isWeb] combination.
+bool _shouldUsePersistentStorage({
+  required TargetPlatform platform,
+  required bool isWeb,
+}) =>
+    !isWeb && _persistentPlatforms.contains(platform);
+
+/// Builds the storage overrides appropriate for the current platform.
 List<Override> createStorageOverridesForPlatform({
   TargetPlatform? platformOverride,
   bool? isWebOverride,
@@ -23,16 +36,17 @@ List<Override> createStorageOverridesForPlatform({
 }) {
   final platform = platformOverride ?? defaultTargetPlatform;
   final isWeb = isWebOverride ?? kIsWeb;
-  final usePersistentStorage = !isWeb && _persistentPlatforms.contains(
-    platform,
+  final usePersistentStorage = _shouldUsePersistentStorage(
+    platform: platform,
+    isWeb: isWeb,
   );
 
   final hiveInitializer = usePersistentStorage
-      ? (persistentHiveInitializer?.call() ?? RealHiveInitializer())
+      ? (persistentHiveInitializer ?? RealHiveInitializer.new)()
       : InMemoryHiveInitializer();
 
   final secureStorage = usePersistentStorage
-      ? (persistentSecureStorage?.call() ?? FlutterSecureStorageAdapter())
+      ? (persistentSecureStorage ?? FlutterSecureStorageAdapter.new)()
       : InMemorySecureStorage();
 
   return <Override>[

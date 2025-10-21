@@ -1,8 +1,7 @@
 import 'dart:async';
 
+import 'package:cascade_flow_infrastructure/src/storage/secure_storage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
-import 'secure_storage.dart';
 
 /// Adapter that exposes [FlutterSecureStorage] through the [SecureStorage]
 /// interface.

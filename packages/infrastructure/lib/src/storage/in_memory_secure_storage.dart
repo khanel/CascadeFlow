@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'secure_storage.dart';
+import 'package:cascade_flow_infrastructure/src/storage/secure_storage.dart';
 
 /// Simple in-memory stand-in for secure storage used during tests.
 class InMemorySecureStorage implements SecureStorage {
