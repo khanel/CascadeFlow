@@ -33,6 +33,7 @@
 - ✅ In-memory Hive initializer for development
 - ✅ Secure storage stub implementation
 - ✅ Logging infrastructure setup
+- ✅ Platform-aware storage overrides inject real Hive + secure storage on supported platforms, with tests verifying persistence across restarts
 
 ### Development Workflow
 - ✅ Build runner configuration for code generation
@@ -71,6 +72,7 @@
 - ✅ Added persistence tests for inbox filter store and controller restoration
 - ✅ **Blue Phase Refactoring Complete**: All technical debt addressed, code quality improved while maintaining 100% functionality
 - ✅ **TDD Validation**: All 72 tests passing, flutter analyze with no functional issues
+- ✅ Platform storage tests validate persistent overrides across Android/iOS/macOS/Windows/Linux and ensure Hive data survives container restarts
 
 ## What's Left to Build
 

@@ -75,6 +75,7 @@ CascadeFlow follows a **feature-sliced architecture** with clear separation of c
 - **Notifications**: Platform notification services
 - **Logging**: Structured logging infrastructure
 - **Pattern**: Adapter pattern for platform abstractions
+- **Platform Overrides**: `createStorageOverridesForPlatform` injects `RealHiveInitializer` and `FlutterSecureStorageAdapter` on desktop/mobile targets while keeping in-memory stubs for web/tests
 
 ## Key Design Patterns
 

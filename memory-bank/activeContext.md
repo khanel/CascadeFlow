@@ -72,6 +72,12 @@
 - Refactored filter controller to short-circuit redundant updates and split inbox list rendering into focused widgets for maintainability
 - Persisted filter selections via `CaptureInboxFilterStore` using secure storage stubs, restoring them on controller bootstrap and syncing updates automatically
 
+### Platform Storage Overrides
+- Added `createStorageOverridesForPlatform` to supply platform-aware overrides for storage during app bootstrap
+- `CascadeBootstrap` now injects persistent `RealHiveInitializer` and `FlutterSecureStorageAdapter` implementations on Android, iOS, macOS, Windows, and Linux
+- Introduced `SecureStorage` abstraction with both in-memory and Flutter-backed adapters
+- Added widget-level tests (`app/test/storage_overrides_test.dart`) covering platform selection and verifying Hive persistence across container restarts
+
 ### Capture Inbox Filter Presets
 - Added `CaptureFilterPreset` model for saving and loading custom filter configurations
 - Implemented preset management in `CaptureInboxFilterStore` with save, load, delete, and clear operations

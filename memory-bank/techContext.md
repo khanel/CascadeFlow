@@ -18,6 +18,7 @@
 - **hive_ce_flutter**: 2.3.2 - Flutter integration for Hive CE
 - **path_provider**: 2.1.5 - Platform-specific path resolution
 - **flutter_secure_storage**: 9.2.4 - Encrypted key-value storage
+- **SecureStorage Abstraction**: `SecureStorage` interface with `InMemorySecureStorage` for tests and `FlutterSecureStorageAdapter` for production runtime overrides
 
 ### Functional Programming
 - **fpdart**: 1.1.1 - Functional programming utilities (TaskEither, Option, etc.)
