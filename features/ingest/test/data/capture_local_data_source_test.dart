@@ -98,6 +98,48 @@ class _ThrowingHiveBox implements HiveBox<CaptureItemHiveModel> {
   }
 }
 
+class _GetThrowingHiveBox implements HiveBox<CaptureItemHiveModel> {
+  _GetThrowingHiveBox({required this.error, required this.stackTrace});
+
+  final Object error;
+  final StackTrace stackTrace;
+
+  @override
+  Future<void> put(String key, CaptureItemHiveModel value) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<CaptureItemHiveModel?> get(String key) {
+    return Future<CaptureItemHiveModel?>.error(error, stackTrace);
+  }
+
+  @override
+  Future<List<CaptureItemHiveModel>> values() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> delete(String key) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> clear() {
+    throw UnimplementedError();
+  }
+
+  @override
+  CaptureItemHiveModel require(String key) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> close() {
+    throw UnimplementedError();
+  }
+}
+
 class _ThrowingHiveInitializer extends HiveInitializer {
   _ThrowingHiveInitializer({required HiveBox<CaptureItemHiveModel> box})
     : _box = box;
@@ -185,6 +227,37 @@ void main() {
       expect(failure.cause, same(error));
       expect(failure.stackTrace, equals(stackTrace));
       expect(failure.message, contains('save'));
+    },
+  );
+
+  test(
+    'readResult wraps hive read failures in InfrastructureFailure',
+    () async {
+      // ARRANGE
+      final error = StateError('read-boom');
+      final stackTrace = StackTrace.current;
+      final throwingBox = _GetThrowingHiveBox(
+        error: error,
+        stackTrace: stackTrace,
+      );
+      final initializer = _ThrowingHiveInitializer(box: throwingBox);
+      final dataSource = CaptureLocalDataSource(initializer: initializer);
+      await dataSource.warmUp();
+
+      // ACT
+      final result = await dataSource.readResult('missing-id');
+
+      // ASSERT
+      expect(
+        result,
+        isA<FailureResult<CaptureItemHiveModel?, InfrastructureFailure>>(),
+      );
+      final failure =
+          (result as FailureResult<CaptureItemHiveModel?, InfrastructureFailure>)
+              .failure;
+      expect(failure.cause, same(error));
+      expect(failure.stackTrace, equals(stackTrace));
+      expect(failure.message, contains('read'));
     },
   );
 
