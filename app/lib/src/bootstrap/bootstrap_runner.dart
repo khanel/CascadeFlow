@@ -41,7 +41,7 @@ Future<void> runCascadeBootstrap(ProviderContainer container) async {
     ),
   );
   final adapterRegistryBox =
-      await hiveInitializer.openEncryptedBox<Map<String, Object?>>(
+      await hiveInitializer.openEncryptedBox<Map<dynamic, dynamic>>(
         adapterRegistryBoxName,
       );
   await adapterRegistryBox.put(

@@ -30,7 +30,7 @@ HiveAdapterRegistrar appHiveAdapterRegistrar(Ref ref) {
   return () async {
     await registerCaptureItemHiveAdapter();
     final registryBox =
-        await initializer.openEncryptedBox<Map<String, Object?>>(
+        await initializer.openEncryptedBox<Map<dynamic, dynamic>>(
           adapterRegistryBoxName,
         );
     await registryBox.put(
