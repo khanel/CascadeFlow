@@ -10,14 +10,14 @@ This package exposes a small set of Riverpod providers that the feature slices c
 - **Usage:** Read it when you need lightweight console logging inside application layers while more advanced logging is still being designed.
 
 ### `hiveInitializerProvider`
-- **Type:** `Provider<InMemoryHiveInitializer>`
-- **Implementation:** wraps the in-memory Hive initializer stub used in tests. It guarantees `initialize()` is idempotent and that each named box is only created once.
+- **Type:** `Provider<HiveInitializer>`
+- **Implementation:** resolves to the in-memory Hive initializer stub by default for tests and local development. Production builds override it with `RealHiveInitializer` to persist data across sessions. The initializer guarantees `initialize()` is idempotent and that each named box is only created once.
 - **Usage:** Call `initialize()` during app bootstrap, then resolve encrypted boxes for repositories and data sources.
 
 ### `secureStorageProvider`
-- **Type:** `Provider<InMemorySecureStorage>`
-- **Implementation:** uses an in-memory map to simulate secure key-value storage.
-- **Usage:** Prototype flows that need to persist API tokens or Hive encryption keys. Replace with the production secure storage once native integrations land.
+- **Type:** `Provider<SecureStorage>`
+- **Implementation:** defaults to the in-memory map-backed stub. Production builds override it with `FlutterSecureStorageAdapter` so Hive encryption keys survive app restarts.
+- **Usage:** Read/write sensitive configuration such as Hive encryption keys or auth tokens. Swap implementations in `ProviderScope` overrides depending on the runtime environment.
 
 ## Example usage
 
