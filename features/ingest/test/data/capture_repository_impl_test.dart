@@ -160,4 +160,41 @@ void main() {
     final inboxItems = await repository.loadInbox();
     expect(inboxItems, equals(<CaptureItem>[second]));
   });
+
+  test('loadInbox_returnsOnlyInboxItems_whenMultipleStatusesExist', () async {
+    // ARRANGE - Create a large number of items to test performance optimization
+    final inboxItems = List.generate(
+      100,
+      (index) => buildTestCaptureItem(
+        id: 'inbox-$index',
+        createdMicros: index * 10,
+        updatedMicros: index * 10,
+      ),
+    );
+    final archivedItems = List.generate(
+      50,
+      (index) => buildTestCaptureItem(
+        id: 'archived-$index',
+        status: CaptureStatus.archived,
+        createdMicros: index * 20,
+        updatedMicros: index * 20,
+      ),
+    );
+
+    // Save all items
+    for (final item in [...inboxItems, ...archivedItems]) {
+      await repository.save(item);
+    }
+
+    // ACT - Load inbox items
+    final result = await repository.loadInbox();
+
+    // ASSERT - Should only return inbox items, not archived ones
+    expect(result, hasLength(100));
+    expect(result.every((item) => item.status == CaptureStatus.inbox), isTrue);
+    expect(
+      result.map((item) => item.id.value).toSet(),
+      equals(inboxItems.map((item) => item.id.value).toSet()),
+    );
+  });
 }

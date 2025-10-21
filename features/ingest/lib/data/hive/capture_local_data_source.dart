@@ -5,12 +5,6 @@ import 'package:cascade_flow_ingest/data/hive/capture_item_hive_model.dart';
 /// Hive box name for capture inbox items.
 const String captureItemsBoxName = 'capture_items';
 
-// BLUE Phase Refactoring Complete: Applied TDD guidelines
-// ✅ Minimal Complexity: Simplified _ensureBox() logic, removed redundant
-//    variable assignment
-// ✅ Clear Logic Flow: Direct null check for improved readability
-// ✅ Single Responsibility: Maintained focused method responsibilities
-
 /// Local data source responsible for interacting with the
 /// capture inbox box.
 class CaptureLocalDataSource {

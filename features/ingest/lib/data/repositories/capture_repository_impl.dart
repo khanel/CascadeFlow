@@ -20,6 +20,9 @@ class CaptureRepositoryImpl implements CaptureRepository {
   }
 
   /// Loads all inbox capture items ordered by newest creation time first.
+  ///
+  /// This method loads all items from the data source, then filters for
+  /// inbox items and sorts them in memory.
   @override
   Future<List<CaptureItem>> loadInbox({
     int? limit,
