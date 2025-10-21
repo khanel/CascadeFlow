@@ -3,6 +3,17 @@
 ## Current Development Focus
 
 ### Phase Research Notes
+- **RED – Capture local read/delete Result tests (2024-11-25)**
+  - Sources:
+    - Dart team, “Dart testing overview” – https://dart.dev/guides/testing
+    - Flutter team, “An introduction to unit testing” – https://docs.flutter.dev/cookbook/testing/unit/introduction
+  - Takeaways:
+    - Give tests intent-revealing descriptions tied to the observable behaviour so failures identify the scenario immediately.
+    - Follow Arrange/Act/Assert structure with explicit setup inside each test to avoid hidden coupling across cases.
+    - Simulate async failures using `Future.error` so both error and stack trace can be asserted on the resulting `InfrastructureFailure`.
+    - Await the SUT call before matching on `Result` objects to ensure thrown errors do not bypass expectations.
+    - Use type-safe matchers such as `isA<FailureResult<...>>` plus `same(error)` to confirm cause preservation.
+  - Reuse: See `researchIndex.md › Capture Local Data Source Result Handling`.
 - **RED – Wrap capture data source operations in `Result`**
   - Sources:
     - Dart team, “Futures and error handling” – https://dart.dev/guides/libraries/futures-error-handling
@@ -23,16 +34,16 @@
     - Provide operation-specific failure messages (e.g., “save capture model”) to make debugging storage issues easier.
     - Keep Hive initialization idempotent and reuse opened boxes to avoid state churn during repeated write attempts.
   - Reuse: See `researchIndex.md › Ingest Data Layer Result Wrapping` (GREEN section).
-- **BLUE – Refine result API naming & clarity**
+- **BLUE – Consolidate capture error handling helpers (2024-11-25)**
   - Sources:
-    - Dart team, “Effective Dart: Style” – https://dart.dev/effective-dart/style
+    - Refactoring.Guru, “What is Refactoring?” – https://refactoring.guru/refactoring/what-is-refactoring
     - Dart team, “Effective Dart: Design” – https://dart.dev/effective-dart/design
   - Takeaways:
-    - Favor intent-revealing method names and documentation so callers understand when to choose the new `Result`-returning APIs.
-    - Keep exception translation helpers private to reduce the public surface area and limit knowledge of failure mechanics to a single place.
-    - Prefer small, reusable helpers over inline anonymous functions to lower cyclomatic complexity and increase readability.
-    - Ensure error messages remain concise and consistent with project terminology for downstream logging.
-  - Reuse: Detailed in `researchIndex.md › Ingest Data Layer Result Wrapping` (BLUE section).
+    - Collapse duplicate error translation helpers into a single operation-aware method to keep behaviour consistent across save/read paths.
+    - Feed operation descriptors into the helper rather than hardcoding message strings in multiple places.
+    - Introduce shared expectation utilities in tests to enforce uniform assertions and reduce duplication.
+    - Keep refactors incremental with tests run between changes for safety.
+  - Reuse: Logged in `researchIndex.md › Capture Local Data Source Result Handling`.
 
 ### Primary Feature: Ingest - Deep Review Complete
 - **Status**: 🟡 Technical Debt Identified - Comprehensive review complete

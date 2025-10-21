@@ -90,3 +90,49 @@ For every research effort, add or update an entry using the following structure 
   - [Effective Dart: Design](https://dart.dev/effective-dart/design) — guides API surface minimisation and reuse.
 - Reuse Notes:
   - Re-evaluate after repository integration or when refactoring cross-feature storage patterns; remove if ingest focus shifts away from Hive result handling.
+
+### Topic: Capture Local Data Source Result Handling
+- Feature / Area: Ingest › Data Layer › CaptureLocalDataSource
+- Last Updated: 2024-11-25
+- References:
+  - Cite this entry in phase notes as “researchIndex.md › Capture Local Data Source Result Handling”
+
+#### RED Guidance
+- Summary:
+  - Extend capture data source tests to cover `Result`-returning read/delete paths by simulating Hive failures and asserting InfrastructureFailure wrapping.
+- Key Practices:
+  - Name tests after the observable behaviour so failing output highlights the scenario.
+  - Structure each test with explicit Arrange/Act/Assert sections to minimize hidden coupling.
+  - Use `Future.error` on stubbed Hive calls to preserve both error and stack trace in assertions.
+  - Verify `Result` instances using `isA<FailureResult<...>>` and `same(error)` to ensure cause identity.
+- Source Index:
+  - [Dart testing overview](https://dart.dev/guides/testing) — covers asynchronous unit testing patterns and matcher usage.
+  - [An introduction to unit testing](https://docs.flutter.dev/cookbook/testing/unit/introduction) — reinforces focused, readable test structure.
+- Reuse Notes:
+  - Revisit when additional data source operations gain `Result` variants or when switching persistence fakes.
+
+#### GREEN Guidance
+- Summary:
+  - Implement `Result` wrappers for read/delete using existing box access helpers while keeping the outward API compatible for existing callers.
+- Key Practices:
+  - Reuse `_useBox` and `Result.guardAsync` to centralise Hive error handling.
+  - Preserve stack traces when mapping exceptions into `InfrastructureFailure`.
+  - Expose new `Result` helpers alongside existing void/nullable methods to avoid breaking consumers.
+- Source Index:
+  - [Dart testing overview](https://dart.dev/guides/testing) — documents async error propagation informing guard implementation.
+  - [An introduction to unit testing](https://docs.flutter.dev/cookbook/testing/unit/introduction) — encourages writing minimal code to satisfy the new contract.
+- Reuse Notes:
+  - Reference when introducing additional persistence operations or adapting to new storage adapters; assumptions hold while Hive APIs throw `Future` errors.
+
+#### BLUE Guidance
+- Summary:
+  - Consolidate duplicated error-wrapping logic and shared test assertions so the new `Result` helpers remain maintainable without changing behaviour.
+- Key Practices:
+  - Extract reusable assertion helpers for InfrastructureFailure expectations across tests.
+  - Align helper signatures with operation semantics instead of duplicating message strings.
+  - Apply refactors incrementally, running tests after each change.
+- Source Index:
+  - [What is Refactoring?](https://refactoring.guru/refactoring/what-is-refactoring) — emphasises removing duplication while keeping behaviour unchanged.
+  - [Effective Dart: Design](https://dart.dev/effective-dart/design) — guides intent-revealing helper design and consistent APIs.
+- Reuse Notes:
+  - Apply during future refactors touching capture storage error handling or when porting patterns to other features’ data layers.
