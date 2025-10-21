@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cascade_flow_core/cascade_flow_core.dart';
 import 'package:cascade_flow_infrastructure/storage.dart';
 import 'package:cascade_flow_ingest/data/hive/capture_item_hive_model.dart';
 import 'package:cascade_flow_ingest/data/hive/capture_local_data_source.dart';
@@ -26,7 +27,8 @@ class _RecordingInitializer extends InMemoryHiveInitializer {
   }
 }
 
-class _TestPathProvider extends Fake with MockPlatformInterfaceMixin
+class _TestPathProvider extends Fake
+    with MockPlatformInterfaceMixin
     implements PathProviderPlatform {
   _TestPathProvider(this.path);
 
@@ -54,6 +56,63 @@ Future<T> _withPersistentStorageOverrides<T>(
   }
 }
 
+class _ThrowingHiveBox implements HiveBox<CaptureItemHiveModel> {
+  _ThrowingHiveBox({required this.error, required this.stackTrace});
+
+  final Object error;
+  final StackTrace stackTrace;
+
+  @override
+  Future<void> put(String key, CaptureItemHiveModel value) {
+    return Future<void>.error(error, stackTrace);
+  }
+
+  @override
+  Future<CaptureItemHiveModel?> get(String key) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<CaptureItemHiveModel>> values() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> delete(String key) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> clear() {
+    throw UnimplementedError();
+  }
+
+  @override
+  CaptureItemHiveModel require(String key) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> close() {
+    throw UnimplementedError();
+  }
+}
+
+class _ThrowingHiveInitializer extends HiveInitializer {
+  _ThrowingHiveInitializer({required HiveBox<CaptureItemHiveModel> box})
+    : _box = box;
+
+  final HiveBox<CaptureItemHiveModel> _box;
+
+  @override
+  Future<void> doInitialize() async {}
+
+  @override
+  Future<HiveBox<T>> openEncryptedBox<T>(String name) async {
+    return _box as HiveBox<T>;
+  }
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -71,10 +130,7 @@ void main() {
 
     // ASSERT
     expect(initializer.initializeCalled, isTrue);
-    expect(
-      initializer.openedBoxes,
-      contains(captureItemsBoxName),
-    );
+    expect(initializer.openedBoxes, contains(captureItemsBoxName));
     expect(initializer.openedBoxes.length, equals(1));
   });
 
@@ -99,6 +155,39 @@ void main() {
     expect(stored!.toDomain(), equals(item));
   });
 
+  test(
+    'saveResult wraps hive write failures in InfrastructureFailure',
+    () async {
+      // ARRANGE
+      final error = StateError('boom');
+      final stackTrace = StackTrace.current;
+      final throwingBox = _ThrowingHiveBox(
+        error: error,
+        stackTrace: stackTrace,
+      );
+      final initializer = _ThrowingHiveInitializer(box: throwingBox);
+      final dataSource = CaptureLocalDataSource(initializer: initializer);
+      await dataSource.warmUp();
+      final item = buildTestCaptureItem(
+        id: 'failing-save',
+        createdMicros: 10,
+        updatedMicros: 10,
+      );
+      final model = CaptureItemHiveModel.fromDomain(item);
+
+      // ACT
+      final result = await dataSource.saveResult(model);
+
+      // ASSERT
+      expect(result, isA<FailureResult<void, InfrastructureFailure>>());
+      final failure =
+          (result as FailureResult<void, InfrastructureFailure>).failure;
+      expect(failure.cause, same(error));
+      expect(failure.stackTrace, equals(stackTrace));
+      expect(failure.message, contains('save'));
+    },
+  );
+
   test('readAll returns models in insertion order '
       'with latest values', () async {
     // ARRANGE
@@ -106,16 +195,10 @@ void main() {
     final dataSource = CaptureLocalDataSource(initializer: initializer);
     await dataSource.warmUp();
     final first = CaptureItemHiveModel.fromDomain(
-      buildTestCaptureItem(
-        id: 'capture-a',
-        createdMicros: 50,
-      ),
+      buildTestCaptureItem(id: 'capture-a', createdMicros: 50),
     );
     final second = CaptureItemHiveModel.fromDomain(
-      buildTestCaptureItem(
-        id: 'capture-b',
-        createdMicros: 60,
-      ),
+      buildTestCaptureItem(id: 'capture-b', createdMicros: 60),
     );
 
     // ACT
@@ -135,11 +218,7 @@ void main() {
     final dataSource = CaptureLocalDataSource(initializer: initializer);
     await dataSource.warmUp();
     final model = CaptureItemHiveModel.fromDomain(
-      buildTestCaptureItem(
-        id: 'to-delete',
-        createdMicros: 5,
-        updatedMicros: 5,
-      ),
+      buildTestCaptureItem(id: 'to-delete', createdMicros: 5, updatedMicros: 5),
     );
     await dataSource.save(model);
 
@@ -246,10 +325,7 @@ void main() {
     );
 
     // Save from different sources concurrently
-    await Future.wait([
-      dataSource1.save(item1),
-      dataSource2.save(item2),
-    ]);
+    await Future.wait([dataSource1.save(item1), dataSource2.save(item2)]);
 
     // Verify both items are readable from either source
     final results = await Future.wait([
@@ -297,10 +373,7 @@ void main() {
     expect(roundtripItem.updatedAt, equals(originalItem.updatedAt));
     expect(roundtripItem.archivedAt, equals(originalItem.archivedAt));
     expect(roundtripItem.context.source, equals(originalItem.context.source));
-    expect(
-      roundtripItem.context.channel,
-      equals(originalItem.context.channel),
-    );
+    expect(roundtripItem.context.channel, equals(originalItem.context.channel));
     expect(roundtripItem.metadata, equals(originalItem.metadata));
   });
 
