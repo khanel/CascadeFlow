@@ -140,6 +140,48 @@ class _GetThrowingHiveBox implements HiveBox<CaptureItemHiveModel> {
   }
 }
 
+class _DeleteThrowingHiveBox implements HiveBox<CaptureItemHiveModel> {
+  _DeleteThrowingHiveBox({required this.error, required this.stackTrace});
+
+  final Object error;
+  final StackTrace stackTrace;
+
+  @override
+  Future<void> put(String key, CaptureItemHiveModel value) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<CaptureItemHiveModel?> get(String key) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<CaptureItemHiveModel>> values() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> delete(String key) {
+    return Future<void>.error(error, stackTrace);
+  }
+
+  @override
+  Future<void> clear() {
+    throw UnimplementedError();
+  }
+
+  @override
+  CaptureItemHiveModel require(String key) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> close() {
+    throw UnimplementedError();
+  }
+}
+
 void expectInfrastructureFailure<T>(
   Result<T, InfrastructureFailure> result, {
   required Object cause,
@@ -266,6 +308,33 @@ void main() {
         cause: error,
         stackTrace: stackTrace,
         messageFragment: 'read',
+      );
+    },
+  );
+
+  test(
+    'deleteResult wraps hive delete failures in InfrastructureFailure',
+    () async {
+      // ARRANGE
+      final error = StateError('delete-boom');
+      final stackTrace = StackTrace.current;
+      final throwingBox = _DeleteThrowingHiveBox(
+        error: error,
+        stackTrace: stackTrace,
+      );
+      final initializer = _ThrowingHiveInitializer(box: throwingBox);
+      final dataSource = CaptureLocalDataSource(initializer: initializer);
+      await dataSource.warmUp();
+
+      // ACT
+      final result = await dataSource.deleteResult('existing-id');
+
+      // ASSERT
+      expectInfrastructureFailure<void>(
+        result,
+        cause: error,
+        stackTrace: stackTrace,
+        messageFragment: 'delete',
       );
     },
   );
