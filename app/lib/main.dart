@@ -1,6 +1,7 @@
 import 'package:cascade_flow_app/src/bootstrap/cascade_app_theme.dart';
 import 'package:cascade_flow_app/src/bootstrap/cascade_layout_scope.dart';
 import 'package:cascade_flow_app/src/bootstrap/hive_adapter_registration.dart';
+import 'package:cascade_flow_app/src/bootstrap/storage_overrides.dart';
 import 'package:cascade_flow_infrastructure/cascade_flow_infrastructure.dart';
 import 'package:cascade_flow_ingest/presentation/pages/capture_home_page.dart';
 import 'package:cascade_flow_presentation/cascade_flow_presentation.dart';
@@ -21,6 +22,7 @@ class CascadeBootstrap extends StatelessWidget {
   Widget build(BuildContext context) {
     return ProviderScope(
       overrides: [
+        ...createStorageOverridesForPlatform(),
         loggerProvider.overrideWithValue(const PrintLogger()),
         hiveAdapterRegistrarProvider.overrideWith(appHiveAdapterRegistrar),
       ],

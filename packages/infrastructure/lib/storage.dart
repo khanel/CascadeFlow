@@ -8,3 +8,5 @@ export 'src/storage/hive_initializer.dart';
 export 'src/storage/in_memory_hive_initializer.dart';
 export 'src/storage/in_memory_secure_storage.dart';
 export 'src/storage/real_hive_initializer.dart';
+export 'src/storage/secure_storage.dart';
+export 'src/storage/flutter_secure_storage_adapter.dart';

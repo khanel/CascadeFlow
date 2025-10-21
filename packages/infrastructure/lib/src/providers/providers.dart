@@ -11,7 +11,7 @@ final loggerProvider = Provider<PrintLogger>(
 );
 
 /// Provides the in-memory Hive initializer stub for early development.
-final hiveInitializerProvider = Provider<InMemoryHiveInitializer>(
+final hiveInitializerProvider = Provider<HiveInitializer>(
   (ref) => InMemoryHiveInitializer(),
 );
 
@@ -21,7 +21,7 @@ final hiveAdapterRegistrarProvider = Provider<HiveAdapterRegistrar>(
 );
 
 /// Provides a disposable secure storage stub backed by an in-memory map.
-final secureStorageProvider = Provider<InMemorySecureStorage>(
+final secureStorageProvider = Provider<SecureStorage>(
   (ref) => InMemorySecureStorage(),
 );
 

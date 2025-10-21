@@ -7,13 +7,13 @@ import 'package:cascade_flow_ingest/shared/capture_inbox_filter.dart';
 /// Persists capture inbox filter selections and presets using secure storage.
 class CaptureInboxFilterStore {
   /// Creates a store for persisting inbox filters.
-  CaptureInboxFilterStore({required InMemorySecureStorage secureStorage})
+  CaptureInboxFilterStore({required SecureStorage secureStorage})
     : _secureStorage = secureStorage;
 
   static const String _storageKey = 'captureInboxFilter';
   static const String _presetsStorageKey = 'captureInboxFilterPresets';
 
-  final InMemorySecureStorage _secureStorage;
+  final SecureStorage _secureStorage;
 
   /// Loads the previously stored filter, returning empty filter when absent.
   Future<CaptureInboxFilter> load() async {
