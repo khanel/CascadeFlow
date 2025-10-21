@@ -1,8 +1,6 @@
 import 'package:cascade_flow_app/main.dart';
 import 'package:cascade_flow_app/src/bootstrap/cascade_layout_scope.dart';
-import 'package:cascade_flow_app/src/bootstrap/storage_overrides.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -13,12 +11,9 @@ void main() {
 
       // ARRANGE: mount the app shell under test.
       await tester.pumpWidget(
-        ProviderScope(
-          overrides: createStorageOverridesForPlatform(isWebOverride: true),
-          child: const CascadeFlowApp(),
-        ),
+        const CascadeBootstrap(isWebOverride: true),
       );
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       // ACT: no interactions required; we inspect initial configuration.
 

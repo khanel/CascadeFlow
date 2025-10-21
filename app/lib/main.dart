@@ -1,3 +1,4 @@
+import 'package:cascade_flow_app/src/bootstrap/bootstrap_runner.dart';
 import 'package:cascade_flow_app/src/bootstrap/cascade_app_theme.dart';
 import 'package:cascade_flow_app/src/bootstrap/cascade_layout_scope.dart';
 import 'package:cascade_flow_app/src/bootstrap/hive_adapter_registration.dart';
@@ -16,17 +17,78 @@ void main() {
 /// Wraps the application with global provider overrides shared across slices.
 class CascadeBootstrap extends StatelessWidget {
   /// Creates a bootstrap wrapper supplying global provider overrides.
-  const CascadeBootstrap({super.key});
+  const CascadeBootstrap({
+    super.key,
+    this.platformOverride,
+    this.isWebOverride,
+  });
+
+  /// Optional platform override primarily used for tests.
+  final TargetPlatform? platformOverride;
+
+  /// Optional web flag override primarily used for tests.
+  final bool? isWebOverride;
 
   @override
   Widget build(BuildContext context) {
     return ProviderScope(
       overrides: [
-        ...createStorageOverridesForPlatform(),
+        ...createStorageOverridesForPlatform(
+          platformOverride: platformOverride,
+          isWebOverride: isWebOverride,
+        ),
         loggerProvider.overrideWithValue(const PrintLogger()),
         hiveAdapterRegistrarProvider.overrideWith(appHiveAdapterRegistrar),
       ],
-      child: const CascadeFlowApp(),
+      child: const _BootstrapGate(),
+    );
+  }
+}
+
+class _BootstrapGate extends ConsumerStatefulWidget {
+  const _BootstrapGate();
+
+  @override
+  ConsumerState<_BootstrapGate> createState() => _BootstrapGateState();
+}
+
+class _BootstrapGateState extends ConsumerState<_BootstrapGate> {
+  late final Future<void> _bootstrapFuture =
+      runCascadeBootstrap(ref.container);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _bootstrapFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            ),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: Scaffold(
+              body: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    'Failed to initialize storage.\n${snapshot.error}',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+
+        return const CascadeFlowApp();
+      },
     );
   }
 }

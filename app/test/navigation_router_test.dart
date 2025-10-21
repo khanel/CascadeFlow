@@ -1,9 +1,7 @@
 import 'package:cascade_flow_app/main.dart';
-import 'package:cascade_flow_app/src/bootstrap/storage_overrides.dart';
 import 'package:cascade_flow_ingest/presentation/pages/capture_home_page.dart';
 import 'package:cascade_flow_presentation/cascade_flow_presentation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
@@ -166,12 +164,9 @@ Future<void> _pumpUntilVisible(WidgetTester tester, Finder finder) async {
 
 Future<void> _pumpCascadeApp(WidgetTester tester) async {
   await tester.pumpWidget(
-    ProviderScope(
-      overrides: createStorageOverridesForPlatform(isWebOverride: true),
-      child: const CascadeFlowApp(),
-    ),
+    const CascadeBootstrap(isWebOverride: true),
   );
-  await tester.pump();
+  await tester.pumpAndSettle();
 }
 
 Future<void> _verifyBranchDetailRoute(
