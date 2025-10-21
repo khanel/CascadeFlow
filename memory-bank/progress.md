@@ -59,6 +59,7 @@
 - ✅ Implemented `CaptureFilterPreset` model for custom filter configurations
 - ✅ Enhanced `CaptureInboxFilterStore` with preset functionality and error handling
 - ✅ Added comprehensive tests for filter presets following TDD cycle
+- ✅ Blue-phase refactor cleaned storage overrides/test harness helpers without altering behaviour
 
 ### Testing
 - ✅ Provider tests cover `CaptureQuickEntryController` success and failure flows
@@ -73,6 +74,7 @@
 - ✅ **Blue Phase Refactoring Complete**: All technical debt addressed, code quality improved while maintaining 100% functionality
 - ✅ **TDD Validation**: All 72 tests passing, flutter analyze with no functional issues
 - ✅ Platform storage tests validate persistent overrides across Android/iOS/macOS/Windows/Linux and ensure Hive data survives container restarts
+- ✅ Real Hive initializer now consumes the `SecureStorage` abstraction with a Flutter adapter default, so tests can inject `InMemorySecureStorage` without touching plugin channels
 
 ## What's Left to Build
 
