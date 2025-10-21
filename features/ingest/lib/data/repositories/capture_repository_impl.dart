@@ -16,29 +16,20 @@ class CaptureRepositoryImpl implements CaptureRepository {
   @override
   Future<void> save(CaptureItem item) async {
     final model = CaptureItemHiveModel.fromDomain(item);
-    await _localDataSource.save(model);
+    final result = await _localDataSource.save(model);
+    if (result case FailureResult(failure: final failure)) {
+      throw failure;
+    }
   }
 
   /// Loads all inbox capture items ordered by newest creation time first.
   ///
-  /// This method loads all items from the data source, then filters for
-  /// inbox items and sorts them in memory.
+  /// This method uses Hive queries to efficiently filter and sort inbox items.
   @override
   Future<List<CaptureItem>> loadInbox({
     int? limit,
     EntityId? startAfter,
   }) async {
-    final models = await _localDataSource.readAll();
-    final sortedInbox =
-        models
-            .map((model) => model.toDomain())
-            .where((item) => item.status == CaptureStatus.inbox)
-            .toList()
-          ..sort(
-            (CaptureItem a, CaptureItem b) =>
-                b.createdAt.compareTo(a.createdAt),
-          );
-
     if (limit != null && limit < 0) {
       throw ArgumentError.value(
         limit,
@@ -46,6 +37,20 @@ class CaptureRepositoryImpl implements CaptureRepository {
         'Limit must be greater than or equal to zero',
       );
     }
+
+    final result = await _localDataSource.readInbox();
+    if (result case FailureResult(failure: final failure)) {
+      throw failure;
+    }
+
+    final models =
+        (result
+                as SuccessResult<
+                  List<CaptureItemHiveModel>,
+                  InfrastructureFailure
+                >)
+            .value;
+    final sortedInbox = models.map((model) => model.toDomain()).toList();
 
     final paged = _sliceAfter(sortedInbox, startAfter);
     final limited = limit == null ? paged : paged.take(limit).toList();

@@ -35,7 +35,7 @@ class CaptureLocalDataSource {
   ) {
     return Result.guardAsync<void, InfrastructureFailure>(
       body: () => save(model),
-      onError: (error, stackTrace) => _wrapOperationError(
+      onError: (error, stackTrace) => _mapToInfrastructureFailure(
         error: error,
         stackTrace: stackTrace,
         operation: 'save',
@@ -55,7 +55,7 @@ class CaptureLocalDataSource {
   ) {
     return Result.guardAsync<CaptureItemHiveModel?, InfrastructureFailure>(
       body: () => read(id),
-      onError: (error, stackTrace) => _wrapOperationError(
+      onError: (error, stackTrace) => _mapToInfrastructureFailure(
         error: error,
         stackTrace: stackTrace,
         operation: 'read',
@@ -74,7 +74,7 @@ class CaptureLocalDataSource {
   Future<Result<void, InfrastructureFailure>> deleteResult(String id) {
     return Result.guardAsync<void, InfrastructureFailure>(
       body: () => delete(id),
-      onError: (error, stackTrace) => _wrapOperationError(
+      onError: (error, stackTrace) => _mapToInfrastructureFailure(
         error: error,
         stackTrace: stackTrace,
         operation: 'delete',
@@ -86,6 +86,24 @@ class CaptureLocalDataSource {
   /// Returns a snapshot of every stored capture model.
   Future<List<CaptureItemHiveModel>> readAll() async {
     return _useBox((box) => box.values());
+  }
+
+  /// Reads all inbox capture items sorted by newest creation time first.
+  Future<Result<List<CaptureItemHiveModel>, InfrastructureFailure>>
+  readInbox() {
+    return Result.guardAsync(
+      body: () async {
+        final models = await _useBox((box) => box.values());
+        return models.where((model) => model.status == 'inbox').toList()
+          ..sort((a, b) => b.createdAtMicros.compareTo(a.createdAtMicros));
+      },
+      onError: (error, stackTrace) => _mapToInfrastructureFailure(
+        error: error,
+        stackTrace: stackTrace,
+        operation: 'read inbox',
+        id: 'inbox',
+      ),
+    );
   }
 
   Future<HiveBox<CaptureItemHiveModel>> _ensureBox() async {
@@ -103,7 +121,7 @@ class CaptureLocalDataSource {
     return action(box);
   }
 
-  InfrastructureFailure _wrapOperationError({
+  InfrastructureFailure _mapToInfrastructureFailure({
     required Object error,
     required StackTrace stackTrace,
     required String operation,
