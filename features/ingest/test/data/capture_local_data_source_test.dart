@@ -140,6 +140,19 @@ class _GetThrowingHiveBox implements HiveBox<CaptureItemHiveModel> {
   }
 }
 
+void expectInfrastructureFailure<T>(
+  Result<T, InfrastructureFailure> result, {
+  required Object cause,
+  required StackTrace stackTrace,
+  required String messageFragment,
+}) {
+  expect(result, isA<FailureResult<T, InfrastructureFailure>>());
+  final failure = (result as FailureResult<T, InfrastructureFailure>).failure;
+  expect(failure.cause, same(cause));
+  expect(failure.stackTrace, equals(stackTrace));
+  expect(failure.message, contains(messageFragment));
+}
+
 class _ThrowingHiveInitializer extends HiveInitializer {
   _ThrowingHiveInitializer({required HiveBox<CaptureItemHiveModel> box})
     : _box = box;
@@ -221,12 +234,12 @@ void main() {
       final result = await dataSource.saveResult(model);
 
       // ASSERT
-      expect(result, isA<FailureResult<void, InfrastructureFailure>>());
-      final failure =
-          (result as FailureResult<void, InfrastructureFailure>).failure;
-      expect(failure.cause, same(error));
-      expect(failure.stackTrace, equals(stackTrace));
-      expect(failure.message, contains('save'));
+      expectInfrastructureFailure<void>(
+        result,
+        cause: error,
+        stackTrace: stackTrace,
+        messageFragment: 'save',
+      );
     },
   );
 
@@ -248,16 +261,12 @@ void main() {
       final result = await dataSource.readResult('missing-id');
 
       // ASSERT
-      expect(
+      expectInfrastructureFailure<CaptureItemHiveModel?>(
         result,
-        isA<FailureResult<CaptureItemHiveModel?, InfrastructureFailure>>(),
+        cause: error,
+        stackTrace: stackTrace,
+        messageFragment: 'read',
       );
-      final failure =
-          (result as FailureResult<CaptureItemHiveModel?, InfrastructureFailure>)
-              .failure;
-      expect(failure.cause, same(error));
-      expect(failure.stackTrace, equals(stackTrace));
-      expect(failure.message, contains('read'));
     },
   );
 

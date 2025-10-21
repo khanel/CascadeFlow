@@ -41,9 +41,10 @@ class CaptureLocalDataSource {
   ) {
     return Result.guardAsync<void, InfrastructureFailure>(
       body: () => save(model),
-      onError: (error, stackTrace) => _wrapSaveError(
+      onError: (error, stackTrace) => _wrapOperationError(
         error: error,
         stackTrace: stackTrace,
+        operation: 'save',
         id: model.id,
       ),
     );
@@ -60,9 +61,10 @@ class CaptureLocalDataSource {
   ) {
     return Result.guardAsync<CaptureItemHiveModel?, InfrastructureFailure>(
       body: () => read(id),
-      onError: (error, stackTrace) => _wrapReadError(
+      onError: (error, stackTrace) => _wrapOperationError(
         error: error,
         stackTrace: stackTrace,
+        operation: 'read',
         id: id,
       ),
     );
@@ -93,9 +95,10 @@ class CaptureLocalDataSource {
     return action(box);
   }
 
-  InfrastructureFailure _wrapSaveError({
+  InfrastructureFailure _wrapOperationError({
     required Object error,
     required StackTrace stackTrace,
+    required String operation,
     required String id,
   }) {
     if (error is InfrastructureFailure) {
@@ -106,26 +109,7 @@ class CaptureLocalDataSource {
       );
     }
     return InfrastructureFailure(
-      message: 'Failed to save capture model "$id".',
-      cause: error,
-      stackTrace: stackTrace,
-    );
-  }
-
-  InfrastructureFailure _wrapReadError({
-    required Object error,
-    required StackTrace stackTrace,
-    required String id,
-  }) {
-    if (error is InfrastructureFailure) {
-      return InfrastructureFailure(
-        message: error.message,
-        cause: error.cause,
-        stackTrace: error.stackTrace ?? stackTrace,
-      );
-    }
-    return InfrastructureFailure(
-      message: 'Failed to read capture model "$id".',
+      message: 'Failed to $operation capture model "$id".',
       cause: error,
       stackTrace: stackTrace,
     );
