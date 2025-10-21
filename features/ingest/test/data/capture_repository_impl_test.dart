@@ -109,10 +109,7 @@ void main() {
 
     // ACT
     final pageOne = await repository.loadInbox(limit: 2);
-    final pageTwo = await repository.loadInbox(
-      limit: 2,
-      startAfter: middle.id,
-    );
+    final pageTwo = await repository.loadInbox(limit: 2, startAfter: middle.id);
 
     // ASSERT
     expect(pageOne, equals(<CaptureItem>[newest, middle]));

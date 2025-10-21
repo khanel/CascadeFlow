@@ -59,9 +59,7 @@ void main() {
 
       // ACT
       final result = useCase(
-        request: const CaptureQuickEntryRequest(
-          rawContent: '   ',
-        ),
+        request: const CaptureQuickEntryRequest(rawContent: '   '),
       );
 
       // ASSERT

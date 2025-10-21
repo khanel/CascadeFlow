@@ -53,8 +53,7 @@ class _BootstrapGate extends ConsumerStatefulWidget {
 }
 
 class _BootstrapGateState extends ConsumerState<_BootstrapGate> {
-  late final Future<void> _bootstrapFuture =
-      runCascadeBootstrap(ref.container);
+  late final Future<void> _bootstrapFuture = runCascadeBootstrap(ref.container);
 
   @override
   Widget build(BuildContext context) {
@@ -201,44 +200,44 @@ abstract final class _Paths {
 
 final List<_NavigationBranchDefinition> _navigationBranches =
     <_NavigationBranchDefinition>[
-  _NavigationBranchDefinition(
-    path: _Paths.capture,
-    label: 'Capture',
-    icon: Icons.inbox_outlined,
-    selectedIcon: Icons.inbox,
-    rootBuilder: (context) => const CaptureHomePage(),
-  ),
-  const _NavigationBranchDefinition(
-    path: _Paths.plan,
-    label: 'Plan',
-    icon: Icons.event_note_outlined,
-    selectedIcon: Icons.event_note,
-  ),
-  const _NavigationBranchDefinition(
-    path: _Paths.execute,
-    label: 'Execute',
-    icon: Icons.play_circle_outline,
-    selectedIcon: Icons.play_circle,
-  ),
-  const _NavigationBranchDefinition(
-    path: _Paths.review,
-    label: 'Review',
-    icon: Icons.rate_review_outlined,
-    selectedIcon: Icons.rate_review,
-  ),
-  const _NavigationBranchDefinition(
-    path: _Paths.insights,
-    label: 'Insights',
-    icon: Icons.insights_outlined,
-    selectedIcon: Icons.insights,
-  ),
-  const _NavigationBranchDefinition(
-    path: _Paths.settings,
-    label: 'Settings',
-    icon: Icons.settings_outlined,
-    selectedIcon: Icons.settings,
-  ),
-];
+      _NavigationBranchDefinition(
+        path: _Paths.capture,
+        label: 'Capture',
+        icon: Icons.inbox_outlined,
+        selectedIcon: Icons.inbox,
+        rootBuilder: (context) => const CaptureHomePage(),
+      ),
+      const _NavigationBranchDefinition(
+        path: _Paths.plan,
+        label: 'Plan',
+        icon: Icons.event_note_outlined,
+        selectedIcon: Icons.event_note,
+      ),
+      const _NavigationBranchDefinition(
+        path: _Paths.execute,
+        label: 'Execute',
+        icon: Icons.play_circle_outline,
+        selectedIcon: Icons.play_circle,
+      ),
+      const _NavigationBranchDefinition(
+        path: _Paths.review,
+        label: 'Review',
+        icon: Icons.rate_review_outlined,
+        selectedIcon: Icons.rate_review,
+      ),
+      const _NavigationBranchDefinition(
+        path: _Paths.insights,
+        label: 'Insights',
+        icon: Icons.insights_outlined,
+        selectedIcon: Icons.insights,
+      ),
+      const _NavigationBranchDefinition(
+        path: _Paths.settings,
+        label: 'Settings',
+        icon: Icons.settings_outlined,
+        selectedIcon: Icons.settings,
+      ),
+    ];
 
 class _NavigationBranchDefinition {
   const _NavigationBranchDefinition({
@@ -255,37 +254,35 @@ class _NavigationBranchDefinition {
   final IconData selectedIcon;
   final WidgetBuilder? rootBuilder;
 
-  String get _branchId =>
-      path.startsWith('/') ? path.substring(1) : path;
+  String get _branchId => path.startsWith('/') ? path.substring(1) : path;
 
   GoRoute get route => GoRoute(
-        path: path,
-        builder: (BuildContext context, GoRouterState state) {
-          final builder = rootBuilder;
-          if (builder != null) {
-            return builder(context);
-          }
-          return _scaffoldFactory.buildRoot(
-            branchId: _branchId,
-            branchLabel: label,
-          );
-        },
-        routes: <RouteBase>[
-          GoRoute(
-            path: _Paths.detailSegment,
-            builder: (BuildContext context, GoRouterState state) =>
-                _scaffoldFactory.buildDetail(
-                  branchId: _branchId,
-                  branchLabel: label,
-                ),
-          ),
-        ],
+    path: path,
+    builder: (BuildContext context, GoRouterState state) {
+      final builder = rootBuilder;
+      if (builder != null) {
+        return builder(context);
+      }
+      return _scaffoldFactory.buildRoot(
+        branchId: _branchId,
+        branchLabel: label,
       );
+    },
+    routes: <RouteBase>[
+      GoRoute(
+        path: _Paths.detailSegment,
+        builder: (BuildContext context, GoRouterState state) =>
+            _scaffoldFactory.buildDetail(
+              branchId: _branchId,
+              branchLabel: label,
+            ),
+      ),
+    ],
+  );
 
   NavigationDestination get destination => NavigationDestination(
-        icon: Icon(icon),
-        selectedIcon: Icon(selectedIcon),
-        label: label,
-      );
-
+    icon: Icon(icon),
+    selectedIcon: Icon(selectedIcon),
+    label: label,
+  );
 }

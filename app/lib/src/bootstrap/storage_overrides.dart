@@ -24,8 +24,7 @@ const Set<TargetPlatform> _persistentPlatforms = <TargetPlatform>{
 bool _shouldUsePersistentStorage({
   required TargetPlatform platform,
   required bool isWeb,
-}) =>
-    !isWeb && _persistentPlatforms.contains(platform);
+}) => !isWeb && _persistentPlatforms.contains(platform);
 
 /// Builds the storage overrides appropriate for the current platform.
 List<Override> createStorageOverridesForPlatform({

@@ -286,14 +286,12 @@ bootstrapper before facade clear''',
       await runCascadeBootstrap(container);
 
       // ASSERT
-      final registryBox =
-          await hiveInitializer.openEncryptedBox<Map<String, Object?>>(
+      final registryBox = await hiveInitializer
+          .openEncryptedBox<Map<String, Object?>>(
             adapterRegistryBoxName,
           );
-      final bootstrapMetadata =
-          registryBox.require('bootstrap');
-      final captureMetadata =
-          registryBox.require(captureAdapterRegistryKey);
+      final bootstrapMetadata = registryBox.require('bootstrap');
+      final captureMetadata = registryBox.require(captureAdapterRegistryKey);
 
       expect(bootstrapMetadata['status'], 'registered');
       expect(

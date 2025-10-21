@@ -9,7 +9,8 @@ import 'package:hive_ce/hive.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
-class _TestPathProvider extends Fake with MockPlatformInterfaceMixin
+class _TestPathProvider extends Fake
+    with MockPlatformInterfaceMixin
     implements PathProviderPlatform {
   _TestPathProvider(this.path);
 
@@ -114,11 +115,13 @@ void main() {
               persistentSecureStorage: () => sharedSecureStorage,
             ),
           );
-          final secondInitializer =
-              secondContainer.read(hiveInitializerProvider);
+          final secondInitializer = secondContainer.read(
+            hiveInitializerProvider,
+          );
           await secondInitializer.initialize();
-          final restoredBox =
-              await secondInitializer.openEncryptedBox<String>('test.box');
+          final restoredBox = await secondInitializer.openEncryptedBox<String>(
+            'test.box',
+          );
           final restored = await restoredBox.get('persisted');
 
           expect(restored, 'value');

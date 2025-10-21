@@ -32,9 +32,7 @@ void main() {
       );
 
       // ACT
-      final result = useCase(
-        request: FileCaptureItemRequest(item: item),
-      );
+      final result = useCase(request: FileCaptureItemRequest(item: item));
 
       // ASSERT
       expect(result, isA<SuccessResult<CaptureItem, Failure>>());
@@ -65,9 +63,7 @@ void main() {
       );
 
       // ACT
-      final result = useCase(
-        request: FileCaptureItemRequest(item: filedItem),
-      );
+      final result = useCase(request: FileCaptureItemRequest(item: filedItem));
 
       // ASSERT
       expect(result, isA<FailureResult<CaptureItem, Failure>>());

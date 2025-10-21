@@ -15,10 +15,7 @@ CaptureItem buildTestCaptureItem({
   return CaptureItem.create(
     id: EntityId(id),
     content: content,
-    context: CaptureContext(
-      source: source,
-      channel: channel,
-    ),
+    context: CaptureContext(source: source, channel: channel),
     status: status,
     createdAt: Timestamp(
       DateTime.fromMicrosecondsSinceEpoch(createdMicros, isUtc: true),

@@ -100,9 +100,7 @@ void main() {
             captureQuickEntryUseCaseProvider.overrideWithValue(useCase),
           ],
           child: const MaterialApp(
-            home: Scaffold(
-              body: CaptureQuickAddSheet(),
-            ),
+            home: Scaffold(body: CaptureQuickAddSheet()),
           ),
         ),
       );
@@ -110,26 +108,17 @@ void main() {
       final fieldFinder = find.byKey(CaptureQuickAddSheetKeys.contentField);
       final buttonFinder = find.byKey(CaptureQuickAddSheetKeys.submitButton);
 
-      expect(
-        tester.widget<FilledButton>(buttonFinder).onPressed,
-        isNull,
-      );
+      expect(tester.widget<FilledButton>(buttonFinder).onPressed, isNull);
 
       await tester.enterText(fieldFinder, 'Refine capture workflow');
       await tester.pump();
 
-      expect(
-        tester.widget<FilledButton>(buttonFinder).onPressed,
-        isNotNull,
-      );
+      expect(tester.widget<FilledButton>(buttonFinder).onPressed, isNotNull);
 
       await tester.tap(buttonFinder);
       await tester.pump();
 
-      expect(
-        tester.widget<FilledButton>(buttonFinder).onPressed,
-        isNull,
-      );
+      expect(tester.widget<FilledButton>(buttonFinder).onPressed, isNull);
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
       saveCompleter.complete();
@@ -138,10 +127,7 @@ void main() {
 
       expect(repository.saveCallCount, equals(1));
       expect(repository.savedItems.single.id, equals(captureId));
-      expect(
-        tester.widget<FilledButton>(buttonFinder).onPressed,
-        isNull,
-      );
+      expect(tester.widget<FilledButton>(buttonFinder).onPressed, isNull);
       expect(find.byType(CircularProgressIndicator), findsNothing);
       final field = tester.widget<TextField>(fieldFinder);
       expect(field.controller?.text ?? '', isEmpty);
@@ -159,9 +145,7 @@ void main() {
             ),
           ],
           child: const MaterialApp(
-            home: Scaffold(
-              body: CaptureQuickAddSheet(),
-            ),
+            home: Scaffold(body: CaptureQuickAddSheet()),
           ),
         ),
       );
@@ -177,10 +161,7 @@ void main() {
 
       expect(repository.saveCallCount, equals(0));
       expect(find.text('Capture failed'), findsOneWidget);
-      expect(
-        tester.widget<FilledButton>(buttonFinder).onPressed,
-        isNotNull,
-      );
+      expect(tester.widget<FilledButton>(buttonFinder).onPressed, isNotNull);
     });
   });
 }

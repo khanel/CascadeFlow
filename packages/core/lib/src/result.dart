@@ -28,7 +28,7 @@ sealed class Result<T, F extends Failure> {
     FailureResult<T, F>(failure: final failure) => onFailure(failure),
   };
 
-  /// Applies a transformation to the successful value while 
+  /// Applies a transformation to the successful value while
   /// preserving failures.
   Result<R, F> map<R>(R Function(T value) transform) => switch (this) {
     SuccessResult<T, F>(value: final value) => SuccessResult<R, F>(

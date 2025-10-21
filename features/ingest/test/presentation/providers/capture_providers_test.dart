@@ -30,9 +30,7 @@ void main() {
           ),
         ];
       final container = ProviderContainer(
-        overrides: [
-          captureRepositoryProvider.overrideWithValue(repository),
-        ],
+        overrides: [captureRepositoryProvider.overrideWithValue(repository)],
       );
       addTearDown(container.dispose);
 
@@ -44,66 +42,54 @@ void main() {
       expect(repository.loadInboxInvocations, equals(1));
     });
 
-    test(
-      'requests default batch size when loading inbox items',
-      () async {
-        // ARRANGE
-        final repository = _RecordingCaptureRepository()
-          ..inboxItems = <CaptureItem>[
-            buildTestCaptureItem(id: 'capture-1'),
-            buildTestCaptureItem(id: 'capture-2'),
-            buildTestCaptureItem(id: 'capture-3'),
-          ];
-        final container = ProviderContainer(
-          overrides: [
-            captureRepositoryProvider.overrideWithValue(repository),
-          ],
-        );
-        addTearDown(container.dispose);
+    test('requests default batch size when loading inbox items', () async {
+      // ARRANGE
+      final repository = _RecordingCaptureRepository()
+        ..inboxItems = <CaptureItem>[
+          buildTestCaptureItem(id: 'capture-1'),
+          buildTestCaptureItem(id: 'capture-2'),
+          buildTestCaptureItem(id: 'capture-3'),
+        ];
+      final container = ProviderContainer(
+        overrides: [captureRepositoryProvider.overrideWithValue(repository)],
+      );
+      addTearDown(container.dispose);
 
-        // ACT
-        final items = await container.read(captureInboxItemsProvider.future);
+      // ACT
+      final items = await container.read(captureInboxItemsProvider.future);
 
-        // ASSERT
-        expect(
-          repository.lastLimit,
-          equals(CaptureInboxConstants.defaultBatchSize),
-        );
-        expect(items, equals(repository.inboxItems));
-      },
-    );
+      // ASSERT
+      expect(
+        repository.lastLimit,
+        equals(CaptureInboxConstants.defaultBatchSize),
+      );
+      expect(items, equals(repository.inboxItems));
+    });
   });
 
   group('captureInboxPageProvider', () {
-    test(
-      'loads items after provided cursor using custom limit',
-      () async {
-        // ARRANGE
-        final newest = buildTestCaptureItem(id: 'capture-newest');
-        final middle = buildTestCaptureItem(id: 'capture-middle');
-        final oldest = buildTestCaptureItem(id: 'capture-oldest');
-        final repository = _RecordingCaptureRepository()
-          ..inboxItems = <CaptureItem>[newest, middle, oldest];
-        final container = ProviderContainer(
-          overrides: [
-            captureRepositoryProvider.overrideWithValue(repository),
-          ],
-        );
-        addTearDown(container.dispose);
+    test('loads items after provided cursor using custom limit', () async {
+      // ARRANGE
+      final newest = buildTestCaptureItem(id: 'capture-newest');
+      final middle = buildTestCaptureItem(id: 'capture-middle');
+      final oldest = buildTestCaptureItem(id: 'capture-oldest');
+      final repository = _RecordingCaptureRepository()
+        ..inboxItems = <CaptureItem>[newest, middle, oldest];
+      final container = ProviderContainer(
+        overrides: [captureRepositoryProvider.overrideWithValue(repository)],
+      );
+      addTearDown(container.dispose);
 
-        // ACT
-        final page = await container.read(
-          captureInboxPageProvider(
-            (limit: 2, startAfter: newest.id),
-          ).future,
-        );
+      // ACT
+      final page = await container.read(
+        captureInboxPageProvider((limit: 2, startAfter: newest.id)).future,
+      );
 
-        // ASSERT
-        expect(repository.lastLimit, equals(2));
-        expect(repository.lastStartAfterId, equals(newest.id));
-        expect(page, equals(<CaptureItem>[middle, oldest]));
-      },
-    );
+      // ASSERT
+      expect(repository.lastLimit, equals(2));
+      expect(repository.lastStartAfterId, equals(newest.id));
+      expect(page, equals(<CaptureItem>[middle, oldest]));
+    });
   });
 
   group('captureInboxPaginationControllerProvider', () {
@@ -115,9 +101,7 @@ void main() {
           buildTestCaptureItem(id: 'capture-2'),
         ];
       final container = ProviderContainer(
-        overrides: [
-          captureRepositoryProvider.overrideWithValue(repository),
-        ],
+        overrides: [captureRepositoryProvider.overrideWithValue(repository)],
       );
       addTearDown(container.dispose);
 
@@ -130,10 +114,7 @@ void main() {
 
       // ASSERT
       expect(state, isA<AsyncData<CaptureInboxPaginationState>>());
-      expect(
-        state.requireValue.items,
-        equals(repository.inboxItems),
-      );
+      expect(state.requireValue.items, equals(repository.inboxItems));
       expect(state.requireValue.hasMore, isFalse);
       expect(repository.loadInboxInvocations, equals(1));
     });
@@ -151,9 +132,7 @@ void main() {
           ),
         );
       final container = ProviderContainer(
-        overrides: [
-          captureRepositoryProvider.overrideWithValue(repository),
-        ],
+        overrides: [captureRepositoryProvider.overrideWithValue(repository)],
       );
       addTearDown(container.dispose);
       final controller = container.read(
@@ -173,10 +152,7 @@ void main() {
 
       final updated = container
           .read(captureInboxPaginationControllerProvider)
-          .maybeWhen(
-            data: (value) => value,
-            orElse: () => null,
-          );
+          .maybeWhen(data: (value) => value, orElse: () => null);
 
       // ASSERT
       expect(updated, isNotNull);
@@ -189,13 +165,9 @@ void main() {
     test('ignores loadNextPage when no more items remain', () async {
       // ARRANGE
       final repository = _RecordingCaptureRepository()
-        ..inboxItems = <CaptureItem>[
-          buildTestCaptureItem(id: 'capture-1'),
-        ];
+        ..inboxItems = <CaptureItem>[buildTestCaptureItem(id: 'capture-1')];
       final container = ProviderContainer(
-        overrides: [
-          captureRepositoryProvider.overrideWithValue(repository),
-        ],
+        overrides: [captureRepositoryProvider.overrideWithValue(repository)],
       );
       addTearDown(container.dispose);
       final controller = container.read(
@@ -312,16 +284,12 @@ void main() {
         ),
       );
       final container = ProviderContainer(
-        overrides: [
-          captureInboxFilterStoreProvider.overrideWithValue(store),
-        ],
+        overrides: [captureInboxFilterStoreProvider.overrideWithValue(store)],
       );
       addTearDown(container.dispose);
 
       // ACT
-      final controller = container.read(
-        captureInboxFilterProvider.notifier,
-      );
+      final controller = container.read(captureInboxFilterProvider.notifier);
       await controller.whenReady();
       final filter = container.read(captureInboxFilterProvider);
 
@@ -335,14 +303,10 @@ void main() {
       final storage = InMemorySecureStorage();
       final store = CaptureInboxFilterStore(secureStorage: storage);
       final container = ProviderContainer(
-        overrides: [
-          captureInboxFilterStoreProvider.overrideWithValue(store),
-        ],
+        overrides: [captureInboxFilterStoreProvider.overrideWithValue(store)],
       );
       addTearDown(container.dispose);
-      final controller = container.read(
-        captureInboxFilterProvider.notifier,
-      );
+      final controller = container.read(captureInboxFilterProvider.notifier);
       await controller.whenReady();
 
       // ACT

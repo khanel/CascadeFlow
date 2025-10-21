@@ -27,18 +27,11 @@ void main() {
               ),
             ),
           ],
-          child: const MaterialApp(
-            home: Scaffold(
-              body: CaptureInboxList(),
-            ),
-          ),
+          child: const MaterialApp(home: Scaffold(body: CaptureInboxList())),
         ),
       );
 
-      expect(
-        find.byKey(CaptureInboxListKeys.loadingIndicator),
-        findsOneWidget,
-      );
+      expect(find.byKey(CaptureInboxListKeys.loadingIndicator), findsOneWidget);
 
       completer.complete(<CaptureItem>[]);
       await tester.pump();
@@ -57,11 +50,7 @@ void main() {
               ),
             ),
           ],
-          child: const MaterialApp(
-            home: Scaffold(
-              body: CaptureInboxList(),
-            ),
-          ),
+          child: const MaterialApp(home: Scaffold(body: CaptureInboxList())),
         ),
       );
       await tester.pump();
@@ -97,11 +86,7 @@ void main() {
               ),
             ),
           ],
-          child: const MaterialApp(
-            home: Scaffold(
-              body: CaptureInboxList(),
-            ),
-          ),
+          child: const MaterialApp(home: Scaffold(body: CaptureInboxList())),
         ),
       );
       await tester.pump();
@@ -123,11 +108,7 @@ void main() {
               ),
             ),
           ],
-          child: const MaterialApp(
-            home: Scaffold(
-              body: CaptureInboxList(),
-            ),
-          ),
+          child: const MaterialApp(home: Scaffold(body: CaptureInboxList())),
         ),
       );
       await tester.pump();
@@ -136,9 +117,7 @@ void main() {
       expect(find.textContaining('Failed to load inbox'), findsOneWidget);
     });
 
-    testWidgets('loads next page when scrolled near the end', (
-      tester,
-    ) async {
+    testWidgets('loads next page when scrolled near the end', (tester) async {
       final firstPage = List<CaptureItem>.generate(
         CaptureInboxConstants.defaultBatchSize,
         (index) => buildTestCaptureItem(
@@ -168,14 +147,8 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            captureRepositoryProvider.overrideWithValue(repository),
-          ],
-          child: const MaterialApp(
-            home: Scaffold(
-              body: CaptureInboxList(),
-            ),
-          ),
+          overrides: [captureRepositoryProvider.overrideWithValue(repository)],
+          child: const MaterialApp(home: Scaffold(body: CaptureInboxList())),
         ),
       );
 
@@ -212,14 +185,8 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            captureRepositoryProvider.overrideWithValue(repository),
-          ],
-          child: const MaterialApp(
-            home: Scaffold(
-              body: CaptureInboxList(),
-            ),
-          ),
+          overrides: [captureRepositoryProvider.overrideWithValue(repository)],
+          child: const MaterialApp(home: Scaffold(body: CaptureInboxList())),
         ),
       );
       await tester.pumpAndSettle();
@@ -246,10 +213,7 @@ void main() {
 
     testWidgets('filters inbox items by capture source', (tester) async {
       final items = <CaptureItem>[
-        buildTestCaptureItem(
-          id: 'capture-1',
-          content: 'Quick entry item',
-        ),
+        buildTestCaptureItem(id: 'capture-1', content: 'Quick entry item'),
         buildTestCaptureItem(
           id: 'capture-2',
           content: 'Automation item',
@@ -267,11 +231,7 @@ void main() {
               ),
             ),
           ],
-          child: const MaterialApp(
-            home: Scaffold(
-              body: CaptureInboxList(),
-            ),
-          ),
+          child: const MaterialApp(home: Scaffold(body: CaptureInboxList())),
         ),
       );
       await tester.pumpAndSettle();
@@ -319,11 +279,7 @@ void main() {
               ),
             ),
           ],
-          child: const MaterialApp(
-            home: Scaffold(
-              body: CaptureInboxList(),
-            ),
-          ),
+          child: const MaterialApp(home: Scaffold(body: CaptureInboxList())),
         ),
       );
       await tester.pumpAndSettle();
@@ -355,11 +311,7 @@ void main() {
               ),
             ),
           ],
-          child: const MaterialApp(
-            home: Scaffold(
-              body: CaptureInboxList(),
-            ),
-          ),
+          child: const MaterialApp(home: Scaffold(body: CaptureInboxList())),
         ),
       );
       await tester.pumpAndSettle();
@@ -384,11 +336,7 @@ void main() {
               ),
             ),
           ],
-          child: const MaterialApp(
-            home: Scaffold(
-              body: CaptureInboxList(),
-            ),
-          ),
+          child: const MaterialApp(home: Scaffold(body: CaptureInboxList())),
         ),
       );
       await tester.pumpAndSettle();
@@ -407,10 +355,7 @@ void main() {
 class _StubCaptureRepository implements CaptureRepository {
   _StubCaptureRepository({required this.onLoadInbox});
 
-  final Future<List<CaptureItem>> Function({
-    int? limit,
-    EntityId? startAfter,
-  })
+  final Future<List<CaptureItem>> Function({int? limit, EntityId? startAfter})
   onLoadInbox;
 
   final List<CaptureItem> savedItems = [];
@@ -424,13 +369,7 @@ class _StubCaptureRepository implements CaptureRepository {
   Future<void> delete(EntityId id) async {}
 
   @override
-  Future<List<CaptureItem>> loadInbox({
-    int? limit,
-    EntityId? startAfter,
-  }) {
-    return onLoadInbox(
-      limit: limit,
-      startAfter: startAfter,
-    );
+  Future<List<CaptureItem>> loadInbox({int? limit, EntityId? startAfter}) {
+    return onLoadInbox(limit: limit, startAfter: startAfter);
   }
 }

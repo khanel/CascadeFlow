@@ -108,8 +108,8 @@ void main() {
 
       // Assert
       expect(result, isA<FailureResult<int, InfrastructureFailure>>());
-      final failure = (result as FailureResult<int, InfrastructureFailure>)
-          .failure;
+      final failure =
+          (result as FailureResult<int, InfrastructureFailure>).failure;
       expect(failure.message, 'Failed to compute');
       expect(failure.cause, isA<StateError>());
       expect(failure.stackTrace, isNotNull);
@@ -149,8 +149,8 @@ void main() {
 
       // Assert
       expect(result, isA<FailureResult<void, InfrastructureFailure>>());
-      final failure = (result as FailureResult<void, InfrastructureFailure>)
-          .failure;
+      final failure =
+          (result as FailureResult<void, InfrastructureFailure>).failure;
       expect(failure.message, 'Async failure');
       expect(failure.cause, isA<ArgumentError>());
       expect(failure.stackTrace, isNotNull);

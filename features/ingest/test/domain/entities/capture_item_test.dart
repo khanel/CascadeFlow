@@ -12,10 +12,7 @@ void main() {
         channel: 'keyboard',
       );
       const content = '   File the design idea  ';
-      const metadata = {
-        'source_app': 'workspace',
-        'note_id': 'note_42',
-      };
+      const metadata = {'source_app': 'workspace', 'note_id': 'note_42'};
 
       // Act
       final item = CaptureItem.create(
@@ -73,9 +70,7 @@ void main() {
         source: CaptureSource.quickCapture,
         channel: 'keyboard',
       );
-      const metadata = {
-        'BadKey': 'value',
-      };
+      const metadata = {'BadKey': 'value'};
 
       // Act
       void act() => CaptureItem.create(

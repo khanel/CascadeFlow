@@ -7,8 +7,8 @@ abstract class DomainEvent {
   DomainEvent({
     EntityId? eventId,
     Timestamp? occurredOn,
-  })  : eventId = eventId ?? EntityId.generate(),
-        occurredOn = occurredOn ?? Timestamp.now();
+  }) : eventId = eventId ?? EntityId.generate(),
+       occurredOn = occurredOn ?? Timestamp.now();
 
   /// Unique identifier for this event instance.
   final EntityId eventId;

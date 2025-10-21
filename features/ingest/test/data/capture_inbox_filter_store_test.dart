@@ -43,9 +43,7 @@ void main() {
     test('clears stored snapshot', () async {
       final storage = InMemorySecureStorage();
       final store = CaptureInboxFilterStore(secureStorage: storage);
-      await store.save(
-        const CaptureInboxFilter(channel: 'keyboard'),
-      );
+      await store.save(const CaptureInboxFilter(channel: 'keyboard'));
 
       await store.clear();
       final restored = await store.load();

@@ -32,9 +32,7 @@ void main() {
       );
 
       // ACT
-      final result = useCase(
-        request: ArchiveCaptureItemRequest(item: item),
-      );
+      final result = useCase(request: ArchiveCaptureItemRequest(item: item));
 
       // ASSERT
       expect(result, isA<SuccessResult<CaptureItem, Failure>>());

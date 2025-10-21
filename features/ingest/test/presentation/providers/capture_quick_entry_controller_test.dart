@@ -83,17 +83,15 @@ void main() {
     test('submit persists capture and transitions to success state', () async {
       final states = <CaptureQuickEntryStatus>[];
 
-      final stateSub = container.listen(
-        captureQuickEntryControllerProvider,
-        (CaptureQuickEntryState? previous, CaptureQuickEntryState next) {
-          states.add(next.status);
-        },
-      );
+      final stateSub = container.listen(captureQuickEntryControllerProvider, (
+        CaptureQuickEntryState? previous,
+        CaptureQuickEntryState next,
+      ) {
+        states.add(next.status);
+      });
       addTearDown(stateSub.close);
 
-      states.add(
-        container.read(captureQuickEntryControllerProvider).status,
-      );
+      states.add(container.read(captureQuickEntryControllerProvider).status);
 
       expect(await container.read(captureInboxItemsProvider.future), isEmpty);
       expect(repository.loadInboxCallCount, equals(1));

@@ -29,7 +29,8 @@ class FocusSessionCompleted extends DomainEvent {
     required this.sessionId,
     required this.duration,
     required this.completedAt,
-    required Timestamp super.occurredOn, super.eventId,
+    required Timestamp super.occurredOn,
+    super.eventId,
   });
 
   /// Identifier of the focus session that completed.
