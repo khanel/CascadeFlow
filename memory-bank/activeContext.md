@@ -2,6 +2,38 @@
 
 ## Current Development Focus
 
+### Phase Research Notes
+- **RED – Wrap capture data source operations in `Result`**
+  - Sources:
+    - Dart team, “Futures and error handling” – https://dart.dev/guides/libraries/futures-error-handling
+    - Flutter API docs, “FlutterError class” – https://api.flutter.dev/flutter/foundation/FlutterError-class.html
+  - Takeaways:
+    - Prefer `try`/`catch` around awaited futures so asynchronous exceptions surface synchronously before wrapping them in domain-friendly results.
+    - Preserve original stack traces when mapping errors into project-specific `Failure` types to avoid losing debugging context.
+    - Provide actionable error descriptions that align with Flutter’s error reporting expectations, so downstream UI can surface meaningful diagnostics.
+    - Keep error handling centralized per operation to reduce duplicated guards across callers.
+  - Reuse: Covered in `researchIndex.md › Ingest Data Layer Result Wrapping` (RED section).
+- **GREEN – Implement `saveResult` guard around Hive writes**
+  - Sources:
+    - Dart team, “Error handling” – https://dart.dev/language/error-handling
+    - Hive GitHub README – https://raw.githubusercontent.com/hivedb/hive/master/README.md
+  - Takeaways:
+    - Use `try`/`catch` with `rethrow`-like preserving of `cause` to maintain original error context while mapping to domain failures.
+    - Ensure asynchronous Hive writes are awaited so thrown errors propagate into our guard logic instead of being dropped on microtask queues.
+    - Provide operation-specific failure messages (e.g., “save capture model”) to make debugging storage issues easier.
+    - Keep Hive initialization idempotent and reuse opened boxes to avoid state churn during repeated write attempts.
+  - Reuse: See `researchIndex.md › Ingest Data Layer Result Wrapping` (GREEN section).
+- **BLUE – Refine result API naming & clarity**
+  - Sources:
+    - Dart team, “Effective Dart: Style” – https://dart.dev/effective-dart/style
+    - Dart team, “Effective Dart: Design” – https://dart.dev/effective-dart/design
+  - Takeaways:
+    - Favor intent-revealing method names and documentation so callers understand when to choose the new `Result`-returning APIs.
+    - Keep exception translation helpers private to reduce the public surface area and limit knowledge of failure mechanics to a single place.
+    - Prefer small, reusable helpers over inline anonymous functions to lower cyclomatic complexity and increase readability.
+    - Ensure error messages remain concise and consistent with project terminology for downstream logging.
+  - Reuse: Detailed in `researchIndex.md › Ingest Data Layer Result Wrapping` (BLUE section).
+
 ### Primary Feature: Ingest - Deep Review Complete
 - **Status**: 🟡 Technical Debt Identified - Comprehensive review complete
 - **Previous Issue**: The data layer implementation did not fully align with the `ingest-plan.md`.
@@ -13,6 +45,12 @@
 - **Infrastructure Stubs**: In-memory implementations for early development
 
 ## Recent Changes
+
+### Ingest Data Layer Result Wrappers
+- Added `CaptureLocalDataSource.saveResult` to wrap Hive writes in `Result<void, InfrastructureFailure>` and preserve original error context.
+- Introduced `_wrapSaveError` helper so existing infrastructure failures retain stack traces while new failures use consistent messaging.
+- Added regression test `saveResult wraps hive write failures in InfrastructureFailure` to guarantee the guard path and error metadata.
+- Documented supporting research in `researchIndex.md › Ingest Data Layer Result Wrapping`; revisit or prune when ingest storage priorities shift.
 
 ### Capture Inbox Filing Gesture
 - Added long-press gesture to inbox items to trigger filing workflow
