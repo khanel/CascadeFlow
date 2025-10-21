@@ -75,6 +75,20 @@ class CaptureLocalDataSource {
     await _useBox((box) => box.delete(id));
   }
 
+  /// Deletes the capture model identified by [id] and returns a [Result]
+  /// describing success or failure, ignoring missing entries.
+  Future<Result<void, InfrastructureFailure>> deleteResult(String id) {
+    return Result.guardAsync<void, InfrastructureFailure>(
+      body: () => delete(id),
+      onError: (error, stackTrace) => _wrapOperationError(
+        error: error,
+        stackTrace: stackTrace,
+        operation: 'delete',
+        id: id,
+      ),
+    );
+  }
+
   /// Returns a snapshot of every stored capture model.
   Future<List<CaptureItemHiveModel>> readAll() async {
     return _useBox((box) => box.values());
