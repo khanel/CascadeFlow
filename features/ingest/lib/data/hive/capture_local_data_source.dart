@@ -1,3 +1,4 @@
+import 'package:cascade_flow_core/cascade_flow_core.dart';
 import 'package:cascade_flow_infrastructure/storage.dart';
 import 'package:cascade_flow_ingest/data/hive/capture_item_hive_model.dart';
 
@@ -34,6 +35,20 @@ class CaptureLocalDataSource {
     await _useBox((box) => box.put(model.id, model));
   }
 
+  /// Persists [model] and returns a [Result] describing success or failure.
+  Future<Result<void, InfrastructureFailure>> saveResult(
+    CaptureItemHiveModel model,
+  ) {
+    return Result.guardAsync<void, InfrastructureFailure>(
+      body: () => save(model),
+      onError: (error, stackTrace) => _wrapSaveError(
+        error: error,
+        stackTrace: stackTrace,
+        id: model.id,
+      ),
+    );
+  }
+
   /// Reads a capture model for the given [id], returning null when missing.
   Future<CaptureItemHiveModel?> read(String id) async {
     return _useBox((box) => box.get(id));
@@ -62,5 +77,24 @@ class CaptureLocalDataSource {
   ) async {
     final box = await _ensureBox();
     return action(box);
+  }
+
+  InfrastructureFailure _wrapSaveError({
+    required Object error,
+    required StackTrace stackTrace,
+    required String id,
+  }) {
+    if (error is InfrastructureFailure) {
+      return InfrastructureFailure(
+        message: error.message,
+        cause: error.cause,
+        stackTrace: error.stackTrace ?? stackTrace,
+      );
+    }
+    return InfrastructureFailure(
+      message: 'Failed to save capture model "$id".',
+      cause: error,
+      stackTrace: stackTrace,
+    );
   }
 }
