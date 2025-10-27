@@ -153,6 +153,15 @@
 - **Code Quality Improvements**: Added intent-based architecture for extensibility, proper focus management
 - **Verification**: All tests pass, code is clean and maintainable
 
+### Voice Capture for Quick-Add Sheet
+- **Status**: ✅ Complete - TDD cycle completed for voice capture functionality
+- **RED Phase**: Added failing widget test for voice capture button tap that starts listening and appends transcribed text
+- **GREEN Phase**: Implemented minimal voice capture using speech_to_text package with button state management and text appending
+- **BLUE Phase**: Refactored for code quality with proper linting, formatting, and test verification
+- **Technical Debt Addressed**: Added voice input capability to improve accessibility and user experience
+- **Code Quality Improvements**: Cross-platform speech recognition, proper state management, and error handling
+- **Verification**: All tests pass, code is clean and maintainable
+
 ### Capture Domain Status Helpers
 - `CaptureItem` exposes `isInbox`, `isFiled`, and `isArchived` getters to reduce direct status comparisons throughout the domain layer
 - Filing workflow implemented via `FileCaptureItem` use case, transitioning items to the new `CaptureStatus.filed` state while emitting `CaptureItemFiled` events

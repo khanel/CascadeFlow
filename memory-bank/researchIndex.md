@@ -91,10 +91,61 @@ For every research effort, add or update an entry using the following structure 
   - Ensure Actions are properly scoped and don't leak focus.
   - Run tests after each change to maintain passing state.
 - Source Index:
-  - [Effective Dart: Design](https://dart.dev/effective-dart/design) — Guidelines for intent-revealing names and API design in shortcut implementations.
+  - [Effective Dart: Design](https://dart.dev/effective-dart/design) — Guidelines for intent-based architecture and API design in shortcut implementations.
   - [Refactoring.Guru](https://refactoring.guru/refactoring/what-is-refactoring) — General refactoring principles for improving code without changing behavior.
 - Reuse Notes:
   - Use during future refactors of input handling or when adding accessibility features; remove if shortcuts are removed from the feature.
+
+### Topic: Flutter Voice Capture Implementation for Text Input
+- Feature / Area: Ingest › Presentation Layer › CaptureQuickAddSheet
+- Last Updated: 2025-10-27
+- References:
+  - Cite this entry in phase notes as "researchIndex.md › Flutter Voice Capture Implementation for Text Input"
+
+#### RED Guidance
+- Summary:
+  - Write failing tests that verify voice capture button triggers speech recognition and appends transcribed text to the input field.
+  - Focus on testing the integration with speech_to_text package, including permission handling and error states.
+- Key Practices:
+  - Use widget tests to simulate button tap and mock speech recognition results.
+  - Test permission denied scenarios and ensure UI reflects listening state.
+  - Assert that transcribed text is appended to existing content without overwriting.
+- Source Index:
+  - [speech_to_text | Flutter package - Pub.dev](https://pub.dev/packages/speech_to_text) — Official package documentation with initialization and listening examples.
+  - [Flutter Speech To Text Tutorial | Voice Recognition App iOS & Android](https://www.youtube.com/watch?v=W4G0v_lu7IE) — Step-by-step tutorial for setting up speech recognition.
+  - [Implementing Speech-to-Text and Voice Command Recognition in Flutter](https://geekyants.com/en-us/blog/implementing-speech-to-text-and-voice-command-recognition-in-flutter-enhancing-user-interaction) — Comprehensive guide on integrating speech-to-text for user interaction.
+- Reuse Notes:
+  - Revisit when implementing voice features in other parts of the app or when upgrading speech_to_text package.
+
+#### GREEN Guidance
+- Summary:
+  - Implement minimal voice capture using speech_to_text package to append transcribed text to the input field.
+  - Handle basic permission requests and listening states.
+- Key Practices:
+  - Initialize SpeechToText in initState and request permissions.
+  - On button press, start listening and append results to the text controller.
+  - Show visual feedback during listening (e.g., change button icon).
+- Source Index:
+  - [speech_to_text | Flutter package - Pub.dev](https://pub.dev/packages/speech_to_text) — Code examples for initialization and listening.
+  - [Building a Speech-to-Text Input Using Flutter and BLoC](https://blog.nonstopio.com/building-a-speech-to-text-input-using-flutter-and-bloc-67109cca367c) — Example of integrating speech-to-text with state management.
+  - [Flutter Speech To Text - Medium](https://medium.com/@ahmad.hamoush.785/flutter-speech-to-text-8fc4daa59c8c) — Tutorial on continuous listening and result handling.
+- Reuse Notes:
+  - Apply when adding voice input to other text fields; guidance covers basic speech-to-text integration.
+
+#### BLUE Guidance
+- Summary:
+  - Refactor voice capture implementation for better error handling, accessibility, and code organization.
+  - Ensure consistent styling and remove any duplication.
+- Key Practices:
+  - Add proper error handling for permission denials and speech recognition failures.
+  - Improve accessibility with tooltips and screen reader support.
+  - Extract voice capture logic into a separate controller or mixin if needed.
+- Source Index:
+  - [Effective Dart: Design](https://dart.dev/effective-dart/design) — Guidelines for clean API design in voice features.
+  - [Flutter Accessibility](https://docs.flutter.dev/development/accessibility-and-localization/accessibility) — Best practices for accessible voice interfaces.
+  - [Refactoring.Guru](https://refactoring.guru/refactoring/what-is-refactoring) — Principles for improving code structure without changing behavior.
+- Reuse Notes:
+  - Use during future refactors of voice input features or when adding advanced speech processing.
 
 ### Topic: Ingest Data Layer Result Wrapping
 - Feature / Area: Ingest › Data Layer › Hive persistence

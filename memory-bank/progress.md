@@ -62,6 +62,7 @@
 - ✅ Added comprehensive tests for filter presets following TDD cycle
 - ✅ Blue-phase refactor cleaned storage overrides/test harness helpers without altering behaviour
 - ✅ Implemented keyboard shortcuts for quick-add sheet (Ctrl+Enter to submit, Escape to clear)
+- ✅ Implemented voice capture functionality using speech_to_text package
 
 ### Testing
 - ✅ Provider tests cover `CaptureQuickEntryController` success and failure flows
