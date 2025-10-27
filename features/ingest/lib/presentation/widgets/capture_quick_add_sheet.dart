@@ -13,7 +13,9 @@ abstract final class CaptureQuickAddSheetKeys {
   static const Key submitButton = Key('captureQuickAdd_submitButton');
 
   /// Key used to locate the voice capture button.
-  static const Key voiceCaptureButton = Key('captureQuickAdd_voiceCaptureButton');
+  static const Key voiceCaptureButton = Key(
+    'captureQuickAdd_voiceCaptureButton',
+  );
 }
 
 /// Intent for submitting the capture form via keyboard shortcut.
@@ -132,7 +134,7 @@ class _CaptureQuickAddSheetState extends ConsumerState<CaptureQuickAddSheet> {
                         IconButton(
                           key: CaptureQuickAddSheetKeys.voiceCaptureButton,
                           onPressed: () {
-                            // TODO: Implement voice capture functionality
+                            // TODO(implement): Implement voice capture functionality
                           },
                           icon: const Icon(Icons.mic),
                           tooltip: 'Voice capture',
@@ -146,7 +148,9 @@ class _CaptureQuickAddSheetState extends ConsumerState<CaptureQuickAddSheet> {
                                 ? const SizedBox(
                                     height: 20,
                                     width: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
                                   )
                                 : const Text('Add'),
                           ),
