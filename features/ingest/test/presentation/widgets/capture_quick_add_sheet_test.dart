@@ -200,7 +200,10 @@ void main() {
       await tester.pump();
 
       expect(repository.saveCallCount, equals(1));
-      expect(repository.savedItems.single.content, equals('Shortcut submission test'));
+      expect(
+        repository.savedItems.single.content,
+        equals('Shortcut submission test'),
+      );
     });
 
     testWidgets('Escape clears the field when it has content', (tester) async {
@@ -208,9 +211,7 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            captureRepositoryProvider.overrideWithValue(repository),
-          ],
+          overrides: [captureRepositoryProvider.overrideWithValue(repository)],
           child: const MaterialApp(
             home: Scaffold(body: CaptureQuickAddSheet()),
           ),
