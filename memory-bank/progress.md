@@ -136,7 +136,9 @@
   - ✅ Refactor `CaptureLocalDataSource` to return `Result` types.
   - ✅ Optimize `CaptureRepositoryImpl.loadInbox` to use Hive queries for efficient filtering.
   - ✅ Implement explicit error handling in `CaptureRepositoryImpl`.
-  - 🔄 Add data migration helpers.
+  - ✅ Add data migration helpers.
+  - ✅ Complete TDD cycle for `CaptureMigrationHelper` with RED, GREEN, and BLUE phases.
+  - ✅ Refactor migration helper for improved code quality, documentation, and naming.
 - ⏳ **Ingest Presentation Layer (Medium Priority):**
     - Implement keyboard shortcuts for the quick-add sheet.
     - Add a voice capture stub to the UI.
