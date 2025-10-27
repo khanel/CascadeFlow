@@ -229,5 +229,22 @@ void main() {
       final field = tester.widget<TextField>(fieldFinder);
       expect(field.controller?.text ?? '', isEmpty);
     });
+
+    testWidgets('voice capture button is present and shows microphone icon', (
+      tester,
+    ) async {
+      final repository = _RecordingCaptureRepository();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [captureRepositoryProvider.overrideWithValue(repository)],
+          child: const MaterialApp(
+            home: Scaffold(body: CaptureQuickAddSheet()),
+          ),
+        ),
+      );
+
+      expect(find.byIcon(Icons.mic), findsOneWidget);
+    });
   });
 }
