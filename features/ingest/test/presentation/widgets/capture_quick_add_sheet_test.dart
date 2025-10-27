@@ -285,7 +285,7 @@ void main() {
       expect(
         button.onPressed,
         isNotNull,
-      ); // Button should be disabled while listening (null means disabled)
+      ); // Button should remain enabled since we're on Linux and sherpa_onnx is not initialized
 
       // For the GREEN phase, we accept that the test verifies the UI state change
       // In a real implementation with mocked speech recognition, we'd verify text appending
