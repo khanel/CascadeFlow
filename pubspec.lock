@@ -588,10 +588,10 @@ packages:
     dependency: transitive
     description:
       name: record
-      sha256: "2e3d56d196abcd69f1046339b75e5f3855b2406fc087e5991f6703f188aa03a6"
+      sha256: "6bad72fb3ea6708d724cf8b6c97c4e236cf9f43a52259b654efeb6fd9b737f1f"
       url: "https://pub.dev"
     source: hosted
-    version: "5.2.1"
+    version: "6.1.2"
   record_android:
     dependency: transitive
     description:
@@ -600,22 +600,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.4"
-  record_darwin:
+  record_ios:
     dependency: transitive
     description:
-      name: record_darwin
-      sha256: e487eccb19d82a9a39cd0126945cfc47b9986e0df211734e2788c95e3f63c82c
+      name: record_ios
+      sha256: "765b42ac1be019b1674ddd809b811fc721fe5a93f7bb1da7803f0d16772fd6d7"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.2"
+    version: "1.1.4"
   record_linux:
     dependency: transitive
     description:
       name: record_linux
-      sha256: "74d41a9ebb1eb498a38e9a813dd524e8f0b4fdd627270bda9756f437b110a3e3"
+      sha256: "235b1f1fb84e810f8149cc0c2c731d7d697f8d1c333b32cb820c449bf7bb72d8"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.2"
+    version: "1.2.1"
+  record_macos:
+    dependency: transitive
+    description:
+      name: record_macos
+      sha256: "842ea4b7e95f4dd237aacffc686d1b0ff4277e3e5357865f8d28cd28bc18ed95"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.2"
   record_platform_interface:
     dependency: transitive
     description:
@@ -680,54 +688,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
-  sherpa_onnx:
-    dependency: transitive
-    description:
-      name: sherpa_onnx
-      sha256: "297a4eda27bd2a07dfb80031ae514cc4fb4a5019e415bd01601a93d8bd95189b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.12.15"
-  sherpa_onnx_android:
-    dependency: transitive
-    description:
-      name: sherpa_onnx_android
-      sha256: f7a9852cfb088cd975cee5a18a38b6664a36853fb2c2a1b9b5cb1867cac84690
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.12.15"
-  sherpa_onnx_ios:
-    dependency: transitive
-    description:
-      name: sherpa_onnx_ios
-      sha256: "963549e01ab64ca72fc424eda7b2ba7b8c4de0c7abb428eb43db9a69142b64b3"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.12.15"
-  sherpa_onnx_linux:
-    dependency: transitive
-    description:
-      name: sherpa_onnx_linux
-      sha256: "0254e13245ab57ae1f4871210a82b7db91d5c9122e1e6faab0ce668b7e0dbad2"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.12.15"
-  sherpa_onnx_macos:
-    dependency: transitive
-    description:
-      name: sherpa_onnx_macos
-      sha256: "4e547e8637c81a13cef2e251462f5e75a546cbf7f935737bcccac80671d0fd71"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.12.15"
-  sherpa_onnx_windows:
-    dependency: transitive
-    description:
-      name: sherpa_onnx_windows
-      sha256: "803dad28dd99ba2c86f9c920afe23b320ab55b0942a1ddd883bde0808a42625a"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.12.15"
   sky_engine:
     dependency: transitive
     description: flutter

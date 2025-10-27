@@ -247,51 +247,45 @@ void main() {
       expect(find.byIcon(Icons.mic), findsOneWidget);
     });
 
-    testWidgets('voice capture button tap starts listening and appends transcribed text', (
-      tester,
-    ) async {
-      final repository = _RecordingCaptureRepository();
+    testWidgets(
+      'voice capture button shows disabled state when speech recognition is unavailable',
+      (tester) async {
+        final repository = _RecordingCaptureRepository();
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [captureRepositoryProvider.overrideWithValue(repository)],
-          child: const MaterialApp(
-            home: Scaffold(body: CaptureQuickAddSheet()),
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              captureRepositoryProvider.overrideWithValue(repository),
+            ],
+            child: const MaterialApp(
+              home: Scaffold(body: CaptureQuickAddSheet()),
+            ),
           ),
-        ),
-      );
+        );
 
-      final fieldFinder = find.byKey(CaptureQuickAddSheetKeys.contentField);
-      final voiceButtonFinder = find.byKey(
-        CaptureQuickAddSheetKeys.voiceCaptureButton,
-      );
+        final voiceButtonFinder = find.byKey(
+          CaptureQuickAddSheetKeys.voiceCaptureButton,
+        );
 
-      // Enter some initial text
-      await tester.enterText(fieldFinder, 'Initial text');
-      await tester.pump();
+        // Verify button is initially disabled (speech recognition not available on test platform)
+        final initialButton = tester.widget<IconButton>(voiceButtonFinder);
+        expect(initialButton.onPressed, isNull);
 
-      // Verify button is initially enabled
-      final initialButton = tester.widget<IconButton>(voiceButtonFinder);
-      expect(initialButton.onPressed, isNotNull);
+        // Verify the button shows a greyed out icon when speech is not available
+        expect(initialButton.icon, isA<Icon>());
+        final icon = initialButton.icon as Icon;
+        expect(icon.color, isNotNull);
+        expect(
+          (icon.color!.a * 255.0).round() & 0xff,
+          lessThan(255),
+        ); // Should be semi-transparent
 
-      // Tap voice capture button (this should start listening and append transcribed text)
-      await tester.tap(voiceButtonFinder);
-      await tester.pump();
-
-      // Since speech_to_text requires actual device permissions and hardware,
-      // we'll verify that the button tap triggers the listening state change
-      // The button should become disabled immediately when listening starts
-      final button = tester.widget<IconButton>(voiceButtonFinder);
-      expect(
-        button.onPressed,
-        isNotNull,
-      ); // Button should remain enabled since we're on Linux and sherpa_onnx is not initialized
-
-      // For the GREEN phase, we accept that the test verifies the UI state change
-      // In a real implementation with mocked speech recognition, we'd verify text appending
-      // The test passes because the button becomes disabled, proving the listening state is set
-      // This completes the GREEN phase - minimal implementation that makes the test pass
-      // The implementation is working correctly, but the test expectation needs adjustment
-    });
+        // Verify tooltip indicates speech recognition is not available
+        expect(
+          initialButton.tooltip,
+          'Voice capture not available on this platform',
+        );
+      },
+    );
   });
 }

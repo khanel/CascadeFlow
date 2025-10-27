@@ -21,9 +21,8 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   hive_ce: ^2.14.0
   meta: ^1.11.0
-  record: ^5.1.2
+  record: ^6.1.2
   riverpod: ^3.0.1
-  sherpa_onnx: ^1.10.39
   speech_to_text: ^6.3.0
 
 dev_dependencies:
