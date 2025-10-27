@@ -154,13 +154,17 @@
 - **Verification**: All tests pass, code is clean and maintainable
 
 ### Voice Capture for Quick-Add Sheet
-- **Status**: ✅ Complete - TDD cycle completed for voice capture functionality
+- **Status**: ✅ Complete - TDD cycle completed for voice capture functionality with Linux support
 - **RED Phase**: Added failing widget test for voice capture button tap that starts listening and appends transcribed text
 - **GREEN Phase**: Implemented minimal voice capture using speech_to_text package with button state management and text appending
 - **BLUE Phase**: Refactored for code quality with proper linting, formatting, and test verification
-- **Technical Debt Addressed**: Added voice input capability to improve accessibility and user experience
-- **Code Quality Improvements**: Cross-platform speech recognition, proper state management, and error handling
-- **Verification**: All tests pass, code is clean and maintainable
+- **Linux Support Added**: Integrated sherpa_onnx package for local speech recognition on Linux platforms where speech_to_text is not supported
+- **Platform Detection**: Added Platform.isLinux detection to conditionally use sherpa_onnx on Linux, speech_to_text on other platforms
+- **Fallback Logic**: Implemented graceful fallback from sherpa_onnx to speech_to_text if initialization fails
+- **Dependencies**: Added sherpa_onnx (^1.10.39) and record (^5.1.2) packages for Linux speech recognition and audio recording
+- **Technical Debt Addressed**: Added voice input capability to improve accessibility and user experience across all platforms
+- **Code Quality Improvements**: Cross-platform speech recognition, proper state management, error handling, and platform abstraction
+- **Verification**: All tests pass, code is clean and maintainable, flutter analyze shows 0 issues
 
 ### Capture Domain Status Helpers
 - `CaptureItem` exposes `isInbox`, `isFiled`, and `isArchived` getters to reduce direct status comparisons throughout the domain layer

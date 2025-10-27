@@ -32,6 +32,11 @@
 - **intl**: 0.20.2 - Internationalization and localization
 - **flutter_local_notifications**: 19.4.2 - Local notification scheduling
 
+### Speech Recognition
+- **speech_to_text**: 6.3.0 - Cross-platform speech recognition (Android, iOS, macOS, Windows, web)
+- **sherpa_onnx**: 1.10.39 - Local speech recognition for Linux platforms
+- **record**: 5.1.2 - Audio recording for speech recognition workflows
+
 ### Infrastructure
 - **logger**: 2.6.1 - Structured logging
 - **build_runner**: 2.8.0 - Code generation tooling
