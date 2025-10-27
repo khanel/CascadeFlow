@@ -152,10 +152,8 @@ class _CaptureInboxListContent extends ConsumerWidget {
             key: Key('captureInbox_dismiss_${item.id.value}'),
             background: const _ArchiveBackground(),
             secondaryBackground: const _DeleteBackground(),
-            confirmDismiss: (direction) => actions.confirmDismiss(
-              direction,
-              item,
-            ),
+            confirmDismiss: (direction) =>
+                actions.confirmDismiss(direction, item),
             child: GestureDetector(
               onLongPress: () => actions.file(item),
               child: ListTile(
@@ -269,10 +267,7 @@ class _CaptureInboxFilterBar extends ConsumerWidget {
     return presetsAsync.maybeWhen(
       data: (presets) => presets
           .map(
-            (preset) => PopupMenuItem(
-              value: preset,
-              child: Text(preset.name),
-            ),
+            (preset) => PopupMenuItem(value: preset, child: Text(preset.name)),
           )
           .toList(),
       orElse: () => [],
@@ -412,21 +407,17 @@ class _CaptureInboxLoadingMore extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Padding(
       padding: EdgeInsets.symmetric(vertical: 16),
-      child: Center(
-        child: CircularProgressIndicator.adaptive(),
-      ),
+      child: Center(child: CircularProgressIndicator.adaptive()),
     );
   }
 }
 
 class _CaptureInboxActions {
-  _CaptureInboxActions({
-    required this.context,
-    required WidgetRef ref,
-  }) : _archiveUseCase = ref.read(archiveCaptureItemUseCaseProvider),
-       _fileUseCase = ref.read(fileCaptureItemUseCaseProvider),
-       _repository = ref.read(captureRepositoryProvider),
-       _container = ref.container;
+  _CaptureInboxActions({required this.context, required WidgetRef ref})
+    : _archiveUseCase = ref.read(archiveCaptureItemUseCaseProvider),
+      _fileUseCase = ref.read(fileCaptureItemUseCaseProvider),
+      _repository = ref.read(captureRepositoryProvider),
+      _container = ref.container;
 
   final BuildContext context;
   final ArchiveCaptureItem _archiveUseCase;
@@ -456,9 +447,7 @@ class _CaptureInboxActions {
       return;
     }
 
-    final result = _fileUseCase(
-      request: FileCaptureItemRequest(item: item),
-    );
+    final result = _fileUseCase(request: FileCaptureItemRequest(item: item));
 
     switch (result) {
       case SuccessResult<CaptureItem, Failure>(value: final filed):
@@ -468,10 +457,7 @@ class _CaptureInboxActions {
     }
   }
 
-  Future<bool> confirmDismiss(
-    DismissDirection direction,
-    CaptureItem item,
-  ) {
+  Future<bool> confirmDismiss(DismissDirection direction, CaptureItem item) {
     return switch (direction) {
       DismissDirection.startToEnd => archive(item),
       DismissDirection.endToStart => confirmDelete(item),
@@ -518,9 +504,7 @@ class _CaptureInboxActions {
           context: context,
           builder: (dialogContext) => AlertDialog(
             title: const Text('Delete capture?'),
-            content: Text(
-              'Deleting "${item.content}" cannot be undone.',
-            ),
+            content: Text('Deleting "${item.content}" cannot be undone.'),
             actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.of(dialogContext).pop(false),
@@ -549,18 +533,10 @@ class _CaptureInboxActions {
     }
   }
 
-  void showMessage(
-    String message, {
-    SnackBarAction? action,
-  }) {
+  void showMessage(String message, {SnackBarAction? action}) {
     _messenger
       ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          action: action,
-        ),
-      );
+      ..showSnackBar(SnackBar(content: Text(message), action: action));
   }
 
   void _refreshInbox() {

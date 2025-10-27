@@ -63,10 +63,7 @@ class CaptureInboxFilterController extends Notifier<CaptureInboxFilter> {
 
   /// Sets the active source filter and resets the channel selection.
   void setSource(CaptureSource? source) {
-    final next = state.copyWith(
-      source: source,
-      channel: null,
-    );
+    final next = state.copyWith(source: source, channel: null);
     if (next == state) {
       return;
     }
@@ -119,9 +116,7 @@ class CaptureInboxFilterController extends Notifier<CaptureInboxFilter> {
         : store.save(filter);
 
     unawaited(
-      persistence.catchError(
-        (Object error, StackTrace stackTrace) => null,
-      ),
+      persistence.catchError((Object error, StackTrace stackTrace) => null),
     );
   }
 
@@ -186,10 +181,7 @@ typedef CaptureInboxPageArgs = ({int? limit, EntityId? startAfter});
 /// Provides the default inbox page used by the capture inbox list.
 final FutureProvider<List<CaptureItem>> captureInboxItemsProvider =
     FutureProvider.autoDispose<List<CaptureItem>>((ref) async {
-      return _loadInboxPage(
-        ref,
-        limit: CaptureInboxConstants.defaultBatchSize,
-      );
+      return _loadInboxPage(ref, limit: CaptureInboxConstants.defaultBatchSize);
     });
 
 /// Loads a paginated slice of the inbox after an optional cursor.
@@ -250,10 +242,7 @@ class CaptureInboxPaginationState {
 
   /// Returns a state that reflects an in-flight load-more request.
   CaptureInboxPaginationState beginLoadMore() {
-    return copyWith(
-      isLoadingMore: true,
-      loadMoreError: null,
-    );
+    return copyWith(isLoadingMore: true, loadMoreError: null);
   }
 
   /// Returns a state that appends [appended] items and updates [hasMore].
@@ -262,10 +251,7 @@ class CaptureInboxPaginationState {
     required bool hasMore,
   }) {
     final updated = <CaptureItem>[...items, ...appended];
-    return CaptureInboxPaginationState(
-      items: updated,
-      hasMore: hasMore,
-    );
+    return CaptureInboxPaginationState(items: updated, hasMore: hasMore);
   }
 
   /// Returns a state that captures the error produced during load-more.
@@ -299,10 +285,7 @@ class CaptureInboxPaginationController
       final items = await _loadPage();
       final hasMore = _hasMoreItems(items);
       state = AsyncValue.data(
-        CaptureInboxPaginationState(
-          items: items,
-          hasMore: hasMore,
-        ),
+        CaptureInboxPaginationState(items: items, hasMore: hasMore),
       );
     } on Object catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
@@ -314,10 +297,7 @@ class CaptureInboxPaginationController
 
   /// Requests the next page of inbox items when available.
   Future<void> loadNextPage() async {
-    final current = state.maybeWhen(
-      data: (value) => value,
-      orElse: () => null,
-    );
+    final current = state.maybeWhen(data: (value) => value, orElse: () => null);
 
     if (_shouldSkipLoadMore(current)) {
       return;
@@ -331,10 +311,7 @@ class CaptureInboxPaginationController
     try {
       final next = await _loadPage(startAfter: cursor);
       state = AsyncValue.data(
-        loadingMore.append(
-          next,
-          hasMore: _hasMoreItems(next),
-        ),
+        loadingMore.append(next, hasMore: _hasMoreItems(next)),
       );
     } on Object catch (error, stackTrace) {
       state = AsyncValue.data(loadingMore.withLoadMoreError(error, stackTrace));
@@ -371,10 +348,7 @@ Future<List<CaptureItem>> _loadInboxPage(
   EntityId? startAfter,
 }) {
   final repository = ref.watch(captureRepositoryProvider);
-  return repository.loadInbox(
-    limit: limit,
-    startAfter: startAfter,
-  );
+  return repository.loadInbox(limit: limit, startAfter: startAfter);
 }
 
 /// Describes the submission lifecycle for the quick-entry controller.
@@ -400,11 +374,7 @@ class CaptureQuickEntryState {
     required CaptureQuickEntryStatus status,
     CaptureItem? item,
     Failure? failure,
-  }) : this._(
-         status: status,
-         item: item,
-         failure: failure,
-       );
+  }) : this._(status: status, item: item, failure: failure);
 
   /// Internal constructor used by the named factories.
   const CaptureQuickEntryState._({
@@ -423,17 +393,11 @@ class CaptureQuickEntryState {
 
   /// State representing a successful submission.
   const CaptureQuickEntryState.success(CaptureItem item)
-    : this._(
-        status: CaptureQuickEntryStatus.success,
-        item: item,
-      );
+    : this._(status: CaptureQuickEntryStatus.success, item: item);
 
   /// State representing a failed submission.
   const CaptureQuickEntryState.error(Failure failure)
-    : this._(
-        status: CaptureQuickEntryStatus.error,
-        failure: failure,
-      );
+    : this._(status: CaptureQuickEntryStatus.error, failure: failure);
 
   /// Submission status of the controller.
   final CaptureQuickEntryStatus status;
@@ -454,9 +418,7 @@ class CaptureQuickEntryController extends Notifier<CaptureQuickEntryState> {
   CaptureQuickEntryState build() => const CaptureQuickEntryState.initial();
 
   /// Submits a quick-entry request, persisting successful captures.
-  Future<void> submit({
-    required CaptureQuickEntryRequest request,
-  }) async {
+  Future<void> submit({required CaptureQuickEntryRequest request}) async {
     final validationFailure = _validateRequest(request);
     if (validationFailure != null) {
       state = CaptureQuickEntryState.error(validationFailure);
@@ -528,16 +490,12 @@ class CaptureFilterPresetController
 
   /// Saves a new preset or updates an existing one.
   Future<void> savePreset(CaptureFilterPreset preset) async {
-    await _performPresetOperation(
-      () => _store!.savePreset(preset),
-    );
+    await _performPresetOperation(() => _store!.savePreset(preset));
   }
 
   /// Deletes a preset by name.
   Future<void> deletePreset(String name) async {
-    await _performPresetOperation(
-      () => _store!.deletePreset(name),
-    );
+    await _performPresetOperation(() => _store!.deletePreset(name));
   }
 
   /// Helper method to perform preset operations with consistent error handling.
@@ -576,9 +534,7 @@ captureFilterPresetProvider =
     NotifierProvider<
       CaptureFilterPresetController,
       AsyncValue<List<CaptureFilterPreset>>
-    >(
-      CaptureFilterPresetController.new,
-    );
+    >(CaptureFilterPresetController.new);
 
 /// Provider exposing the quick-entry controller to presentation code.
 final NotifierProvider<CaptureQuickEntryController, CaptureQuickEntryState>

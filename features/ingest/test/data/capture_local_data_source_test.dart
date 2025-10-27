@@ -23,6 +23,7 @@ class _RecordingInitializer extends InMemoryHiveInitializer {
   @override
   Future<HiveBox<T>> openEncryptedBox<T>(String name) {
     openedBoxes.add(name);
+
     return super.openEncryptedBox<T>(name);
   }
 }

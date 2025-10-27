@@ -36,9 +36,7 @@ class ArchiveCaptureItem {
       body: () {
         final item = request.item;
         if (item.isArchived) {
-          throw const DomainFailure(
-            message: 'Capture item already archived',
-          );
+          throw const DomainFailure(message: 'Capture item already archived');
         }
 
         final timestamp = _nowProvider();

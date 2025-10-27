@@ -28,15 +28,9 @@ class CaptureInboxFilterStore {
   Future<void> save(CaptureInboxFilter filter) async {
     try {
       final payload = jsonEncode(filter.toJson());
-      await _secureStorage.write(
-        key: _storageKey,
-        value: payload,
-      );
+      await _secureStorage.write(key: _storageKey, value: payload);
     } on Object catch (error) {
-      throw FilterStorageException(
-        'Failed to save filter to storage',
-        error,
-      );
+      throw FilterStorageException('Failed to save filter to storage', error);
     }
   }
 
@@ -61,17 +55,14 @@ class CaptureInboxFilterStore {
 
   /// Saves a new or updated filter preset.
   Future<void> savePreset(CaptureFilterPreset preset) async {
-    await _modifyPresets(
-      'save preset "${preset.name}"',
-      (presets) {
-        final index = presets.indexWhere((p) => p.name == preset.name);
-        if (index >= 0) {
-          presets[index] = preset;
-        } else {
-          presets.add(preset);
-        }
-      },
-    );
+    await _modifyPresets('save preset "${preset.name}"', (presets) {
+      final index = presets.indexWhere((p) => p.name == preset.name);
+      if (index >= 0) {
+        presets[index] = preset;
+      } else {
+        presets.add(preset);
+      }
+    });
   }
 
   /// Deletes a filter preset by name.
@@ -118,10 +109,7 @@ class CaptureInboxFilterStore {
     } on FilterStorageException {
       rethrow;
     } on Object catch (error) {
-      throw FilterPresetException(
-        'Failed to $operation',
-        error,
-      );
+      throw FilterPresetException('Failed to $operation', error);
     }
   }
 }

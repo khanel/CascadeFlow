@@ -29,16 +29,12 @@ class FileCaptureItem {
   final FileCaptureItemEventPublisher _publishEvent;
 
   /// Executes the use case and returns a `Result` describing the outcome.
-  Result<CaptureItem, Failure> call({
-    required FileCaptureItemRequest request,
-  }) {
+  Result<CaptureItem, Failure> call({required FileCaptureItemRequest request}) {
     return Result.guard<CaptureItem, Failure>(
       body: () {
         final item = request.item;
         if (item.isFiled) {
-          throw const DomainFailure(
-            message: 'Capture item already filed',
-          );
+          throw const DomainFailure(message: 'Capture item already filed');
         }
 
         final timestamp = _nowProvider();

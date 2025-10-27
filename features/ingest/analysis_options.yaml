@@ -1,1 +1,3 @@
-include: ../../analysis_options.yaml
+ # Intentionally empty: the workspace root `analysis_options.yaml` will be used.
+# Removed package-level include to avoid package URI resolution warnings when
+# running formatting tools in monorepo workspace mode.

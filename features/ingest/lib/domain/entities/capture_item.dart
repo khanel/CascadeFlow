@@ -96,9 +96,7 @@ class CaptureItem {
     return trimmed;
   }
 
-  static Map<String, String> _normalizeMetadata(
-    Map<String, String>? metadata,
-  ) {
+  static Map<String, String> _normalizeMetadata(Map<String, String>? metadata) {
     if (metadata == null || metadata.isEmpty) {
       return const <String, String>{};
     }
@@ -202,16 +200,10 @@ class CaptureContext {
         message: 'CaptureContext channel cannot be blank',
       );
     }
-    return CaptureContext._(
-      source: source,
-      channel: normalizedChannel,
-    );
+    return CaptureContext._(source: source, channel: normalizedChannel);
   }
 
-  const CaptureContext._({
-    required this.source,
-    required this.channel,
-  });
+  const CaptureContext._({required this.source, required this.channel});
 
   /// Originating source of a capture (e.g. quick capture, voice).
   final CaptureSource source;

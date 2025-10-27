@@ -11,9 +11,7 @@ class CaptureHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Capture')),
-      body: const SafeArea(
-        child: _CaptureHomeContent(),
-      ),
+      body: const SafeArea(child: _CaptureHomeContent()),
     );
   }
 }

@@ -7,10 +7,7 @@ abstract class CaptureRepository {
   Future<void> save(CaptureItem item);
 
   /// Returns capture items that remain in the inbox, optionally limited.
-  Future<List<CaptureItem>> loadInbox({
-    int? limit,
-    EntityId? startAfter,
-  });
+  Future<List<CaptureItem>> loadInbox({int? limit, EntityId? startAfter});
 
   /// Removes the capture item identified by [id] from storage.
   Future<void> delete(EntityId id);

@@ -57,10 +57,7 @@ class CaptureRepositoryImpl implements CaptureRepository {
     return List.unmodifiable(limited);
   }
 
-  List<CaptureItem> _sliceAfter(
-    List<CaptureItem> items,
-    EntityId? cursor,
-  ) {
+  List<CaptureItem> _sliceAfter(List<CaptureItem> items, EntityId? cursor) {
     if (cursor == null) {
       return items;
     }

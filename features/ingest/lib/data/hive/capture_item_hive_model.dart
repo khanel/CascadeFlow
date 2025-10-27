@@ -74,10 +74,7 @@ class CaptureItemHiveModel {
     return CaptureItem.create(
       id: EntityId(id),
       content: content,
-      context: CaptureContext(
-        source: resolvedSource,
-        channel: channel,
-      ),
+      context: CaptureContext(source: resolvedSource, channel: channel),
       createdAt: createdAt,
       updatedAt: updatedAt,
       status: resolvedStatus,

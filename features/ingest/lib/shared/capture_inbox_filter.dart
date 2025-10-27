@@ -82,10 +82,7 @@ class CaptureFilterPreset {
 @immutable
 class CaptureInboxFilter {
   /// Builds a filter with optional [source] and [channel] constraints.
-  const CaptureInboxFilter({
-    this.source,
-    this.channel,
-  });
+  const CaptureInboxFilter({this.source, this.channel});
 
   /// Restores a filter from the provided JSON map.
   factory CaptureInboxFilter.fromJson(Map<String, dynamic> json) {
@@ -159,10 +156,7 @@ class CaptureInboxFilter {
     final resolvedChannel = identical(channel, _sentinel)
         ? this.channel
         : channel as String?;
-    return CaptureInboxFilter(
-      source: resolvedSource,
-      channel: resolvedChannel,
-    );
+    return CaptureInboxFilter(source: resolvedSource, channel: resolvedChannel);
   }
 
   @override

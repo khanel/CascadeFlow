@@ -68,36 +68,34 @@ class _CaptureQuickAddSheetState extends ConsumerState<CaptureQuickAddSheet> {
 
   @override
   Widget build(BuildContext context) {
-    ref.listen<CaptureQuickEntryState>(
-      captureQuickEntryControllerProvider,
-      (previous, next) {
-        if (!mounted) return;
-        switch (next.status) {
-          case CaptureQuickEntryStatus.success:
-            _contentController.clear();
-            final messenger = ScaffoldMessenger.of(context);
-            messenger.hideCurrentSnackBar();
-            final focusScope = FocusScope.of(context);
-            if (focusScope.hasPrimaryFocus) {
-              focusScope.unfocus();
-            }
-            return;
-          case CaptureQuickEntryStatus.error:
-            final failure = next.failure;
-            if (failure != null) {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(content: Text(failure.message)),
-                );
-            }
-            return;
-          case CaptureQuickEntryStatus.idle:
-          case CaptureQuickEntryStatus.submitting:
-            break;
-        }
-      },
-    );
+    ref.listen<CaptureQuickEntryState>(captureQuickEntryControllerProvider, (
+      previous,
+      next,
+    ) {
+      if (!mounted) return;
+      switch (next.status) {
+        case CaptureQuickEntryStatus.success:
+          _contentController.clear();
+          final messenger = ScaffoldMessenger.of(context);
+          messenger.hideCurrentSnackBar();
+          final focusScope = FocusScope.of(context);
+          if (focusScope.hasPrimaryFocus) {
+            focusScope.unfocus();
+          }
+          return;
+        case CaptureQuickEntryStatus.error:
+          final failure = next.failure;
+          if (failure != null) {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(SnackBar(content: Text(failure.message)));
+          }
+          return;
+        case CaptureQuickEntryStatus.idle:
+        case CaptureQuickEntryStatus.submitting:
+          break;
+      }
+    });
 
     final entryState = ref.watch(captureQuickEntryControllerProvider);
     final isSubmitting =
@@ -190,9 +188,7 @@ class _CaptureQuickAddSheetState extends ConsumerState<CaptureQuickAddSheet> {
 
     await ref
         .read(captureQuickEntryControllerProvider.notifier)
-        .submit(
-          request: CaptureQuickEntryRequest(rawContent: rawContent),
-        );
+        .submit(request: CaptureQuickEntryRequest(rawContent: rawContent));
   }
 
   void _clear() {
