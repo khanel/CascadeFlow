@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cascade_flow_ingest/domain/use_cases/capture_quick_entry.dart';
 import 'package:cascade_flow_ingest/presentation/providers/capture_providers.dart';
 import 'package:flutter/material.dart';
@@ -53,7 +55,9 @@ class _CaptureQuickAddSheetState extends ConsumerState<CaptureQuickAddSheet> {
   }
 
   void _initSpeech() {
-    _speechToText.initialize();
+    // Initialize speech recognition -
+    // we don't await since it's not critical for UI
+    unawaited(_speechToText.initialize());
   }
 
   @override

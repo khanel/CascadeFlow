@@ -262,7 +262,9 @@ void main() {
       );
 
       final fieldFinder = find.byKey(CaptureQuickAddSheetKeys.contentField);
-      final voiceButtonFinder = find.byKey(CaptureQuickAddSheetKeys.voiceCaptureButton);
+      final voiceButtonFinder = find.byKey(
+        CaptureQuickAddSheetKeys.voiceCaptureButton,
+      );
 
       // Enter some initial text
       await tester.enterText(fieldFinder, 'Initial text');
@@ -280,7 +282,10 @@ void main() {
       // we'll verify that the button tap triggers the listening state change
       // The button should become disabled immediately when listening starts
       final button = tester.widget<IconButton>(voiceButtonFinder);
-      expect(button.onPressed, isNotNull); // Button should be disabled while listening (null means disabled)
+      expect(
+        button.onPressed,
+        isNotNull,
+      ); // Button should be disabled while listening (null means disabled)
 
       // For the GREEN phase, we accept that the test verifies the UI state change
       // In a real implementation with mocked speech recognition, we'd verify text appending
