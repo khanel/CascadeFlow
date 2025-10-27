@@ -7,6 +7,7 @@ import 'package:cascade_flow_ingest/domain/use_cases/capture_quick_entry.dart';
 import 'package:cascade_flow_ingest/presentation/providers/capture_providers.dart';
 import 'package:cascade_flow_ingest/presentation/widgets/capture_quick_add_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -162,6 +163,70 @@ void main() {
       expect(repository.saveCallCount, equals(0));
       expect(find.text('Capture failed'), findsOneWidget);
       expect(tester.widget<FilledButton>(buttonFinder).onPressed, isNotNull);
+    });
+
+    testWidgets('Ctrl+Enter submits the form when field has content', (
+      tester,
+    ) async {
+      final repository = _RecordingCaptureRepository();
+      final captureId = EntityId('shortcut-submit');
+      final now = Timestamp(DateTime.utc(2025));
+      final useCase = CaptureQuickEntry(
+        idGenerator: () => captureId,
+        nowProvider: () => now,
+        publishEvent: (_) {},
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            captureRepositoryProvider.overrideWithValue(repository),
+            captureQuickEntryUseCaseProvider.overrideWithValue(useCase),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(body: CaptureQuickAddSheet()),
+          ),
+        ),
+      );
+
+      final fieldFinder = find.byKey(CaptureQuickAddSheetKeys.contentField);
+
+      await tester.enterText(fieldFinder, 'Shortcut submission test');
+      await tester.pump();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.control);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.control);
+      await tester.pump();
+
+      expect(repository.saveCallCount, equals(1));
+      expect(repository.savedItems.single.content, equals('Shortcut submission test'));
+    });
+
+    testWidgets('Escape clears the field when it has content', (tester) async {
+      final repository = _RecordingCaptureRepository();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            captureRepositoryProvider.overrideWithValue(repository),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(body: CaptureQuickAddSheet()),
+          ),
+        ),
+      );
+
+      final fieldFinder = find.byKey(CaptureQuickAddSheetKeys.contentField);
+
+      await tester.enterText(fieldFinder, 'Content to clear');
+      await tester.pump();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pump();
+
+      final field = tester.widget<TextField>(fieldFinder);
+      expect(field.controller?.text ?? '', isEmpty);
     });
   });
 }
