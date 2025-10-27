@@ -1,6 +1,7 @@
 import 'package:cascade_flow_ingest/domain/use_cases/capture_quick_entry.dart';
 import 'package:cascade_flow_ingest/presentation/providers/capture_providers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Keys exposed for widget tests interacting with the quick add sheet.
@@ -10,6 +11,18 @@ abstract final class CaptureQuickAddSheetKeys {
 
   /// Key used to locate the submit button.
   static const Key submitButton = Key('captureQuickAdd_submitButton');
+}
+
+/// Intent for submitting the capture form via keyboard shortcut.
+class SubmitCaptureIntent extends Intent {
+  /// Creates a submit capture intent.
+  const SubmitCaptureIntent();
+}
+
+/// Intent for clearing the capture form via keyboard shortcut.
+class ClearCaptureIntent extends Intent {
+  /// Creates a clear capture intent.
+  const ClearCaptureIntent();
 }
 
 /// Quick-add surface for capturing inbox entries.
@@ -68,46 +81,66 @@ class _CaptureQuickAddSheetState extends ConsumerState<CaptureQuickAddSheet> {
     final isSubmitting =
         entryState.status == CaptureQuickEntryStatus.submitting;
 
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: ValueListenableBuilder<TextEditingValue>(
-        valueListenable: _contentController,
-        builder: (context, value, _) {
-          final isInputEmpty = value.text.trim().isEmpty;
-          final isSubmitDisabled = isSubmitting || isInputEmpty;
-
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              TextField(
-                key: CaptureQuickAddSheetKeys.contentField,
-                controller: _contentController,
-                textInputAction: TextInputAction.done,
-                enabled: !isSubmitting,
-                minLines: 1,
-                maxLines: 4,
-                decoration: const InputDecoration(
-                  labelText: 'Quick capture',
-                  hintText: 'What needs attention?',
-                ),
-                onSubmitted: (_) => _submit(),
-              ),
-              const SizedBox(height: 12),
-              FilledButton(
-                key: CaptureQuickAddSheetKeys.submitButton,
-                onPressed: isSubmitDisabled ? null : _submit,
-                child: isSubmitting
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Add'),
-              ),
-            ],
-          );
+    return Shortcuts(
+      shortcuts: <LogicalKeySet, Intent>{
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.enter):
+            const SubmitCaptureIntent(),
+        LogicalKeySet(LogicalKeyboardKey.escape): const ClearCaptureIntent(),
+      },
+      child: Actions(
+        actions: <Type, Action<Intent>>{
+          SubmitCaptureIntent: CallbackAction<SubmitCaptureIntent>(
+            onInvoke: (intent) => _submit(),
+          ),
+          ClearCaptureIntent: CallbackAction<ClearCaptureIntent>(
+            onInvoke: (intent) => _clear(),
+          ),
         },
+        child: Focus(
+          autofocus: true,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: ValueListenableBuilder<TextEditingValue>(
+              valueListenable: _contentController,
+              builder: (context, value, _) {
+                final isInputEmpty = value.text.trim().isEmpty;
+                final isSubmitDisabled = isSubmitting || isInputEmpty;
+
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    TextField(
+                      key: CaptureQuickAddSheetKeys.contentField,
+                      controller: _contentController,
+                      textInputAction: TextInputAction.done,
+                      enabled: !isSubmitting,
+                      minLines: 1,
+                      maxLines: 4,
+                      decoration: const InputDecoration(
+                        labelText: 'Quick capture',
+                        hintText: 'What needs attention?',
+                      ),
+                      onSubmitted: (_) => _submit(),
+                    ),
+                    const SizedBox(height: 12),
+                    FilledButton(
+                      key: CaptureQuickAddSheetKeys.submitButton,
+                      onPressed: isSubmitDisabled ? null : _submit,
+                      child: isSubmitting
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Add'),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -123,5 +156,9 @@ class _CaptureQuickAddSheetState extends ConsumerState<CaptureQuickAddSheet> {
         .submit(
           request: CaptureQuickEntryRequest(rawContent: rawContent),
         );
+  }
+
+  void _clear() {
+    _contentController.clear();
   }
 }
