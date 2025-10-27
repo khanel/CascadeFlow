@@ -246,5 +246,36 @@ void main() {
 
       expect(find.byIcon(Icons.mic), findsOneWidget);
     });
+
+    testWidgets('voice capture button tap starts listening and appends transcribed text', (
+      tester,
+    ) async {
+      final repository = _RecordingCaptureRepository();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [captureRepositoryProvider.overrideWithValue(repository)],
+          child: const MaterialApp(
+            home: Scaffold(body: CaptureQuickAddSheet()),
+          ),
+        ),
+      );
+
+      final fieldFinder = find.byKey(CaptureQuickAddSheetKeys.contentField);
+      final voiceButtonFinder = find.byKey(CaptureQuickAddSheetKeys.voiceCaptureButton);
+
+      // Enter some initial text
+      await tester.enterText(fieldFinder, 'Initial text');
+      await tester.pump();
+
+      // Tap voice capture button (this should start listening and append transcribed text)
+      await tester.tap(voiceButtonFinder);
+      await tester.pump();
+
+      // For now, this test will fail because voice capture is not implemented
+      // In the future, we would mock the speech recognition and verify the text is appended
+      final field = tester.widget<TextField>(fieldFinder);
+      expect(field.controller?.text ?? '', contains('transcribed speech'));
+    });
   });
 }
