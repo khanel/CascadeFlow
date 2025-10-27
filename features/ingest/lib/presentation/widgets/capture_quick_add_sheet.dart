@@ -11,6 +11,9 @@ abstract final class CaptureQuickAddSheetKeys {
 
   /// Key used to locate the submit button.
   static const Key submitButton = Key('captureQuickAdd_submitButton');
+
+  /// Key used to locate the voice capture button.
+  static const Key voiceCaptureButton = Key('captureQuickAdd_voiceCaptureButton');
 }
 
 /// Intent for submitting the capture form via keyboard shortcut.
@@ -124,16 +127,31 @@ class _CaptureQuickAddSheetState extends ConsumerState<CaptureQuickAddSheet> {
                       onSubmitted: (_) => _submit(),
                     ),
                     const SizedBox(height: 12),
-                    FilledButton(
-                      key: CaptureQuickAddSheetKeys.submitButton,
-                      onPressed: isSubmitDisabled ? null : _submit,
-                      child: isSubmitting
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Text('Add'),
+                    Row(
+                      children: <Widget>[
+                        IconButton(
+                          key: CaptureQuickAddSheetKeys.voiceCaptureButton,
+                          onPressed: () {
+                            // TODO: Implement voice capture functionality
+                          },
+                          icon: const Icon(Icons.mic),
+                          tooltip: 'Voice capture',
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: FilledButton(
+                            key: CaptureQuickAddSheetKeys.submitButton,
+                            onPressed: isSubmitDisabled ? null : _submit,
+                            child: isSubmitting
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  )
+                                : const Text('Add'),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 );
