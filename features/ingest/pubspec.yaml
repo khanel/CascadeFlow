@@ -22,6 +22,7 @@ dependencies:
   hive_ce: ^2.14.0
   meta: ^1.11.0
   riverpod: ^3.0.1
+  speech_to_text: ^6.3.0
 
 dev_dependencies:
   flutter_test:

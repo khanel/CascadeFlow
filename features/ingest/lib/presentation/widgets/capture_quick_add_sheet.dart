@@ -3,6 +3,7 @@ import 'package:cascade_flow_ingest/presentation/providers/capture_providers.dar
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 
 /// Keys exposed for widget tests interacting with the quick add sheet.
 abstract final class CaptureQuickAddSheetKeys {
@@ -42,6 +43,18 @@ class CaptureQuickAddSheet extends ConsumerStatefulWidget {
 
 class _CaptureQuickAddSheetState extends ConsumerState<CaptureQuickAddSheet> {
   final TextEditingController _contentController = TextEditingController();
+  final SpeechToText _speechToText = SpeechToText();
+  bool _isListening = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initSpeech();
+  }
+
+  void _initSpeech() {
+    _speechToText.initialize();
+  }
 
   @override
   void dispose() {
@@ -133,10 +146,8 @@ class _CaptureQuickAddSheetState extends ConsumerState<CaptureQuickAddSheet> {
                       children: <Widget>[
                         IconButton(
                           key: CaptureQuickAddSheetKeys.voiceCaptureButton,
-                          onPressed: () {
-                            // TODO(implement): Implement voice capture functionality
-                          },
-                          icon: const Icon(Icons.mic),
+                          onPressed: _isListening ? null : _startListening,
+                          icon: Icon(_isListening ? Icons.mic_off : Icons.mic),
                           tooltip: 'Voice capture',
                         ),
                         const SizedBox(width: 8),
@@ -182,5 +193,24 @@ class _CaptureQuickAddSheetState extends ConsumerState<CaptureQuickAddSheet> {
 
   void _clear() {
     _contentController.clear();
+  }
+
+  Future<void> _startListening() async {
+    if (!_speechToText.isAvailable) return;
+
+    setState(() => _isListening = true);
+    await _speechToText.listen(
+      onResult: (result) {
+        final recognizedWords = result.recognizedWords;
+        if (recognizedWords.isNotEmpty) {
+          final currentText = _contentController.text;
+          final newText = currentText.isEmpty
+              ? recognizedWords
+              : '$currentText $recognizedWords';
+          _contentController.text = newText;
+        }
+      },
+    );
+    setState(() => _isListening = false);
   }
 }
