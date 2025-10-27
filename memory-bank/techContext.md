@@ -34,8 +34,6 @@
 
 ### Speech Recognition
 - **speech_to_text**: 6.3.0 - Cross-platform speech recognition (Android, iOS, macOS, Windows, web)
-- **sherpa_onnx**: 1.10.39 - Local speech recognition for Linux platforms
-- **record**: 5.1.2 - Audio recording for speech recognition workflows
 
 ### Infrastructure
 - **logger**: 2.6.1 - Structured logging

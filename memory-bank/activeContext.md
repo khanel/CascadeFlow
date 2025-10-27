@@ -154,16 +154,16 @@
 - **Verification**: All tests pass, code is clean and maintainable
 
 ### Voice Capture for Quick-Add Sheet
-- **Status**: ✅ Complete - TDD cycle completed for voice capture functionality with Linux support
+- **Status**: ✅ Complete - TDD cycle completed for voice capture functionality with graceful Linux degradation
 - **RED Phase**: Added failing widget test for voice capture button tap that starts listening and appends transcribed text
 - **GREEN Phase**: Implemented minimal voice capture using speech_to_text package with button state management and text appending
 - **BLUE Phase**: Refactored for code quality with proper linting, formatting, and test verification
-- **Linux Support Added**: Integrated sherpa_onnx package for local speech recognition on Linux platforms where speech_to_text is not supported
-- **Platform Detection**: Added Platform.isLinux detection to conditionally use sherpa_onnx on Linux, speech_to_text on other platforms
-- **Fallback Logic**: Implemented graceful fallback from sherpa_onnx to speech_to_text if initialization fails
-- **Dependencies**: Added sherpa_onnx (^1.10.39) and record (^5.1.2) packages for Linux speech recognition and audio recording
-- **Technical Debt Addressed**: Added voice input capability to improve accessibility and user experience across all platforms
-- **Code Quality Improvements**: Cross-platform speech recognition, proper state management, error handling, and platform abstraction
+- **Linux Support**: Implemented graceful degradation on Linux platforms where speech recognition is not available
+- **Platform Detection**: Added Platform.isLinux detection to disable speech recognition on unsupported platforms
+- **User Experience**: Clear feedback through disabled UI elements and informative tooltips
+- **Cross-Platform**: Full speech recognition on supported platforms (Android, iOS, macOS, Windows, web), disabled on Linux
+- **Technical Debt Addressed**: Added voice input capability with proper platform handling and user feedback
+- **Code Quality Improvements**: Platform-aware initialization, proper state management, error handling, and clean UI
 - **Verification**: All tests pass, code is clean and maintainable, flutter analyze shows 0 issues
 
 ### Capture Domain Status Helpers
