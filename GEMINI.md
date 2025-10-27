@@ -305,7 +305,7 @@ After refactoring changes are done for this cycle, the agent instructs the human
 3. Format changed files
    - Run `dart format` for all files modified in this cycle.
    - Example (changed-files only): use your VCS to list changed files and pass them to `dart format`.
-   - Acceptable fallback: `dart format .` to format the repository if changed-file targeting is impractical.
+   - Acceptable fallback: `molos exec -- dart format .` to format the repository if changed-file targeting is impractical.
 
 The agent provides the specific commands to run and explains what success looks like at each step.
 
