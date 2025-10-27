@@ -144,6 +144,15 @@
 - Enhanced filter store with constants, improved serialization, and robust error handling
 - Followed TDD cycle: tests first (failing tests for presets), then implementation, then refactoring with error handling
 
+### Keyboard Shortcuts for Quick-Add Sheet
+- **Status**: ✅ Complete - TDD cycle completed for keyboard shortcuts
+- **RED Phase**: Added failing tests for Ctrl+Enter submission and Escape clearing functionality
+- **GREEN Phase**: Implemented shortcuts using Flutter's Shortcuts/Actions/Focus widgets with minimal code to make tests pass
+- **BLUE Phase**: Refactored for code quality, ran analyze (0 issues), formatted code, and verified all tests pass
+- **Technical Debt Addressed**: Enhanced user experience with keyboard shortcuts for power users
+- **Code Quality Improvements**: Added intent-based architecture for extensibility, proper focus management
+- **Verification**: All tests pass, code is clean and maintainable
+
 ### Capture Domain Status Helpers
 - `CaptureItem` exposes `isInbox`, `isFiled`, and `isArchived` getters to reduce direct status comparisons throughout the domain layer
 - Filing workflow implemented via `FileCaptureItem` use case, transitioning items to the new `CaptureStatus.filed` state while emitting `CaptureItemFiled` events
@@ -215,7 +224,7 @@
 ## Next Steps
 
 ### Immediate Priorities
-1. Complete ingest feature implementation
+1. Complete ingest feature implementation (keyboard shortcuts completed)
 2. Establish focus session management
 3. Implement review workflow foundation
 4. Add comprehensive testing coverage

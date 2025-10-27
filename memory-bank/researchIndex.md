@@ -46,6 +46,56 @@ For every research effort, add or update an entry using the following structure 
 
 ## Entries
 
+### Topic: Flutter Keyboard Shortcuts for Text Input Submission
+- Feature / Area: Ingest › Presentation Layer › CaptureQuickAddSheet
+- Last Updated: 2025-10-27
+- References:
+  - Cite this entry in phase notes as "researchIndex.md › Flutter Keyboard Shortcuts for Text Input Submission"
+
+#### RED Guidance
+- Summary:
+  - Focus tests on verifying that keyboard shortcuts trigger the expected actions (e.g., Ctrl+Enter submits, Escape clears) without relying on UI interactions.
+  - Plan for integration with existing TextField onSubmitted behavior to avoid conflicts.
+- Key Practices:
+  - Use widget tests with simulateKeyDownEvent to trigger shortcuts and assert state changes.
+  - Test one shortcut at a time to isolate behavior and ensure clear failure messages.
+  - Mock the controller provider to verify shortcut-triggered submissions.
+- Source Index:
+  - [Add Keyboard Shortcuts to Your Flutter App (No Plugins Needed)](https://dartfoundry.com/add-keyboard-shortcuts-to-your-flutter-app-no-plugins-needed/) — Comprehensive guide on Shortcuts, Actions, and Focus widgets for implementing keyboard shortcuts.
+  - [User input & accessibility - Flutter Documentation](https://docs.flutter.dev/ui/adaptive-responsive/input) — Official docs on Shortcuts widget for applying keyboard shortcuts to widget trees.
+  - [How to handle keyboard shortcuts - flutter - Stack Overflow](https://stackoverflow.com/questions/61960260/how-to-handle-keyboard-shortcuts) — Community examples of handling Ctrl+I and similar shortcuts in Flutter web apps.
+- Reuse Notes:
+  - Revisit when adding more shortcuts or when implementing shortcuts in other UI components; otherwise reuse for similar text input shortcut implementations.
+
+#### GREEN Guidance
+- Summary:
+  - Implement shortcuts using Shortcuts widget wrapping the sheet, with Actions for handling intents, and ensure Focus is properly managed.
+  - Keep implementation minimal to pass tests, avoiding over-engineering.
+- Key Practices:
+  - Wrap the sheet in Shortcuts with LogicalKeySet for Ctrl+Enter and Escape.
+  - Use CallbackAction to trigger submission or clearing on shortcut activation.
+  - Ensure shortcuts don't interfere with existing TextField behavior.
+- Source Index:
+  - [Add Keyboard Shortcuts to Your Flutter App (No Plugins Needed)](https://dartfoundry.com/add-keyboard-shortcuts-to-your-flutter-app-no-plugins-needed/) — Step-by-step example of wiring Shortcuts, Actions, and Focus.
+  - [Easy Keyboard Shortcuts in Flutter Desktop Apps](https://medium.com/@pmutisya/easy-keyboard-shortcuts-in-flutter-desktop-apps-498862b56b17) — Minimal boilerplate approach for adding shortcuts with descriptive text.
+  - [Handling user input - Flutter Documentation](https://docs.flutter.dev/get-started/fundamentals/user-input) — Details on TextField onSubmitted and keyboard event handling.
+- Reuse Notes:
+  - Apply when implementing shortcuts in other forms or dialogs; guidance applies to Flutter's built-in shortcut system.
+
+#### BLUE Guidance
+- Summary:
+  - Refactor shortcut implementation for clarity, remove duplication, and ensure consistent code style while preserving behavior.
+  - Update tests if needed for better readability and coverage.
+- Key Practices:
+  - Extract shortcut definitions into constants for maintainability.
+  - Ensure Actions are properly scoped and don't leak focus.
+  - Run tests after each change to maintain passing state.
+- Source Index:
+  - [Effective Dart: Design](https://dart.dev/effective-dart/design) — Guidelines for intent-revealing names and API design in shortcut implementations.
+  - [Refactoring.Guru](https://refactoring.guru/refactoring/what-is-refactoring) — General refactoring principles for improving code without changing behavior.
+- Reuse Notes:
+  - Use during future refactors of input handling or when adding accessibility features; remove if shortcuts are removed from the feature.
+
 ### Topic: Ingest Data Layer Result Wrapping
 - Feature / Area: Ingest › Data Layer › Hive persistence
 - Last Updated: 2024-11-24

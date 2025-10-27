@@ -61,6 +61,7 @@
 - ✅ Enhanced `CaptureInboxFilterStore` with preset functionality and error handling
 - ✅ Added comprehensive tests for filter presets following TDD cycle
 - ✅ Blue-phase refactor cleaned storage overrides/test harness helpers without altering behaviour
+- ✅ Implemented keyboard shortcuts for quick-add sheet (Ctrl+Enter to submit, Escape to clear)
 
 ### Testing
 - ✅ Provider tests cover `CaptureQuickEntryController` success and failure flows
@@ -139,8 +140,8 @@
   - ✅ Add data migration helpers.
   - ✅ Complete TDD cycle for `CaptureMigrationHelper` with RED, GREEN, and BLUE phases.
   - ✅ Refactor migration helper for improved code quality, documentation, and naming.
-- ⏳ **Ingest Presentation Layer (Medium Priority):**
-    - Implement keyboard shortcuts for the quick-add sheet.
+### Ingest Presentation Layer (Medium Priority):**
+    - ✅ Implement keyboard shortcuts for the quick-add sheet.
     - Add a voice capture stub to the UI.
     - Implement golden tests for UI consistency.
 - ⏳ **Ingest Domain Layer (Low Priority):**
