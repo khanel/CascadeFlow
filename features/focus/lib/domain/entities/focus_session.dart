@@ -32,6 +32,7 @@ class FocusSession {
     this.startedAt,
     this.pausedAt,
     this.completedAt,
+    this.cancelledAt,
     int? totalPausedMinutes,
   }) : totalPausedMinutes = totalPausedMinutes ?? 0,
        assert(durationMinutes > 0, 'Duration must be positive');
@@ -56,6 +57,9 @@ class FocusSession {
 
   /// When the session was completed
   final DateTime? completedAt;
+
+  /// When the session was cancelled
+  final DateTime? cancelledAt;
 
   /// Total minutes the session has been paused
   final int totalPausedMinutes;
@@ -105,6 +109,17 @@ class FocusSession {
     );
   }
 
+  /// Cancels the session
+  FocusSession cancel() {
+    if (status == FocusSessionStatus.completed || status == FocusSessionStatus.cancelled) {
+      throw StateError('Cannot cancel a session that is already completed or cancelled.');
+    }
+    return copyWith(
+      status: FocusSessionStatus.cancelled,
+      cancelledAt: clock.now(),
+    );
+  }
+
   /// Calculates remaining minutes based on current status and elapsed time
   int get remainingMinutes {
     switch (status) {
@@ -136,6 +151,7 @@ class FocusSession {
     DateTime? startedAt,
     DateTime? pausedAt,
     DateTime? completedAt,
+    DateTime? cancelledAt,
     int? totalPausedMinutes,
   }) {
     return FocusSession(
@@ -146,6 +162,7 @@ class FocusSession {
       startedAt: startedAt ?? this.startedAt,
       pausedAt: pausedAt ?? this.pausedAt,
       completedAt: completedAt ?? this.completedAt,
+      cancelledAt: cancelledAt ?? this.cancelledAt,
       totalPausedMinutes: totalPausedMinutes ?? this.totalPausedMinutes,
     );
   }
@@ -161,6 +178,7 @@ class FocusSession {
         other.startedAt == startedAt &&
         other.pausedAt == pausedAt &&
         other.completedAt == completedAt &&
+        other.cancelledAt == cancelledAt &&
         other.totalPausedMinutes == totalPausedMinutes;
   }
 
@@ -174,6 +192,7 @@ class FocusSession {
       startedAt,
       pausedAt,
       completedAt,
+      cancelledAt,
       totalPausedMinutes,
     );
   }
