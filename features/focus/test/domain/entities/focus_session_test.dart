@@ -1,7 +1,7 @@
 import 'package:cascade_flow_core/cascade_flow_core.dart';
+import 'package:cascade_flow_focus/focus.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:cascade_flow_focus/focus.dart';
 
 void main() {
   group('FocusSession', () {
@@ -78,7 +78,8 @@ void main() {
           // Act - Advance time to session completion (90 minutes)
           async.elapse(const Duration(minutes: 90));
 
-          // Simulate completion check (would be triggered by timer in real implementation)
+          // Simulate completion check
+          // (would be triggered by timer in real implementation)
           final completedSession = session.complete();
 
           // Assert
@@ -108,7 +109,8 @@ void main() {
           expect(pausedSession.status, equals(FocusSessionStatus.paused));
           expect(pausedSession.remainingMinutes, equals(75)); // 90 - 15
 
-          // Advance time by 10 minutes while paused (should not affect remaining time)
+          // Advance time by 10 minutes while paused
+          //(should not affect remaining time)
           async.elapse(const Duration(minutes: 10));
 
           // Act - Resume session
@@ -116,7 +118,10 @@ void main() {
 
           // Assert
           expect(resumedSession.status, equals(FocusSessionStatus.active));
-          expect(resumedSession.remainingMinutes, equals(75)); // Still 75, pause time ignored
+          expect(
+            resumedSession.remainingMinutes,
+            equals(75),
+          ); // Still 75, pause time ignored
         });
       },
     );

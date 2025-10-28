@@ -32,8 +32,9 @@ class FocusSession {
     this.startedAt,
     this.pausedAt,
     this.completedAt,
-    this.totalPausedMinutes = 0,
-  }) : assert(durationMinutes > 0, 'Duration must be positive');
+    int? totalPausedMinutes,
+  }) : totalPausedMinutes = totalPausedMinutes ?? 0,
+       assert(durationMinutes > 0, 'Duration must be positive');
 
   /// Unique identifier for the session
   final EntityId id;
@@ -89,7 +90,6 @@ class FocusSession {
     final pausedDuration = clock.now().difference(pausedAt!);
     return copyWith(
       status: FocusSessionStatus.active,
-      pausedAt: null,
       totalPausedMinutes: totalPausedMinutes + pausedDuration.inMinutes,
     );
   }
@@ -180,6 +180,7 @@ class FocusSession {
 
   @override
   String toString() {
-    return 'FocusSession(id: $id, title: $title, duration: ${durationMinutes}min, status: $status)';
+    return 'FocusSession(id: $id, title: $title, '
+        'duration: ${durationMinutes}min, status: $status)';
   }
 }
