@@ -174,5 +174,23 @@ void main() {
         });
       },
     );
+
+    test(
+      'should transition to cancelled when cancelled',
+      () {
+        // Arrange
+        final session = FocusSession(
+          id: EntityId('test-id'),
+          title: 'Deep Work Session',
+        ).start();
+
+        // Act
+        final cancelledSession = session.cancel();
+
+        // Assert
+        expect(cancelledSession.status, equals(FocusSessionStatus.cancelled));
+        expect(cancelledSession.cancelledAt, isNotNull);
+      },
+    );
   });
 }
