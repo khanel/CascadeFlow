@@ -66,9 +66,7 @@ class FocusSession {
 
   /// Starts the focus session
   FocusSession start() {
-    if (status != FocusSessionStatus.scheduled) {
-      throw StateError('Can only start scheduled sessions');
-    }
+    _validateState('start', [FocusSessionStatus.scheduled]);
     return copyWith(
       status: FocusSessionStatus.active,
       startedAt: clock.now(),
@@ -77,9 +75,7 @@ class FocusSession {
 
   /// Pauses the active session
   FocusSession pause() {
-    if (status != FocusSessionStatus.active) {
-      throw StateError('Can only pause active sessions');
-    }
+    _validateState('pause', [FocusSessionStatus.active]);
     return copyWith(
       status: FocusSessionStatus.paused,
       pausedAt: clock.now(),
@@ -88,9 +84,7 @@ class FocusSession {
 
   /// Resumes a paused session
   FocusSession resume() {
-    if (status != FocusSessionStatus.paused) {
-      throw StateError('Can only resume paused sessions');
-    }
+    _validateState('resume', [FocusSessionStatus.paused]);
     final pausedDuration = clock.now().difference(pausedAt!);
     return copyWith(
       status: FocusSessionStatus.active,
@@ -100,9 +94,7 @@ class FocusSession {
 
   /// Completes the session
   FocusSession complete() {
-    if (status != FocusSessionStatus.active) {
-      throw StateError('Can only complete active sessions');
-    }
+    _validateState('complete', [FocusSessionStatus.active]);
     return copyWith(
       status: FocusSessionStatus.completed,
       completedAt: clock.now(),
@@ -111,9 +103,11 @@ class FocusSession {
 
   /// Cancels the session
   FocusSession cancel() {
-    if (status == FocusSessionStatus.completed || status == FocusSessionStatus.cancelled) {
-      throw StateError('Cannot cancel a session that is already completed or cancelled.');
-    }
+    _validateState('cancel', [
+      FocusSessionStatus.scheduled,
+      FocusSessionStatus.active,
+      FocusSessionStatus.paused,
+    ]);
     return copyWith(
       status: FocusSessionStatus.cancelled,
       cancelledAt: clock.now(),
@@ -201,5 +195,14 @@ class FocusSession {
   String toString() {
     return 'FocusSession(id: $id, title: $title, '
         'duration: ${durationMinutes}min, status: $status)';
+  }
+
+  void _validateState(String action, List<FocusSessionStatus> expectedStates) {
+    if (!expectedStates.contains(status)) {
+      throw StateError(
+        'Cannot $action a session with status $status. '
+        'Expected one of: $expectedStates',
+      );
+    }
   }
 }
