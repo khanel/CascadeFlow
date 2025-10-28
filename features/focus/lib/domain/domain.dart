@@ -1,1 +1,2 @@
-// TODO(khanel): replace placeholders with real exports once implemented.
+// Domain exports
+export 'entities/focus_session.dart';
